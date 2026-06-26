@@ -3,13 +3,20 @@ import mdx from '@astrojs/mdx';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
-    site: 'https://example.com',
+    site: 'https://marksmccann.github.io',
     base: '/facilis',
     integrations: [
         starlight({
             title: 'Facilis',
             description:
                 'Framework-agnostic input formatting built around reusable formats and thin adapters.',
+            social: [
+                {
+                    icon: 'github',
+                    label: 'GitHub',
+                    href: 'https://github.com/marksmccann/facilis',
+                },
+            ],
             sidebar: [
                 {
                     label: 'Introduction',
@@ -18,6 +25,10 @@ export default defineConfig({
                         { label: 'Vision', slug: 'vision' },
                         { label: 'Mental Model', slug: 'mental-model' },
                     ],
+                },
+                {
+                    label: 'Demos',
+                    items: [{ label: 'Demo App', slug: 'demo-app' }],
                 },
                 {
                     label: 'Packages',
