@@ -1,0 +1,48 @@
+---
+title: Overview
+slug: ''
+description: Facilis is a framework-agnostic formatting library built around reusable formats and thin adapters.
+template: splash
+hero:
+  title: Facilis
+  tagline: Reusable input formats for HTML, frameworks, and everything in between.
+  actions:
+    - text: Read the Vision
+      link: /facilis/vision/
+      variant: primary
+    - text: Explore the Mental Model
+      link: /facilis/mental-model/
+      variant: secondary
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+## Why Facilis?
+
+Facilis is being designed as a formatting core that stays independent from any
+specific rendering framework, browser event model, or input component library.
+
+## What this monorepo includes
+
+<CardGrid>
+    <LinkCard
+        title="Core Package"
+        description="The published package placeholder that will grow into the core runtime."
+        href="/facilis/packages/core/"
+    />
+    <LinkCard
+        title="Docs App"
+        description="The Starlight documentation site that will ship alongside the package."
+        href="/facilis/packages/docs/"
+    />
+    <LinkCard
+        title="Vision"
+        description="The product direction and API philosophy behind Facilis."
+        href="/facilis/vision/"
+    />
+    <LinkCard
+        title="Mental Model"
+        description="The key ideas shaping formats, adapters, and semantic runtime operations."
+        href="/facilis/mental-model/"
+    />
+</CardGrid>

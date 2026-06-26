@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+  "npmClient": "npm",
+  "packages": [
+    "packages/*",
+    "apps/*"
+  ],
+  "version": "0.0.1",
+  "command": {
+    "version": {
+      "conventionalCommits": true,
+      "changelog": true,
+      "message": "chore(release): publish %s",
+      "push": false
+    }
+  }
+}

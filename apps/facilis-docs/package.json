@@ -1,0 +1,19 @@
+{
+  "name": "facilis-docs",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "description": "Facilis documentation site",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "test": "node -e \"console.log('facilis-docs: no tests defined yet')\"",
+    "test:watch": "node -e \"console.log('facilis-docs: no watch tests defined yet')\""
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^6.0.2",
+    "@astrojs/starlight": "^0.39.3",
+    "astro": "^6.4.4"
+  }
+}

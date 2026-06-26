@@ -1,0 +1,46 @@
+{
+  "name": "facilis-monorepo",
+  "private": true,
+  "type": "module",
+  "description": "Monorepo for the Facilis formatting core and documentation site.",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "lerna run build",
+    "dev": "lerna run dev",
+    "start:docs": "npm run dev -w facilis-docs",
+    "test": "lerna run test",
+    "test:watch": "lerna run test:watch",
+    "prerelease": "lerna run test --no-private && lerna run build --no-private",
+    "release": "lerna version",
+    "postrelease": "lerna publish from-git && git push --follow-tags",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "commit": "cz",
+    "prepare": "husky"
+  },
+  "keywords": [
+    "facilis",
+    "format",
+    "input",
+    "formatter",
+    "monorepo"
+  ],
+  "license": "MIT",
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.4.2",
+    "@commitlint/config-conventional": "^20.4.2",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
+    "husky": "^9.1.7",
+    "lerna": "^9.0.0",
+    "prettier": "^3.0.0"
+  }
+}

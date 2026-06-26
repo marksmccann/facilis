@@ -1,0 +1,28 @@
+{
+  "name": "facilis",
+  "version": "0.0.1",
+  "description": "A framework-agnostic input formatting library.",
+  "type": "module",
+  "main": "./index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "files": [
+    "index.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node -e \"console.log('facilis: no build step defined yet')\"",
+    "test": "node -e \"console.log('facilis: no tests defined yet')\"",
+    "test:watch": "node -e \"console.log('facilis: no watch tests defined yet')\""
+  },
+  "keywords": [
+    "facilis",
+    "format",
+    "input",
+    "mask",
+    "formatter"
+  ],
+  "license": "MIT"
+}
