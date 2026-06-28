@@ -4,11 +4,16 @@
   "description": "A framework-agnostic input formatting library.",
   "type": "module",
   "main": "./index.js",
+  "types": "./src/index.ts",
   "exports": {
-    ".": "./index.js"
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./index.js"
+    }
   },
   "files": [
     "index.js",
+    "src",
     "README.md",
     "LICENSE"
   ],

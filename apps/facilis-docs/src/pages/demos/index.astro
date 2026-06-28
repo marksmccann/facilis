@@ -1,0 +1,105 @@
+---
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Facilis Demo Prototype</title>
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                padding: 2rem;
+                background: #f7f4ee;
+                font-family: Georgia, 'Times New Roman', serif;
+            }
+
+            main {
+                width: min(32rem, 100%);
+                margin: 0 auto;
+                padding: 1.5rem;
+                border: 1px solid #d5dbdf;
+                border-radius: 24px;
+                background: #fffdf8;
+            }
+
+            .stack {
+                display: grid;
+                gap: 1.25rem;
+            }
+
+            .label {
+                display: block;
+                margin-bottom: 0.65rem;
+                font: 700 0.76rem/1.2 ui-sans-serif, system-ui, sans-serif;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: #5b6773;
+            }
+
+            .field {
+                width: 100%;
+                padding: 1rem 1.1rem;
+                border: 1px solid #d5dbdf;
+                border-radius: 16px;
+                background: #fff;
+                color: #17324a;
+                font: inherit;
+                font-size: 1.15rem;
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <div class="stack">
+                <div>
+                    <label class="label" for="pattern-input"
+                        >Pattern Format</label
+                    >
+                    <input
+                        class="field"
+                        id="pattern-input"
+                        data-facilis-pattern-input
+                        type="text"
+                        placeholder="Type a phone number"
+                    />
+                </div>
+
+                <div>
+                    <label class="label" for="numeric-input"
+                        >Numeric Format</label
+                    >
+                    <input
+                        class="field"
+                        id="numeric-input"
+                        data-facilis-numeric-input
+                        type="text"
+                        placeholder="Numeric format coming next"
+                    />
+                </div>
+
+                <div>
+                    <label class="label" for="date-input">Date Format</label>
+                    <input
+                        class="field"
+                        id="date-input"
+                        data-facilis-date-input
+                        type="text"
+                        placeholder="Type a date"
+                    />
+                </div>
+            </div>
+        </main>
+
+        <script>
+            import { mountPrototypeDemo } from '../../demo/mountPrototypeDemo.ts';
+
+            mountPrototypeDemo();
+        </script>
+    </body>
+</html>

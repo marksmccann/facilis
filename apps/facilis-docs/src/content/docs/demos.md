@@ -11,6 +11,11 @@ experiments can share the same deployment target.
 
 The current demo entrypoint is available at `/facilis/demos/`.
 
+## Current focus
+
+The first pass is a browser-testable prototype page that imports TypeScript
+source modules directly from the `facilis` package workspace.
+
 ## Why this setup
 
 - It matches the deployment shape already used in `ornata`.
