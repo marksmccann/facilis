@@ -1,8 +1,20 @@
 import type { Facilis } from './types';
 
 /**
- * Finds the selection position within the normalized value by matching the
- * meaningful characters before the raw cursor position.
+ * Counts the meaningful characters in a value.
+ */
+function countMeaningfulCharacters(
+    value: string,
+    isMeaningfulCharacter: (context: { character: string }) => boolean
+): number {
+    return value
+        .split('')
+        .filter((character) => isMeaningfulCharacter({ character })).length;
+}
+
+/**
+ * Finds the selection position within the normalized value by preserving the
+ * count of meaningful characters before the raw cursor position.
  */
 function getNormalizedSelectionPosition(
     rawValue: string,
@@ -10,39 +22,19 @@ function getNormalizedSelectionPosition(
     normalizedValue: string,
     isMeaningfulCharacter: (context: { character: string }) => boolean
 ): number {
-    const meaningfulPrefix = rawValue
-        .slice(0, rawSelectionPosition)
-        .split('')
-        .filter((character) => isMeaningfulCharacter({ character }));
+    const meaningfulPrefixCount = countMeaningfulCharacters(
+        rawValue.slice(0, rawSelectionPosition),
+        isMeaningfulCharacter
+    );
 
-    if (meaningfulPrefix.length === 0) {
+    if (meaningfulPrefixCount === 0) {
         return 0;
     }
 
-    let matchedCount = 0;
-    let normalizedSelectionPosition = 0;
-
-    for (
-        let currentIndex = 0;
-        currentIndex < normalizedValue.length;
-        currentIndex += 1
-    ) {
-        const character = normalizedValue[currentIndex];
-
-        if (isMeaningfulCharacter({ character })) {
-            normalizedSelectionPosition += 1;
-
-            if (character === meaningfulPrefix[matchedCount]) {
-                matchedCount += 1;
-
-                if (matchedCount === meaningfulPrefix.length) {
-                    return normalizedSelectionPosition;
-                }
-            }
-        }
-    }
-
-    return normalizedSelectionPosition;
+    return Math.min(
+        meaningfulPrefixCount,
+        countMeaningfulCharacters(normalizedValue, isMeaningfulCharacter)
+    );
 }
 
 /**

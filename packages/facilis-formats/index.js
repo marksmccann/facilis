@@ -1,1 +1,1 @@
-export { formatsPlaceholder } from './src/index.ts';
+export { pattern } from './src/pattern.ts';

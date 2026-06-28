@@ -1,5 +1,6 @@
 import { defineFormat } from '../../../../packages/facilis/src/index.ts';
 import { bind } from '../../../../packages/facilis-dom/src/index.ts';
+import { pattern } from '../../../../packages/facilis-formats/src/index.ts';
 
 export function mountPrototypeDemo() {
     const patternInput = document.querySelector(
@@ -15,29 +16,6 @@ export function mountPrototypeDemo() {
     if (!patternInput || !numericInput || !dateInput) {
         return;
     }
-
-    const patternFormat = defineFormat({
-        name: 'pattern',
-        isMeaningfulCharacter({ character }) {
-            return /\d/.test(character);
-        },
-        normalizeValue({ rawValue }) {
-            return rawValue.replace(/[^\d]/g, '');
-        },
-        formatValue({ normalizedValue }) {
-            const value = normalizedValue.slice(0, 10);
-
-            if (value.length === 0) return '';
-
-            const area = value.slice(0, 3);
-            const prefix = value.slice(3, 6);
-            const line = value.slice(6, 10);
-
-            if (value.length <= 3) return `(${area}`;
-            if (value.length <= 6) return `(${area}) ${prefix}`;
-            return `(${area}) ${prefix}-${line}`;
-        },
-    });
 
     const numericFormat = defineFormat({
         name: 'numeric',
@@ -154,7 +132,7 @@ export function mountPrototypeDemo() {
         },
     });
 
-    bind(patternInput, patternFormat());
+    bind(patternInput, pattern('(###) ###-####'));
     bind(numericInput, numericFormat());
     bind(dateInput, dateFormat());
 }
