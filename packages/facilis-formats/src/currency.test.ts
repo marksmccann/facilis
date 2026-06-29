@@ -3,7 +3,7 @@ import { applyBlur, applyInput, typeCharacters } from 'facilis-testing';
 import { currency } from './currency';
 
 describe('currency', () => {
-    it('formats currency while keeping the cursor after each typed digit', () => {
+    it('formats currency with the default symbol while keeping the cursor after each typed digit', () => {
         const format = currency();
 
         expect(typeCharacters(format, '1234567')).toEqual([
@@ -84,6 +84,54 @@ describe('currency', () => {
             formattedValue: '$1,234.50',
             selectionStart: null,
             selectionEnd: null,
+        });
+    });
+
+    it('supports a custom symbol', () => {
+        const format = currency({
+            symbol: '€',
+        });
+
+        expect(
+            applyInput(format, {
+                value: '1234.5',
+            })
+        ).toEqual({
+            formattedValue: '€1,234.5',
+            selectionStart: 8,
+            selectionEnd: 8,
+        });
+    });
+
+    it('supports omitting the symbol', () => {
+        const format = currency({
+            symbol: '',
+        });
+
+        expect(
+            applyInput(format, {
+                value: '1234.5',
+            })
+        ).toEqual({
+            formattedValue: '1,234.5',
+            selectionStart: 7,
+            selectionEnd: 7,
+        });
+    });
+
+    it('supports disabling decimals entirely', () => {
+        const format = currency({
+            cents: 'never',
+        });
+
+        expect(
+            applyInput(format, {
+                value: '1234.56',
+            })
+        ).toEqual({
+            formattedValue: '$1,234',
+            selectionStart: 6,
+            selectionEnd: 6,
         });
     });
 });

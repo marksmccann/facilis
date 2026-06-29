@@ -4,14 +4,16 @@ First-party format definitions for Facilis.
 
 ## `currency`
 
-Create a currency formatter with comma-separated thousands and up to two
-decimal places.
+Create a currency formatter with comma-separated thousands and configurable
+currency symbol and cents behavior.
 
 ```ts
 import { bind } from 'facilis-dom';
 import { currency } from 'facilis-formats';
 
 bind(input, currency());
+bind(input, currency({ symbol: '€' }));
+bind(input, currency({ symbol: '', cents: 'never' }));
 ```
 
 ## `domesticPhoneNumber`

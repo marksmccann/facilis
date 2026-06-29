@@ -86,6 +86,12 @@ export function mountPrototypeDemo() {
 
     bind('[data-facilis-pattern-input]', pattern('(###) ###-####'));
     bind('[data-facilis-domestic-phone-number-input]', domesticPhoneNumber());
-    bind('[data-facilis-currency-input]', currency());
+    bind(
+        '[data-facilis-currency-input]',
+        currency({
+            symbol: '$',
+            cents: 'always',
+        })
+    );
     bind('[data-facilis-date-input]', dateFormat());
 }
