@@ -3,11 +3,18 @@ import {
     resolveSelectionByCharacterMatch,
 } from '../../../../packages/facilis/src/index.ts';
 import { bind } from '../../../../packages/facilis-dom/src/index.ts';
-import { pattern } from '../../../../packages/facilis-formats/src/index.ts';
+import {
+    currency,
+    domesticPhoneNumber,
+    pattern,
+} from '../../../../packages/facilis-formats/src/index.ts';
 
 export function mountPrototypeDemo() {
     const patternInput = document.querySelector(
         '[data-facilis-pattern-input]'
+    ) as HTMLInputElement | null;
+    const domesticPhoneNumberInput = document.querySelector(
+        '[data-facilis-domestic-phone-number-input]'
     ) as HTMLInputElement | null;
     const numericInput = document.querySelector(
         '[data-facilis-numeric-input]'
@@ -16,50 +23,14 @@ export function mountPrototypeDemo() {
         '[data-facilis-date-input]'
     ) as HTMLInputElement | null;
 
-    if (!patternInput || !numericInput || !dateInput) {
+    if (
+        !patternInput ||
+        !domesticPhoneNumberInput ||
+        !numericInput ||
+        !dateInput
+    ) {
         return;
     }
-
-    const numericFormat = defineFormat({
-        name: 'numeric',
-        normalizeValue({ rawValue }) {
-            const cleaned = rawValue.replace(/[^\d.]/g, '');
-            const firstDecimalIndex = cleaned.indexOf('.');
-
-            if (firstDecimalIndex === -1) return cleaned;
-
-            const integerPart = cleaned.slice(0, firstDecimalIndex);
-            const afterFirstDecimal = cleaned.slice(firstDecimalIndex + 1);
-            const fractionalPart = afterFirstDecimal.replace(/\./g, '');
-
-            return `${integerPart}.${fractionalPart.slice(0, 2)}`;
-        },
-        formatValue({ normalizedValue }) {
-            if (normalizedValue === '') return '';
-
-            const hasDecimal = normalizedValue.includes('.');
-            const parts = normalizedValue.split('.');
-            const [integerPart = '', fractionalPart = ''] = parts;
-            const commasRegex = /\B(?=(\d{3})+(?!\d))/g;
-            const formattedInteger = integerPart.replace(commasRegex, ',');
-
-            if (!hasDecimal) return formattedInteger;
-
-            return `${formattedInteger}.${fractionalPart}`;
-        },
-        formatBlurValue({ formattedValue }) {
-            if (formattedValue === '') return '';
-            if (!formattedValue.includes('.')) return `${formattedValue}.00`;
-
-            const parts = formattedValue.split('.');
-            const [integerPart = '', fractionalPart = ''] = parts;
-
-            return `${integerPart}.${fractionalPart.padEnd(2, '0').slice(0, 2)}`;
-        },
-        resolveSelection(context) {
-            return resolveSelectionByCharacterMatch(/[\d.]/, context);
-        },
-    });
 
     const dateFormat = defineFormat({
         name: 'date',
@@ -136,7 +107,8 @@ export function mountPrototypeDemo() {
     });
 
     bind(patternInput, pattern('(###) ###-####'));
-    bind(numericInput, numericFormat());
+    bind(domesticPhoneNumberInput, domesticPhoneNumber());
+    bind(numericInput, currency());
     bind(dateInput, dateFormat());
 }
 
