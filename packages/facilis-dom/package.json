@@ -31,6 +31,10 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "facilis": "0.0.1"
+    "facilis": "0.0.1",
+    "runtime-reporter": "^0.10.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.1"
   }
 }

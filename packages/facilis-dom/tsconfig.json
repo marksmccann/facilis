@@ -6,7 +6,8 @@
         "strict": true,
         "isolatedModules": true,
         "skipLibCheck": true,
-        "allowJs": false
+        "allowJs": false,
+        "types": ["node"]
     },
     "include": ["src/**/*.ts"]
 }

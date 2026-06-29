@@ -10,28 +10,6 @@ import {
 } from '../../../../packages/facilis-formats/src/index.ts';
 
 export function mountPrototypeDemo() {
-    const patternInput = document.querySelector(
-        '[data-facilis-pattern-input]'
-    ) as HTMLInputElement | null;
-    const domesticPhoneNumberInput = document.querySelector(
-        '[data-facilis-domestic-phone-number-input]'
-    ) as HTMLInputElement | null;
-    const numericInput = document.querySelector(
-        '[data-facilis-numeric-input]'
-    ) as HTMLInputElement | null;
-    const dateInput = document.querySelector(
-        '[data-facilis-date-input]'
-    ) as HTMLInputElement | null;
-
-    if (
-        !patternInput ||
-        !domesticPhoneNumberInput ||
-        !numericInput ||
-        !dateInput
-    ) {
-        return;
-    }
-
     const dateFormat = defineFormat({
         name: 'date',
         normalizeValue({ rawValue }) {
@@ -106,42 +84,8 @@ export function mountPrototypeDemo() {
         },
     });
 
-    bind(patternInput, pattern('(###) ###-####'));
-    bind(domesticPhoneNumberInput, domesticPhoneNumber());
-    bind(numericInput, currency());
-    bind(dateInput, dateFormat());
+    bind('[data-facilis-pattern-input]', pattern('(###) ###-####'));
+    bind('[data-facilis-domestic-phone-number-input]', domesticPhoneNumber());
+    bind('[data-facilis-currency-input]', currency());
+    bind('[data-facilis-date-input]', dateFormat());
 }
-
-// if (change.kind === 'insert') {
-//     const { at, inserted, prefix, suffix } = change;
-
-//     // A single number was added to end
-//     if (/^\d$/.test(inserted) && suffix === '') {
-//         if (at === 0) {
-//             return `(${inserted}`;
-//         } else if (at === 4) {
-//             return `${prefix}) ${inserted}`;
-//         } else if (at === 9) {
-//             return `${prefix}-${inserted}`;
-//         } else if (at === 14) {
-//             return before.value;
-//         }
-//     } else {
-//         //
-//     }
-// } else if (change.kind === 'delete') {
-//     const { at, removed, prefix, suffix } = change;
-
-//     // A single number was remove from end
-//     if (/^\d$/.test(removed) && suffix === '') {
-//         if (at === 10) {
-//             return prefix.slice(0, -1);
-//         } else if (at === 6) {
-//             return prefix.slice(0, -2);
-//         } else if (at === 1) {
-//             return prefix.slice(0, -1);
-//         }
-//     } else {
-
-//     }
-// }
