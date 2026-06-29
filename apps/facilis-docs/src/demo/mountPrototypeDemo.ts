@@ -1,4 +1,7 @@
-import { defineFormat } from '../../../../packages/facilis/src/index.ts';
+import {
+    defineFormat,
+    resolveSelectionByCharacterMatch,
+} from '../../../../packages/facilis/src/index.ts';
 import { bind } from '../../../../packages/facilis-dom/src/index.ts';
 import { pattern } from '../../../../packages/facilis-formats/src/index.ts';
 
@@ -19,9 +22,6 @@ export function mountPrototypeDemo() {
 
     const numericFormat = defineFormat({
         name: 'numeric',
-        isMeaningfulCharacter({ character }) {
-            return /[\d.]/.test(character);
-        },
         normalizeValue({ rawValue }) {
             const cleaned = rawValue.replace(/[^\d.]/g, '');
             const firstDecimalIndex = cleaned.indexOf('.');
@@ -56,13 +56,13 @@ export function mountPrototypeDemo() {
 
             return `${integerPart}.${fractionalPart.padEnd(2, '0').slice(0, 2)}`;
         },
+        resolveSelection(context) {
+            return resolveSelectionByCharacterMatch(/[\d.]/, context);
+        },
     });
 
     const dateFormat = defineFormat({
         name: 'date',
-        isMeaningfulCharacter({ character }) {
-            return /\d/.test(character);
-        },
         normalizeValue({ rawValue }) {
             const digits = rawValue.replace(/[^\d]/g, '').slice(0, 8);
 
@@ -129,6 +129,9 @@ export function mountPrototypeDemo() {
         },
         formatValue({ normalizedValue }) {
             return normalizedValue;
+        },
+        resolveSelection(context) {
+            return resolveSelectionByCharacterMatch(/\d/, context);
         },
     });
 

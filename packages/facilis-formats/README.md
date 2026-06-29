@@ -18,13 +18,8 @@ bind(
     pattern({
         pattern: 'AA-####',
         tokens: {
-            A: {
-                matches: /[A-Z]/,
-                transform: ({ character }) => character.toUpperCase(),
-            },
-            '#': {
-                matches: /\d/,
-            },
+            A: { matches: /[A-Z]/ },
+            '#': { matches: /\d/ },
         },
     })
 );
@@ -35,4 +30,4 @@ The preset string form includes:
 - `#` for digits
 - `*` for any character
 
-Use the object form whenever you need custom tokens or token transforms.
+Use the object form whenever you need custom tokens.

@@ -1,19 +1,25 @@
-import type { Facilis } from 'facilis';
+import { defineFormat, type Facilis } from 'facilis';
 import { reporter } from './reporter';
 
+/**
+ * Defines the matching rule for a single token symbol in a pattern format.
+ *
+ * @since 0.0.1
+ */
 export type PatternTokenDefinition = {
     /**
      * Determines whether a raw character can fill this token slot.
      */
     matches: RegExp;
-    /**
-     * Normalizes a matched character before it is stored in the formatted value.
-     */
-    transform?: (context: { character: string }) => string;
 };
 
 export type PatternTokenDefinitions = Record<string, PatternTokenDefinition>;
 
+/**
+ * The explicit configuration object for a pattern format.
+ *
+ * @since 0.0.1
+ */
 export type PatternOptions = {
     /**
      * The pattern string that defines literal characters and token slots.
@@ -25,90 +31,74 @@ export type PatternOptions = {
     tokens: PatternTokenDefinitions;
 };
 
+/**
+ * The accepted input shape for creating a pattern format, either the shorthand
+ * pattern string form or the explicit object form.
+ *
+ * @since 0.0.1
+ */
 export type PatternInput = string | PatternOptions;
 
-type PatternPart =
-    | {
-          literal: string;
-          tokenCountBefore: number;
-      }
-    | {
-          definition: PatternTokenDefinition;
-      };
+/**
+ * Represents one token character entry from the parsed pattern.
+ */
+type PatternTokenPart = {
+    /** Identifies this parsed part as a token entry. */
+    kind: 'token';
+    /** The token symbol used in the original pattern string. */
+    symbol: string;
+    /** The token definition that should consume one normalized character. */
+    definition: PatternTokenDefinition;
+};
 
-type PatternTokenSlot = Extract<PatternPart, { definition: PatternTokenDefinition }>;
+/**
+ * Represents one literal character entry from the parsed pattern.
+ */
+type PatternLiteralPart = {
+    /** Identifies this parsed part as a literal entry. */
+    kind: 'literal';
+    /** The literal character that should appear in the formatted value. */
+    character: string;
+};
 
-const presetTokens = {
-    '#': {
-        matches: /\d/,
-    },
-    '*': {
-        matches: /./,
-    },
-} satisfies PatternTokenDefinitions;
+/**
+ * Describes one ordered part of a parsed pattern, either a token character or
+ * a literal character from the original pattern string.
+ */
+type PatternPart = PatternTokenPart | PatternLiteralPart;
 
-function toPatternOptions(input: PatternInput): PatternOptions {
-    return typeof input === 'string'
-        ? {
-              pattern: input,
-              tokens: presetTokens,
-          }
-        : input;
-}
-
-function getTokenDefinition(
-    character: string,
-    tokens: PatternTokenDefinitions
-) {
-    return tokens[character];
-}
-
-function parsePattern(pattern: string, tokens: PatternTokenDefinitions) {
-    const parts: PatternPart[] = [];
-    const tokenSlots: PatternTokenSlot[] = [];
-    let literal = '';
-    let tokenCountBefore = 0;
-
-    for (const character of pattern) {
-        const definition = getTokenDefinition(character, tokens);
-
-        if (!definition) {
-            literal += character;
-            continue;
-        }
-
-        if (literal !== '') {
-            parts.push({
-                literal,
-                tokenCountBefore,
-            });
-            literal = '';
-        }
-
-        const tokenSlot: PatternTokenSlot = {
-            definition,
+/**
+ * Normalizes the pattern input into the explicit object form, applying the
+ * built-in preset tokens when the shorthand string form is used.
+ */
+function normalizePatternOptions(input: PatternInput): PatternOptions {
+    if (typeof input === 'string') {
+        return {
+            pattern: input,
+            tokens: {
+                '#': { matches: /\d/ },
+                '*': { matches: /./ },
+            },
         };
-        parts.push(tokenSlot);
-        tokenSlots.push(tokenSlot);
-        tokenCountBefore += 1;
     }
 
-    if (literal !== '') {
-        parts.push({
-            literal,
-            tokenCountBefore,
-        });
-    }
-
-    return { parts, tokenSlots };
+    return input;
 }
 
-function assertValidPattern(options: PatternOptions) {
-    if (options.pattern === '') {
+/**
+ * Parses a pattern string into one ordered array of parts, where each entry
+ * describes either a token character or a literal character from the pattern.
+ */
+function parsePattern(options: PatternOptions): PatternPart[] {
+    const { pattern, tokens } = options;
+
+    // Make sure a pattern exists
+    if (pattern === '') {
         reporter.fail('ERR01');
     }
 
-    const tokenSymbols = Object.keys(options.tokens);
+    const patternParts: PatternPart[] = [];
+    const tokenSymbols = Object.keys(tokens);
 
     if (tokenSymbols.length === 0) {
         reporter.fail('ERR02');
@@ -119,155 +109,181 @@ function assertValidPattern(options: PatternOptions) {
             reporter.fail('ERR03');
         }
     }
+
+    for (const character of pattern) {
+        const definition = tokens[character];
+        const isToken = Boolean(definition);
+
+        if (isToken) {
+            const tokenPart: PatternTokenPart = {
+                kind: 'token',
+                symbol: character,
+                definition,
+            };
+
+            patternParts.push(tokenPart);
+        } else {
+            patternParts.push({
+                kind: 'literal',
+                character,
+            });
+        }
+    }
+
+    if (!patternParts.some((part) => part.kind === 'token')) {
+        reporter.fail('ERR04');
+    }
+
+    return patternParts;
 }
 
-function testCharacter(expression: RegExp, character: string) {
-    expression.lastIndex = 0;
-
-    return expression.test(character);
+/**
+ * Returns only the token parts from the parsed pattern.
+ */
+function getTokenParts(patternParts: PatternPart[]): PatternTokenPart[] {
+    return patternParts.filter(
+        (part): part is PatternTokenPart => part.kind === 'token'
+    );
 }
 
-function normalizeValue(
-    rawValue: string,
-    tokenSlots: PatternTokenSlot[]
-) {
+/**
+ * Tests whether a raw character satisfies a token part's matching rule.
+ */
+function characterMatchesToken(tokenPart: PatternTokenPart, character: string) {
+    const { matches } = tokenPart.definition;
+
+    matches.lastIndex = 0;
+
+    return matches.test(character);
+}
+
+/**
+ * Normalizes the raw value by scanning characters left to right and filling
+ * token parts in order with the first matching characters that appear.
+ */
+function normalizeValue(rawValue: string, patternParts: PatternPart[]) {
+    const tokenParts = getTokenParts(patternParts);
     let tokenIndex = 0;
     let normalizedValue = '';
 
     for (const character of rawValue) {
-        const slot = tokenSlots[tokenIndex];
+        const tokenPart = tokenParts[tokenIndex];
 
-        if (!slot) {
-            break;
-        }
+        if (!tokenPart) break;
 
-        if (!testCharacter(slot.definition.matches, character)) {
+        if (!characterMatchesToken(tokenPart, character)) {
             continue;
         }
 
-        normalizedValue +=
-            slot.definition.transform?.({ character }) ?? character;
+        normalizedValue += character;
         tokenIndex += 1;
     }
 
     return normalizedValue;
 }
 
-function shouldIncludeLiteral(
-    normalizedLength: number,
-    tokenCountBefore: number
-) {
-    return tokenCountBefore === 0
-        ? normalizedLength > 0
-        : normalizedLength > tokenCountBefore;
-}
-
-function formatValue(normalizedValue: string, parts: PatternPart[]) {
-    if (normalizedValue === '') {
-        return '';
-    }
+/**
+ * Builds the formatted value by filling token parts from the normalized value
+ * and including literal parts only after their preceding token count has been reached.
+ */
+function formatValue(normalizedValue: string, patternParts: PatternPart[]) {
+    if (normalizedValue === '') return '';
 
     let formattedValue = '';
-    let tokenIndex = 0;
+    let tokenCount = 0;
 
-    for (const part of parts) {
-        if ('literal' in part) {
-            if (
-                shouldIncludeLiteral(
-                    normalizedValue.length,
-                    part.tokenCountBefore
-                )
-            ) {
-                formattedValue += part.literal;
+    for (const part of patternParts) {
+        if (part.kind === 'literal') {
+            // Show a literal only after the user has filled enough
+            // token parts to reach it in the pattern.
+            if (normalizedValue.length > tokenCount) {
+                formattedValue += part.character;
             }
 
             continue;
         }
 
-        const character = normalizedValue[tokenIndex];
+        const character = normalizedValue[tokenCount];
 
-        if (!character) {
-            break;
-        }
+        if (!character) break;
 
         formattedValue += character;
-        tokenIndex += 1;
+        tokenCount += 1;
     }
 
     return formattedValue;
 }
 
-function getNormalizedSelectionPosition(
-    rawValue: string,
-    rawSelectionPosition: number,
-    tokenSlots: PatternTokenSlot[]
-) {
-    let tokenIndex = 0;
-    let normalizedSelectionPosition = 0;
-
-    for (const character of rawValue.slice(0, rawSelectionPosition)) {
-        const slot = tokenSlots[tokenIndex];
-
-        if (!slot) {
-            break;
-        }
-
-        if (!testCharacter(slot.definition.matches, character)) {
-            continue;
-        }
-
-        normalizedSelectionPosition += 1;
-        tokenIndex += 1;
-    }
-
-    return normalizedSelectionPosition;
-}
-
-function getSelectionPosition(
+/**
+ * Counts how many token parts are matched before the raw selection position,
+ * clamped to the normalized value length.
+ */
+function countTokensBeforeSelection(
     rawValue: string,
     rawSelectionPosition: number,
     normalizedValue: string,
-    parts: PatternPart[],
-    tokenSlots: PatternTokenSlot[]
+    patternParts: PatternPart[]
 ) {
-    const targetCount = Math.min(
-        getNormalizedSelectionPosition(
-            rawValue,
-            rawSelectionPosition,
-            tokenSlots
-        ),
-        normalizedValue.length
+    const tokenParts = getTokenParts(patternParts);
+    const rawCharacters = rawValue.slice(0, rawSelectionPosition).split('');
+    let tokenCount = 0;
+
+    for (const character of rawCharacters) {
+        const tokenPart = tokenParts[tokenCount];
+
+        if (!tokenPart) {
+            break;
+        }
+
+        if (!characterMatchesToken(tokenPart, character)) {
+            continue;
+        }
+
+        tokenCount += 1;
+    }
+
+    return Math.min(tokenCount, normalizedValue.length);
+}
+
+/**
+ * Maps the raw selection position to the corresponding position in the
+ * formatted value by counting matched token parts before the selection.
+ */
+function getSelectionPosition(
+    normalizedValue: string,
+    rawValue: string,
+    rawSelectionPosition: number,
+    patternParts: PatternPart[]
+) {
+    const tokensBeforeSelection = countTokensBeforeSelection(
+        rawValue,
+        rawSelectionPosition,
+        normalizedValue,
+        patternParts
     );
 
-    if (targetCount <= 0) {
-        return 0;
-    }
+    if (tokensBeforeSelection <= 0) return 0;
 
     let selectionPosition = 0;
     let tokenCount = 0;
 
-    for (const part of parts) {
-        if ('literal' in part) {
-            if (
-                shouldIncludeLiteral(
-                    normalizedValue.length,
-                    part.tokenCountBefore
-                )
-            ) {
-                selectionPosition += part.literal.length;
+    for (const part of patternParts) {
+        if (part.kind === 'literal') {
+            // Count a visible literal toward the formatted selection position
+            // once the filled token count has progressed past it.
+            if (normalizedValue.length > tokenCount) {
+                selectionPosition += 1;
             }
 
             continue;
         }
 
-        if (tokenCount === targetCount) {
-            break;
-        }
+        if (tokenCount === tokensBeforeSelection) break;
 
         selectionPosition += 1;
         tokenCount += 1;
 
-        if (tokenCount === targetCount) {
+        if (tokenCount === tokensBeforeSelection) {
             return selectionPosition;
         }
     }
@@ -283,46 +299,32 @@ function getSelectionPosition(
 export function pattern(input: string): Facilis.FormatInstance;
 export function pattern(input: PatternOptions): Facilis.FormatInstance;
 export function pattern(input: PatternInput): Facilis.FormatInstance {
-    const options = toPatternOptions(input);
-    assertValidPattern(options);
-    const { parts, tokenSlots } = parsePattern(options.pattern, options.tokens);
+    const patternOptions = normalizePatternOptions(input);
+    const patternParts = parsePattern(patternOptions);
 
-    if (tokenSlots.length === 0) {
-        reporter.fail('ERR04');
-    }
-
-    return {
+    return defineFormat({
         name: 'pattern',
-        onInput(options) {
-            const normalizedValue = normalizeValue(options.value, tokenSlots);
-            const formattedValue = formatValue(normalizedValue, parts);
-
+        normalizeValue({ rawValue }) {
+            return normalizeValue(rawValue, patternParts);
+        },
+        formatValue({ normalizedValue }) {
+            return formatValue(normalizedValue, patternParts);
+        },
+        resolveSelection(context) {
             return {
-                formattedValue,
                 selectionStart: getSelectionPosition(
-                    options.value,
-                    options.selectionStart ?? 0,
-                    normalizedValue,
-                    parts,
-                    tokenSlots
+                    context.normalizedValue,
+                    context.rawValue,
+                    context.rawSelectionStart,
+                    patternParts
                 ),
                 selectionEnd: getSelectionPosition(
-                    options.value,
-                    options.selectionEnd ?? 0,
-                    normalizedValue,
-                    parts,
-                    tokenSlots
+                    context.normalizedValue,
+                    context.rawValue,
+                    context.rawSelectionEnd,
+                    patternParts
                 ),
             };
         },
-        onBlur(options) {
-            const normalizedValue = normalizeValue(options.value, tokenSlots);
-
-            return {
-                formattedValue: formatValue(normalizedValue, parts),
-                selectionStart: null,
-                selectionEnd: null,
-            };
-        },
-    };
+    })();
 }

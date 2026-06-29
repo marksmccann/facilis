@@ -7,4 +7,11 @@ const messages = {
     ERR04: 'Pattern formats require the pattern string to include at least one token.',
 } as const;
 
-export const reporter = createReporter(messages);
+export const reporter = createReporter(
+    process.env.NODE_ENV === 'production' ? ({} as typeof messages) : messages,
+    {
+        formatMessage(message, code) {
+            return `[facilis-formats] ${code}: ${message}`;
+        },
+    }
+);

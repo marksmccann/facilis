@@ -1,13 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { applyBlur, applyInput } from 'facilis-testing';
 import { defineFormat } from './defineFormat';
+import { resolveSelectionByCharacterMatch } from './resolveSelectionByCharacterMatch';
 
 function createPhoneLikeFormat() {
     return defineFormat({
         name: 'phone-like',
-        isMeaningfulCharacter({ character }) {
-            return /\d/.test(character);
-        },
         normalizeValue({ rawValue }) {
             return rawValue.replace(/[^\d]/g, '').slice(0, 6);
         },
@@ -27,6 +25,9 @@ function createPhoneLikeFormat() {
         },
         formatBlurValue({ formattedValue }) {
             return formattedValue === '' ? '' : `${formattedValue}!`;
+        },
+        resolveSelection(context) {
+            return resolveSelectionByCharacterMatch(/\d/, context);
         },
     })();
 }
@@ -113,14 +114,14 @@ describe('defineFormat', () => {
     it('creates isolated instances from the same factory', () => {
         const createFormat = defineFormat({
             name: 'identity',
-            isMeaningfulCharacter({ character }) {
-                return /[a-z]/i.test(character);
-            },
             normalizeValue({ rawValue }) {
                 return rawValue.toUpperCase();
             },
             formatValue({ normalizedValue }) {
                 return normalizedValue;
+            },
+            resolveSelection(context) {
+                return resolveSelectionByCharacterMatch(/[a-z]/i, context);
             },
         });
 

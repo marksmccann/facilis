@@ -86,13 +86,12 @@ describe('pattern', () => {
         );
     });
 
-    it('supports custom tokens and token transforms', () => {
+    it('supports custom tokens', () => {
         const format = pattern({
             pattern: 'AA-##',
             tokens: {
                 A: {
                     matches: /[a-z]/i,
-                    transform: ({ character }) => character.toUpperCase(),
                 },
                 '#': {
                     matches: /\d/,
@@ -107,7 +106,7 @@ describe('pattern', () => {
                 selectionEnd: 4,
             })
         ).toEqual({
-            formattedValue: 'AB-12',
+            formattedValue: 'ab-12',
             selectionStart: 5,
             selectionEnd: 5,
         });
@@ -145,7 +144,7 @@ describe('pattern', () => {
 
     it('fails on invalid pattern input', () => {
         expect(() => pattern('')).toThrowError(
-            'Pattern formats require a non-empty pattern string. (ERR01)'
+            '[facilis-formats] ERR01: Pattern formats require a non-empty pattern string.'
         );
         expect(() =>
             pattern({
@@ -153,7 +152,7 @@ describe('pattern', () => {
                 tokens: {},
             })
         ).toThrowError(
-            'Pattern formats require at least one token definition. (ERR02)'
+            '[facilis-formats] ERR02: Pattern formats require at least one token definition.'
         );
         expect(() =>
             pattern({
@@ -165,7 +164,7 @@ describe('pattern', () => {
                 },
             })
         ).toThrowError(
-            'Pattern format token keys must be a single character each. (ERR03)'
+            '[facilis-formats] ERR03: Pattern format token keys must be a single character each.'
         );
         expect(() =>
             pattern({
@@ -177,7 +176,7 @@ describe('pattern', () => {
                 },
             })
         ).toThrowError(
-            'Pattern formats require the pattern string to include at least one token. (ERR04)'
+            '[facilis-formats] ERR04: Pattern formats require the pattern string to include at least one token.'
         );
     });
 });
