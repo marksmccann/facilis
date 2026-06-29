@@ -3,7 +3,7 @@ import { reporter } from './reporter';
 
 /**
  * Resolves either a direct DOM target or a selector string to the single input
- * element that `bind` should attach to.
+ * element that `bindFormat` should attach to.
  */
 function resolveInput(target: Element | string): HTMLInputElement {
     if (typeof target !== 'string') {
@@ -48,13 +48,12 @@ function resolveInput(target: Element | string): HTMLInputElement {
  * formatting on `input` and `blur`.
  * @since 0.0.1
  */
-export function bind(
+export function bindFormat(
     target: Element | string,
     format: Facilis.FormatInstance
-): void {
+): () => void {
     const input = resolveInput(target);
-
-    input.addEventListener('input', () => {
+    const handleInput = () => {
         const result = format.onInput({
             value: input.value,
             selectionStart: input.selectionStart,
@@ -66,9 +65,8 @@ export function bind(
         if (result.selectionStart !== null && result.selectionEnd !== null) {
             input.setSelectionRange(result.selectionStart, result.selectionEnd);
         }
-    });
-
-    input.addEventListener('blur', () => {
+    };
+    const handleBlur = () => {
         const result = format.onBlur({
             value: input.value,
             selectionStart: input.selectionStart,
@@ -80,5 +78,13 @@ export function bind(
         if (result.selectionStart !== null && result.selectionEnd !== null) {
             input.setSelectionRange(result.selectionStart, result.selectionEnd);
         }
-    });
+    };
+
+    input.addEventListener('input', handleInput);
+    input.addEventListener('blur', handleBlur);
+
+    return () => {
+        input.removeEventListener('input', handleInput);
+        input.removeEventListener('blur', handleBlur);
+    };
 }

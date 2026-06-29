@@ -1,1 +1,1 @@
-export { bind } from './dom';
+export { bindFormat } from './bindFormat';

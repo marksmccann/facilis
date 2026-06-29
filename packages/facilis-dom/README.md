@@ -2,15 +2,19 @@
 
 DOM adapter for Facilis.
 
-## `bind`
+## `bindFormat`
 
 Bind a format to either an `HTMLInputElement` or a CSS selector that resolves
-to one.
+to one. Returns a cleanup function that removes the event listeners.
 
 ```ts
-import { bind } from 'facilis-dom';
+import { bindFormat } from 'facilis-dom';
 import { pattern } from 'facilis-formats';
 
-bind(document.querySelector('#phone')!, pattern('(###) ###-####'));
-bind('#phone', pattern('(###) ###-####'));
+const cleanup = bindFormat(
+    document.querySelector('#phone')!,
+    pattern('(###) ###-####')
+);
+
+bindFormat('#phone', pattern('(###) ###-####'));
 ```

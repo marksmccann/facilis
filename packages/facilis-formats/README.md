@@ -8,12 +8,12 @@ Create a currency formatter with comma-separated thousands and configurable
 currency symbol and cents behavior.
 
 ```ts
-import { bind } from 'facilis-dom';
+import { bindFormat } from 'facilis-dom';
 import { currency } from 'facilis-formats';
 
-bind(input, currency());
-bind(input, currency({ symbol: '€' }));
-bind(input, currency({ symbol: '', cents: 'never' }));
+bindFormat(input, currency());
+bindFormat(input, currency({ symbol: '€' }));
+bindFormat(input, currency({ symbol: '', cents: 'never' }));
 ```
 
 ## `domesticPhoneNumber`
@@ -22,10 +22,10 @@ Create a dedicated formatter for a 10-digit domestic phone number in the
 `(###) ###-####` format.
 
 ```ts
-import { bind } from 'facilis-dom';
+import { bindFormat } from 'facilis-dom';
 import { domesticPhoneNumber } from 'facilis-formats';
 
-bind(input, domesticPhoneNumber());
+bindFormat(input, domesticPhoneNumber());
 ```
 
 ## `pattern`
@@ -34,12 +34,12 @@ Create a format from either a pattern string with preset tokens or an explicit
 pattern object with custom tokens.
 
 ```ts
-import { bind } from 'facilis-dom';
+import { bindFormat } from 'facilis-dom';
 import { pattern } from 'facilis-formats';
 
-bind(input, pattern('(###) ###-####'));
+bindFormat(input, pattern('(###) ###-####'));
 
-bind(
+bindFormat(
     input,
     pattern({
         pattern: 'AA-####',

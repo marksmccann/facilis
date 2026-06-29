@@ -1,1 +1,1 @@
-export { bind } from './src/index.ts';
+export { bindFormat } from './src/index.ts';

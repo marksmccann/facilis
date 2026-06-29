@@ -1,9 +1,9 @@
 import { createReporter } from 'runtime-reporter';
 
 const messages = {
-    ERR01: 'Could not find an input element to `bind` to for the selector "{{ selector }}".',
+    ERR01: 'Could not find an input element to `bindFormat` to for the selector "{{ selector }}".',
     ERR02: 'Bind requires the direct target to be an `HTMLInputElement`, but received <{{ tagName }}> instead.',
-    ERR03: 'Selector "{{ selector }}" resolved to <{{ tagName }}>, but `bind` requires an `HTMLInputElement`.',
+    ERR03: 'Selector "{{ selector }}" resolved to <{{ tagName }}>, but `bindFormat` requires an `HTMLInputElement`.',
     WARN01: 'Selector "{{ selector }}" matched {{ count }} elements. Binding the first match.',
 } as const;
 

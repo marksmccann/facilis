@@ -2,7 +2,7 @@ import {
     defineFormat,
     resolveSelectionByCharacterMatch,
 } from '../../../../packages/facilis/src/index.ts';
-import { bind } from '../../../../packages/facilis-dom/src/index.ts';
+import { bindFormat } from '../../../../packages/facilis-dom/src/index.ts';
 import {
     currency,
     domesticPhoneNumber,
@@ -84,14 +84,17 @@ export function mountPrototypeDemo() {
         },
     });
 
-    bind('[data-facilis-pattern-input]', pattern('(###) ###-####'));
-    bind('[data-facilis-domestic-phone-number-input]', domesticPhoneNumber());
-    bind(
+    bindFormat('[data-facilis-pattern-input]', pattern('(###) ###-####'));
+    bindFormat(
+        '[data-facilis-domestic-phone-number-input]',
+        domesticPhoneNumber()
+    );
+    bindFormat(
         '[data-facilis-currency-input]',
         currency({
             symbol: '$',
             cents: 'always',
         })
     );
-    bind('[data-facilis-date-input]', dateFormat());
+    bindFormat('[data-facilis-date-input]', dateFormat());
 }
