@@ -37,6 +37,18 @@ export default defineConfig({
                         { label: 'Docs App', slug: 'packages/docs' },
                     ],
                 },
+                {
+                    label: 'API Reference',
+                    items: [
+                        { label: 'Formats Overview', slug: 'reference/formats' },
+                        { label: 'currency', slug: 'reference/formats/currency' },
+                        {
+                            label: 'domesticPhoneNumber',
+                            slug: 'reference/formats/domestic-phone-number',
+                        },
+                        { label: 'pattern', slug: 'reference/formats/pattern' },
+                    ],
+                },
             ],
         }),
         mdx(),

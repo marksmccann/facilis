@@ -1,0 +1,231 @@
+---
+interface Props {
+    apiHref: string;
+    title: string;
+}
+
+const { apiHref, title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{title}</title>
+        <style is:global>
+            :root {
+                color-scheme: light;
+                --page-bg: #f4efe6;
+                --panel-bg: #fffdf8;
+                --panel-border: #d4c9b7;
+                --ink: #1f2f3d;
+                --muted: #5d6975;
+                --accent: #b7672b;
+                --accent-soft: #f3e2d3;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                background:
+                    radial-gradient(circle at top left, #fff7eb, transparent 28rem),
+                    linear-gradient(180deg, #f7f2ea 0%, var(--page-bg) 100%);
+                color: var(--ink);
+                font-family: Georgia, "Times New Roman", serif;
+            }
+
+            a {
+                color: inherit;
+            }
+
+            main {
+                width: min(46rem, calc(100% - 2rem));
+                margin: 0 auto;
+                padding: 2rem 0 4rem;
+            }
+
+            .hero {
+                margin-bottom: 2rem;
+                padding: 1.5rem;
+                border: 1px solid var(--panel-border);
+                border-radius: 28px;
+                background: rgba(255, 253, 248, 0.88);
+                box-shadow: 0 18px 60px rgba(82, 62, 40, 0.08);
+            }
+
+            .hero h1 {
+                margin: 0;
+                font-size: clamp(2rem, 5vw, 3.6rem);
+                line-height: 1;
+                overflow-wrap: anywhere;
+            }
+
+            .hero-links {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 0.75rem;
+                margin-top: 1.25rem;
+            }
+
+            .hero-link {
+                display: inline-flex;
+                align-items: center;
+                gap: 0.4rem;
+                padding: 0.75rem 1rem;
+                border: 1px solid var(--panel-border);
+                border-radius: 999px;
+                background: white;
+                color: var(--ink);
+                text-decoration: none;
+                font: 600 0.92rem/1.2 ui-sans-serif, system-ui, sans-serif;
+            }
+
+            .demo-grid {
+                counter-reset: demo-card;
+                display: grid;
+                gap: 1.1rem;
+                grid-template-columns: 1fr;
+            }
+
+            .demo-card {
+                position: relative;
+                overflow: hidden;
+                padding: 1.5rem;
+                border: 1px solid #cfb89a;
+                border-radius: 26px;
+                background:
+                    linear-gradient(180deg, #fffefb 0%, var(--panel-bg) 100%);
+                box-shadow:
+                    0 20px 44px rgba(82, 62, 40, 0.08),
+                    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            }
+
+            .demo-card::before {
+                content: "";
+                position: absolute;
+                inset: 0 auto 0 0;
+                width: 7px;
+                height: auto;
+                background: linear-gradient(180deg, var(--accent) 0%, #d1a16c 100%);
+            }
+
+            .demo-card h2 {
+                display: flex;
+                align-items: baseline;
+                gap: 0.75rem;
+                margin: 0 0 0.55rem;
+                font-size: 1.4rem;
+                line-height: 1.15;
+                color: var(--ink);
+            }
+
+            .demo-card h2::before {
+                counter-increment: demo-card;
+                content: counter(demo-card, decimal-leading-zero);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 2.2rem;
+                height: 2.2rem;
+                padding: 0 0.45rem;
+                border-radius: 999px;
+                background: var(--accent-soft);
+                color: var(--accent);
+                font: 700 0.78rem/1 ui-sans-serif, system-ui, sans-serif;
+                letter-spacing: 0.12em;
+            }
+
+            .demo-card p {
+                margin: 0 0 1rem;
+                color: var(--muted);
+                line-height: 1.62;
+            }
+
+            .demo-label {
+                display: block;
+                margin-bottom: 0.55rem;
+                font: 700 0.72rem/1.2 ui-sans-serif, system-ui, sans-serif;
+                letter-spacing: 0.14em;
+                text-transform: uppercase;
+                color: var(--muted);
+            }
+
+            .demo-input {
+                display: block;
+                width: 100%;
+                margin-bottom: 1.15rem;
+                padding: 0.95rem 1rem;
+                border: 1px solid #ccb396;
+                border-radius: 16px;
+                background: linear-gradient(180deg, #fffdfa 0%, #ffffff 100%);
+                color: var(--ink);
+                font: inherit;
+                font-size: 1.08rem;
+                transition:
+                    border-color 140ms ease,
+                    box-shadow 140ms ease,
+                    transform 140ms ease;
+            }
+
+            .demo-input:focus {
+                outline: none;
+                border-color: #c7884f;
+                box-shadow: 0 0 0 4px rgba(183, 103, 43, 0.12);
+            }
+
+            .demo-input::placeholder {
+                color: #8a8f97;
+            }
+
+            .demo-note {
+                margin-top: 0;
+                padding: 1rem 1.05rem;
+                border: 1px solid #e3bb8a;
+                border-radius: 20px;
+                background:
+                    linear-gradient(180deg, #fff3e5 0%, var(--accent-soft) 100%);
+                color: #69411f;
+                font-size: 0.95rem;
+                line-height: 1.5;
+                box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+            }
+
+            .demo-note::before {
+                content: "Try this";
+                display: block;
+                margin-bottom: 0.45rem;
+                color: var(--accent);
+                font: 700 0.72rem/1.2 ui-sans-serif, system-ui, sans-serif;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+            }
+
+            code {
+                font-family:
+                    ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+                    monospace;
+                font-size: 0.95em;
+                padding: 0.12rem 0.35rem;
+                border-radius: 8px;
+                background: rgba(255, 255, 255, 0.6);
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <header class="hero">
+                <h1>{title}</h1>
+                <div class="hero-links">
+                    <a class="hero-link" href={apiHref}>&larr; Back to API reference</a>
+                </div>
+            </header>
+            <section class="demo-grid">
+                <slot />
+            </section>
+        </main>
+    </body>
+</html>

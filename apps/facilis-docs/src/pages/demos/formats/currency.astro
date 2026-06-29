@@ -1,0 +1,46 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/currency/"
+    title="currency() Demo"
+>
+    <article class="demo-card">
+        <h2>Default formatting</h2>
+        <p>Thousands separators appear automatically, and blur pads cents to two digits.</p>
+        <label class="demo-label" for="currency-default">Type an amount</label>
+        <input class="demo-input" id="currency-default" data-demo-currency-default type="text" placeholder="Try 12345.6" />
+        <p class="demo-note">Try <code>12345.6</code>, then blur the field to see <code>$12,345.60</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Custom symbol</h2>
+        <p>The same format can swap the default dollar symbol for another currency mark.</p>
+        <label class="demo-label" for="currency-euro">Use the euro symbol</label>
+        <input class="demo-input" id="currency-euro" data-demo-currency-euro type="text" placeholder="Try 12345" />
+        <p class="demo-note">This scenario uses the symbol: <code>€</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>No cents</h2>
+        <p>Disable decimals entirely when you only want whole-number currency formatting.</p>
+        <label class="demo-label" for="currency-whole">Whole-number currency</label>
+        <input class="demo-input" id="currency-whole" data-demo-currency-whole type="text" placeholder="Try 12345.6" />
+        <p class="demo-note">This scenario disables cents.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>No symbol and no cents</h2>
+        <p>Omit the symbol entirely when the surrounding UI already makes the unit obvious.</p>
+        <label class="demo-label" for="currency-bare">Bare numeric output</label>
+        <input class="demo-input" id="currency-bare" data-demo-currency-bare type="text" placeholder="Try 12345.6" />
+        <p class="demo-note">This scenario omits the symbol and disables cents.</p>
+    </article>
+
+    <script>
+        import { mountCurrencyDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountCurrencyDemo();
+    </script>
+</FormatDemoLayout>

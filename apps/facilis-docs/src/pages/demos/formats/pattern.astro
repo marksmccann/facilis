@@ -1,0 +1,38 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/pattern/"
+    title="pattern() Demo"
+>
+    <article class="demo-card">
+        <h2>Default formatting</h2>
+        <p>Pattern shorthand is the fastest way to express a phone layout with built-in digit tokens.</p>
+        <label class="demo-label" for="pattern-phone">Phone pattern</label>
+        <input class="demo-input" id="pattern-phone" data-demo-pattern-phone type="text" placeholder="Try 4145551212" />
+        <p class="demo-note">Try <code>4145551212</code> to see the pattern: <code>(###) ###-####</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Custom token definitions</h2>
+        <p>Provide explicit token rules when the built-in symbols are not enough. In this example, <code>A</code> accepts letters and <code>#</code> accepts digits.</p>
+        <label class="demo-label" for="pattern-custom">Letter and digit tokens</label>
+        <input class="demo-input" id="pattern-custom" data-demo-pattern-custom type="text" placeholder="Try AB1234 or ab12cd34" />
+        <p class="demo-note">This scenario uses the pattern: <code>AA-####</code>. The <code>A</code> slots accept letters, the <code>#</code> slots accept digits, and characters that do not satisfy the next token are skipped.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Wildcard token</h2>
+        <p>The built-in <code>*</code> token accepts any character, which is useful for flexible mixed input.</p>
+        <label class="demo-label" for="pattern-wildcard">Wildcard shorthand</label>
+        <input class="demo-input" id="pattern-wildcard" data-demo-pattern-wildcard type="text" placeholder="Try ab12" />
+        <p class="demo-note">This scenario uses the pattern: <code>**-##</code>.</p>
+    </article>
+
+    <script>
+        import { mountPatternDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountPatternDemo();
+    </script>
+</FormatDemoLayout>
