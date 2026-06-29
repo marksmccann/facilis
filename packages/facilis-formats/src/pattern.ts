@@ -13,7 +13,22 @@ export type PatternTokenDefinition = {
     matches: RegExp;
 };
 
+/**
+ * Maps each token symbol used in a pattern string to the rule that determines
+ * which raw characters can fill that token slot.
+ *
+ * @since 0.0.1
+ */
 export type PatternTokenDefinitions = Record<string, PatternTokenDefinition>;
+
+/**
+ * The built-in token definitions shared by the shorthand string syntax and the
+ * explicit object form when `tokens` is omitted.
+ */
+const DefaultPatternTokens = {
+    '#': { matches: /\d/ },
+    '*': { matches: /./ },
+};
 
 /**
  * The explicit configuration object for a pattern format.
@@ -28,7 +43,7 @@ export type PatternOptions = {
     /**
      * The token definitions keyed by the wildcard characters used in the pattern.
      */
-    tokens: PatternTokenDefinitions;
+    tokens?: PatternTokenDefinitions;
 };
 
 /**
@@ -38,6 +53,15 @@ export type PatternOptions = {
  * @since 0.0.1
  */
 export type PatternInput = string | PatternOptions;
+
+/**
+ * The internal normalized pattern options shape after defaults have been
+ * applied.
+ */
+type NormalizedPatternOptions = {
+    pattern: string;
+    tokens: PatternTokenDefinitions;
+};
 
 /**
  * Represents one token character entry from the parsed pattern.
@@ -71,25 +95,27 @@ type PatternPart = PatternTokenPart | PatternLiteralPart;
  * Normalizes the pattern input into the explicit object form, applying the
  * built-in preset tokens when the shorthand string form is used.
  */
-function normalizePatternOptions(input: PatternInput): PatternOptions {
+function normalizePatternOptions(
+    input: PatternInput
+): NormalizedPatternOptions {
     if (typeof input === 'string') {
         return {
             pattern: input,
-            tokens: {
-                '#': { matches: /\d/ },
-                '*': { matches: /./ },
-            },
+            tokens: DefaultPatternTokens,
         };
     }
 
-    return input;
+    return {
+        pattern: input.pattern,
+        tokens: input.tokens ?? DefaultPatternTokens,
+    };
 }
 
 /**
  * Parses a pattern string into one ordered array of parts, where each entry
  * describes either a token character or a literal character from the pattern.
  */
-function parsePattern(options: PatternOptions): PatternPart[] {
+function parsePattern(options: NormalizedPatternOptions): PatternPart[] {
     const { pattern, tokens } = options;
 
     // Make sure a pattern exists

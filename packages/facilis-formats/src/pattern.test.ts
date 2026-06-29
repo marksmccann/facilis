@@ -86,6 +86,27 @@ describe('pattern', () => {
         );
     });
 
+    it('uses the preset tokens when object input omits tokens', () => {
+        const shorthand = pattern('**-##');
+        const explicit = pattern({
+            pattern: '**-##',
+        });
+
+        expect(
+            applyInput(shorthand, {
+                value: 'ab12',
+                selectionStart: 4,
+                selectionEnd: 4,
+            })
+        ).toEqual(
+            applyInput(explicit, {
+                value: 'ab12',
+                selectionStart: 4,
+                selectionEnd: 4,
+            })
+        );
+    });
+
     it('supports custom tokens', () => {
         const format = pattern({
             pattern: 'AA-##',
