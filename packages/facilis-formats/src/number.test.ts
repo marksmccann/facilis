@@ -237,6 +237,91 @@ describe('number', () => {
         });
     });
 
+    it('clamps values above the configured maximum while typing', () => {
+        const format = number({
+            max: 100,
+        });
+
+        expect(
+            applyInput(format, {
+                value: '101',
+            })
+        ).toEqual({
+            formattedValue: '100',
+            selectionStart: 3,
+            selectionEnd: 3,
+        });
+    });
+
+    it('clamps values below the configured minimum while typing', () => {
+        const format = number({
+            allowNegative: true,
+            min: 0,
+        });
+
+        expect(
+            applyInput(format, {
+                value: '-5',
+            })
+        ).toEqual({
+            formattedValue: '0',
+            selectionStart: 1,
+            selectionEnd: 1,
+        });
+    });
+
+    it('preserves a trailing decimal separator before the value is complete', () => {
+        const format = number({
+            decimalPlaces: 2,
+            max: 10,
+        });
+
+        expect(
+            applyInput(format, {
+                value: '10.',
+            })
+        ).toEqual({
+            formattedValue: '10.',
+            selectionStart: 3,
+            selectionEnd: 3,
+        });
+    });
+
+    it('clamps decimal values to the configured maximum while typing', () => {
+        const format = number({
+            decimalPlaces: 2,
+            max: 10,
+        });
+
+        expect(
+            applyInput(format, {
+                value: '10.5',
+            })
+        ).toEqual({
+            formattedValue: '10',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
+    it('clamps decimal values with a custom separator while typing', () => {
+        const format = number({
+            decimalPlaces: 2,
+            decimalSeparator: ',',
+            max: 10,
+        });
+
+        expect(
+            applyInput(format, {
+                value: '10,5',
+            })
+        ).toEqual({
+            formattedValue: '10',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
     it('returns the formatted value unchanged on blur', () => {
         const format = number();
 

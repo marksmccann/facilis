@@ -67,6 +67,23 @@ export function mountNumberDemo() {
             thousandsSeparator: ',',
         })
     );
+    bind('[data-demo-number-max]', () =>
+        number({
+            max: 100,
+        })
+    );
+    bind('[data-demo-number-min]', () =>
+        number({
+            allowNegative: true,
+            min: 0,
+        })
+    );
+    bind('[data-demo-number-decimal-max]', () =>
+        number({
+            decimalPlaces: 2,
+            max: 10,
+        })
+    );
 }
 
 export function mountDomesticPhoneNumberDemo() {

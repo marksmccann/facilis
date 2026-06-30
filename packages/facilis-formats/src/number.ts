@@ -42,6 +42,20 @@ export type NumberOptions = {
      * default is `false`.
      */
     allowNegative?: boolean;
+
+    /**
+     * The minimum numeric value allowed while typing. Values below this
+     * boundary clamp to the minimum as soon as they resolve to a complete
+     * number.
+     */
+    min?: number;
+
+    /**
+     * The maximum numeric value allowed while typing. Values above this
+     * boundary clamp to the maximum as soon as they resolve to a complete
+     * number.
+     */
+    max?: number;
 };
 
 /**
@@ -53,6 +67,8 @@ function normalizeNumberOptions(options: NumberOptions = {}) {
         decimalPlaces: Math.max(0, options.decimalPlaces ?? 0),
         padDecimalPlaces: Math.max(0, options.padDecimalPlaces ?? 0),
         decimalSeparator: options.decimalSeparator ?? '.',
+        max: options.max,
+        min: options.min,
         thousandsSeparator: options.thousandsSeparator ?? '',
     };
 }
@@ -69,6 +85,8 @@ export function number(options?: NumberOptions): FormatInstance {
         decimalPlaces,
         padDecimalPlaces,
         decimalSeparator,
+        max,
+        min,
         thousandsSeparator,
     } = numberOptions;
 
@@ -79,6 +97,8 @@ export function number(options?: NumberOptions): FormatInstance {
                 allowNegative,
                 decimalPlaces,
                 decimalSeparator,
+                max,
+                min,
             });
         },
         formatValue({ normalizedValue }) {

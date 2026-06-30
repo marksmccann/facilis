@@ -1,11 +1,11 @@
 ---
 title: number
-description: Create a numeric format instance with configurable decimal places, separators, and negative-value support.
+description: Create a numeric format instance with configurable decimal places, separators, range limits, and negative-value support.
 ---
 
 `number()` creates a numeric format with optional decimal places, configurable
-decimal and thousands separators, optional blur-time decimal padding, and
-optional negative-value support.
+decimal and thousands separators, optional live range limits, optional
+blur-time decimal padding, and optional negative-value support.
 
 [Play with the demos &rarr;](/facilis/demos/formats/number/)
 
@@ -34,6 +34,14 @@ With `number({ decimalPlaces: 2, decimalSeparator: ',', thousandsSeparator: '.' 
 With `number({ allowNegative: true, decimalPlaces: 2 })`:
 
 - `-12345.67` becomes `-12345.67`
+
+With `number({ min: 0, max: 100 })`:
+
+- `101` becomes `100` while typing
+
+With `number({ decimalPlaces: 2, max: 10 })`:
+
+- `10.5` becomes `10` while typing
 
 ## Signature
 
@@ -66,6 +74,11 @@ const localizedDecimalFormat = number({
     decimalPlaces: 2,
     decimalSeparator: ',',
     thousandsSeparator: '.',
+});
+
+const clampedNumberFormat = number({
+    min: 0,
+    max: 100,
 });
 ```
 
@@ -162,6 +175,41 @@ const signedNumberFormat = number({ allowNegative: true });
 With raw input `-12345`, `defaultNumberFormat` formats as `12345`, while
 `signedNumberFormat` formats as `-12345`.
 
+### `min`
+
+Sets the minimum numeric value allowed while typing.
+
+Default: none
+
+Example:
+
+```ts
+const clampedNumberFormat = number({
+    allowNegative: true,
+    min: 0,
+});
+```
+
+With raw input `-5`, this formats as `0` as soon as the value resolves to a
+complete number.
+
+### `max`
+
+Sets the maximum numeric value allowed while typing.
+
+Default: none
+
+Example:
+
+```ts
+const clampedNumberFormat = number({
+    max: 100,
+});
+```
+
+With raw input `101`, this formats as `100` as soon as the value resolves to a
+complete number.
+
 ## Behavior
 
 - Removes characters other than digits and the configured decimal separator
@@ -170,6 +218,8 @@ With raw input `-12345`, `defaultNumberFormat` formats as `12345`, while
   greater than `0`.
 - Inserts the configured thousands separator into the whole portion during
   formatting.
+- Clamps complete numeric values to `min` and `max` immediately during input
+  normalization when those range limits are configured.
 - Pads the fractional portion with trailing zeroes on blur when
   `padDecimalPlaces` is greater than `0`.
 - Preserves a lone `-` or partial decimal value like `-,` while typing when

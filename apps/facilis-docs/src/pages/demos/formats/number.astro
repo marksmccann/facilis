@@ -54,6 +54,30 @@ import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
         <p class="demo-note">This scenario enables negative values and uses grouped thousands with up to two decimal places.</p>
     </article>
 
+    <article class="demo-card">
+        <h2>Maximum clamp</h2>
+        <p>Clamp the value to a maximum as soon as typing resolves to a complete number above the allowed range.</p>
+        <label class="demo-label" for="number-max">Maximum 100</label>
+        <input class="demo-input" id="number-max" data-demo-number-max type="text" placeholder="Try 101" />
+        <p class="demo-note">This scenario uses <code>max: 100</code>, so values like <code>101</code> or <code>999</code> become <code>100</code> while typing.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Minimum clamp</h2>
+        <p>Clamp signed input back to a minimum when the number resolves below the allowed range.</p>
+        <label class="demo-label" for="number-min">Minimum 0</label>
+        <input class="demo-input" id="number-min" data-demo-number-min type="text" placeholder="Try -5" />
+        <p class="demo-note">This scenario uses <code>allowNegative: true</code> and <code>min: 0</code>, so values like <code>-5</code> become <code>0</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Decimal clamp</h2>
+        <p>Clamp decimal input to a maximum while still preserving in-progress values like a trailing decimal separator.</p>
+        <label class="demo-label" for="number-decimal-max">Maximum 10 with decimals</label>
+        <input class="demo-input" id="number-decimal-max" data-demo-number-decimal-max type="text" placeholder="Try 10.5" />
+        <p class="demo-note">This scenario uses <code>decimalPlaces: 2</code> and <code>max: 10</code>, so <code>10.5</code> becomes <code>10</code> while <code>10.</code> stays in progress.</p>
+    </article>
+
     <script>
         import { mountNumberDemo } from '../../../demo/mountFormatDemos.ts';
 

@@ -82,4 +82,49 @@ describe('normalizeValueForNumber', () => {
             })
         ).toBe('-,');
     });
+
+    it('clamps values above the configured maximum', () => {
+        expect(
+            normalizeValueForNumber('101', {
+                max: 100,
+            })
+        ).toBe('100');
+    });
+
+    it('clamps values below the configured minimum', () => {
+        expect(
+            normalizeValueForNumber('-5', {
+                allowNegative: true,
+                min: 0,
+            })
+        ).toBe('0');
+    });
+
+    it('preserves partial decimal values before they resolve to a complete number', () => {
+        expect(
+            normalizeValueForNumber('10.', {
+                decimalPlaces: 2,
+                max: 10,
+            })
+        ).toBe('10.');
+    });
+
+    it('clamps decimal values and trims trailing zero padding', () => {
+        expect(
+            normalizeValueForNumber('10.5', {
+                decimalPlaces: 2,
+                max: 10,
+            })
+        ).toBe('10');
+    });
+
+    it('clamps decimal values with a custom separator', () => {
+        expect(
+            normalizeValueForNumber('10,5', {
+                decimalPlaces: 2,
+                decimalSeparator: ',',
+                max: 10,
+            })
+        ).toBe('10');
+    });
 });
