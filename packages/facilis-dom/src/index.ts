@@ -1,1 +1,1 @@
-export { bindFormat } from './bindFormat';
+export * from './bindFormat';

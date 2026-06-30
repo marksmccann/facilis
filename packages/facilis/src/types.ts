@@ -96,9 +96,3 @@ export type FormatInstance = {
  * @since 0.0.1
  */
 export type FormatFactory = () => FormatInstance;
-
-export type * from './formatBlurValueForNumber';
-export type * from './formatValueForNumber';
-export type * from './normalizeValueForNumber';
-export type * from './parsePatternOptions';
-export type * from './resolveSelectionForNumber';
