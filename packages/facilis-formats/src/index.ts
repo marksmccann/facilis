@@ -1,11 +1,9 @@
 export { currency } from './currency';
-export type { CurrencyOptions } from './currency';
 export { number } from './number';
-export type { NumberOptions } from './number';
 export { pattern } from './pattern';
-export type {
-    PatternInput,
-    PatternTokenDefinition,
-    PatternTokenDefinitions,
-    PatternOptions,
-} from './pattern';
+export { text } from './text';
+
+export type * from './currency';
+export type * from './number';
+export type * from './pattern';
+export type * from './text';

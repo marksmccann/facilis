@@ -14,6 +14,7 @@ Dedicated format demos live at:
 - `/facilis/demos/formats/currency/`
 - `/facilis/demos/formats/number/`
 - `/facilis/demos/formats/pattern/`
+- `/facilis/demos/formats/text/`
 
 ## Current focus
 

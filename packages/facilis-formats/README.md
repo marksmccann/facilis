@@ -45,3 +45,27 @@ The preset string form includes:
 - `*` for any character
 
 Use the object form whenever you need custom tokens.
+
+## `text`
+
+Create a text format that keeps only the characters matched by a regular
+expression.
+
+```ts
+import { bindFormat } from 'facilis-dom';
+import { text } from 'facilis-formats';
+
+bindFormat(
+    input,
+    text({
+        matches: /[a-z]/i,
+    })
+);
+
+bindFormat(
+    input,
+    text({
+        matches: /\d/,
+    })
+);
+```

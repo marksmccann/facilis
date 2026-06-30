@@ -3,6 +3,7 @@ import {
     currency,
     number,
     pattern,
+    text,
 } from '../../../../packages/facilis-formats/src/index.ts';
 
 function bind(target: string, factory: () => ReturnType<typeof currency>) {
@@ -108,4 +109,22 @@ export function mountPatternDemo() {
         })
     );
     bind('[data-demo-pattern-wildcard]', () => pattern('**-##'));
+}
+
+export function mountTextDemo() {
+    bind('[data-demo-text-letters]', () =>
+        text({
+            matches: /[a-z]/i,
+        })
+    );
+    bind('[data-demo-text-digits]', () =>
+        text({
+            matches: /\d/,
+        })
+    );
+    bind('[data-demo-text-hex]', () =>
+        text({
+            matches: /[a-f0-9]/i,
+        })
+    );
 }

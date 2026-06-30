@@ -6,11 +6,8 @@ import {
     resolveSelectionForPattern,
     type FormatInstance,
     type ParsePatternOptions,
-    type PatternTokenDefinition,
     type PatternTokenDefinitions,
 } from 'facilis';
-
-export type { PatternTokenDefinition, PatternTokenDefinitions };
 
 /**
  * The built-in token definitions shared by the shorthand string syntax and the

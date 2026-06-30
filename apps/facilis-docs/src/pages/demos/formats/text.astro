@@ -1,0 +1,38 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/text/"
+    title="text() Demo"
+>
+    <article class="demo-card">
+        <h2>Letters only</h2>
+        <p>Use <code>matches</code> to preserve only the characters that fit the text rule.</p>
+        <label class="demo-label" for="text-letters">Letter text</label>
+        <input class="demo-input" id="text-letters" data-demo-text-letters type="text" placeholder="Try ab12CD34" />
+        <p class="demo-note">This scenario uses <code>/[a-z]/i</code>, so digits are removed and letters are preserved.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Digits only</h2>
+        <p>Numeric-only text works well when you want a plain string of digits without number-specific formatting.</p>
+        <label class="demo-label" for="text-digits">Digit text</label>
+        <input class="demo-input" id="text-digits" data-demo-text-digits type="text" placeholder="Try A1B2C3" />
+        <p class="demo-note">This scenario uses <code>/\d/</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Hex characters</h2>
+        <p>More specific character sets can preserve domain-oriented text such as hexadecimal characters.</p>
+        <label class="demo-label" for="text-hex">Hex text</label>
+        <input class="demo-input" id="text-hex" data-demo-text-hex type="text" placeholder="Try g1h2Z3f" />
+        <p class="demo-note">This scenario uses <code>/[a-f0-9]/i</code>.</p>
+    </article>
+
+    <script>
+        import { mountTextDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountTextDemo();
+    </script>
+</FormatDemoLayout>
