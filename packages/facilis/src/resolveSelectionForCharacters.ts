@@ -57,7 +57,7 @@ function getFormattedSelectionPosition(
  *
  * @since 0.0.1
  */
-export function resolveSelectionForCharacterMatch(
+export function resolveSelectionForCharacters(
     context: FormatSelectionContext,
     characterMatch: RegExp
 ): FormatSelectionResult {

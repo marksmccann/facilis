@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { resolveSelectionForCharacterMatch } from './resolveSelectionForCharacterMatch';
+import { resolveSelectionForCharacters } from './resolveSelectionForCharacters';
 
-describe('resolveSelectionForCharacterMatch', () => {
+describe('resolveSelectionForCharacters', () => {
     it('maps matched characters onto the formatted value', () => {
         expect(
-            resolveSelectionForCharacterMatch(
+            resolveSelectionForCharacters(
                 {
                     rawValue: '(123) 4',
                     rawSelectionStart: 7,
@@ -22,7 +22,7 @@ describe('resolveSelectionForCharacterMatch', () => {
 
     it('clamps the selection count to the normalized value length', () => {
         expect(
-            resolveSelectionForCharacterMatch(
+            resolveSelectionForCharacters(
                 {
                     rawValue: '(123) 456999',
                     rawSelectionStart: 12,
@@ -40,7 +40,7 @@ describe('resolveSelectionForCharacterMatch', () => {
 
     it('returns zeroed selections when no matched characters precede the cursor', () => {
         expect(
-            resolveSelectionForCharacterMatch(
+            resolveSelectionForCharacters(
                 {
                     rawValue: '(',
                     rawSelectionStart: 1,
@@ -58,7 +58,7 @@ describe('resolveSelectionForCharacterMatch', () => {
 
     it('supports selection ranges with non-digit match rules', () => {
         expect(
-            resolveSelectionForCharacterMatch(
+            resolveSelectionForCharacters(
                 {
                     rawValue: 'ab-',
                     rawSelectionStart: 1,
