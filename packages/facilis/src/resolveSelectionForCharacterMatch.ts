@@ -1,15 +1,23 @@
-import type { Facilis } from './types';
+import type {
+    FormatSelectionContext,
+    FormatSelectionResult,
+} from './types';
 
+/**
+ * Counts how many characters in the provided value satisfy the match rule.
+ */
 function countMatchedCharacters(value: string, characterMatch: RegExp): number {
-    return value
-        .split('')
-        .filter((character) => {
-            characterMatch.lastIndex = 0;
+    return value.split('').filter((character) => {
+        characterMatch.lastIndex = 0;
 
-            return characterMatch.test(character);
-        }).length;
+        return characterMatch.test(character);
+    }).length;
 }
 
+/**
+ * Maps a matched-character count to the corresponding cursor position in the
+ * formatted value.
+ */
 function getFormattedSelectionPosition(
     formattedValue: string,
     targetCount: number,
@@ -46,11 +54,13 @@ function getFormattedSelectionPosition(
  * Resolves the next selection range by counting how many characters match the
  * provided regular expression before the raw selection and mapping that count
  * onto the formatted value.
+ *
+ * @since 0.0.1
  */
-export function resolveSelectionByCharacterMatch(
-    characterMatch: RegExp,
-    context: Facilis.FormatSelectionContext
-): Facilis.FormatSelectionResult {
+export function resolveSelectionForCharacterMatch(
+    context: FormatSelectionContext,
+    characterMatch: RegExp
+): FormatSelectionResult {
     const selectionStartCount = Math.min(
         countMatchedCharacters(
             context.rawValue.slice(0, context.rawSelectionStart),

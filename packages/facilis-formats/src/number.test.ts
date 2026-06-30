@@ -283,4 +283,39 @@ describe('number', () => {
             selectionEnd: null,
         });
     });
+
+    it('pads a missing fractional portion on blur when configured', () => {
+        const format = number({
+            decimalPlaces: 0,
+            padDecimalPlaces: 2,
+        });
+
+        expect(
+            applyBlur(format, {
+                value: '1234',
+            })
+        ).toEqual({
+            formattedValue: '1234.00',
+            selectionStart: null,
+            selectionEnd: null,
+        });
+    });
+
+    it('pads an incomplete fractional portion on blur when configured', () => {
+        const format = number({
+            decimalPlaces: 2,
+            padDecimalPlaces: 2,
+            thousandsSeparator: ',',
+        });
+
+        expect(
+            applyBlur(format, {
+                value: '1,234.5',
+            })
+        ).toEqual({
+            formattedValue: '1,234.50',
+            selectionStart: null,
+            selectionEnd: null,
+        });
+    });
 });

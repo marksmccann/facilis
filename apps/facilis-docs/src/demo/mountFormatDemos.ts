@@ -35,6 +35,12 @@ export function mountCurrencyDemo() {
 
 export function mountNumberDemo() {
     bind('[data-demo-number-default]', () => number());
+    bind('[data-demo-number-padded]', () =>
+        number({
+            decimalPlaces: 0,
+            padDecimalPlaces: 2,
+        })
+    );
     bind('[data-demo-number-grouped]', () =>
         number({
             decimalPlaces: 2,

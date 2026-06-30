@@ -1,14 +1,14 @@
 import {
     defineFormat,
-    resolveSelectionByCharacterMatch,
-    type Facilis,
+    resolveSelectionForCharacterMatch,
+    type FormatInstance,
 } from 'facilis';
 
 /**
  * Creates a formatter for a 10-digit domestic phone number in the
  * `(###) ###-####` format.
  */
-export function domesticPhoneNumber(): Facilis.FormatInstance {
+export function domesticPhoneNumber(): FormatInstance {
     return defineFormat({
         name: 'domesticPhoneNumber',
         normalizeValue({ rawValue }) {
@@ -32,7 +32,7 @@ export function domesticPhoneNumber(): Facilis.FormatInstance {
             return `(${areaCode}) ${prefix}-${lineNumber}`;
         },
         resolveSelection(context) {
-            return resolveSelectionByCharacterMatch(/\d/, context);
+            return resolveSelectionForCharacterMatch(context, /\d/);
         },
     })();
 }

@@ -17,8 +17,8 @@ export type FormatValueForNumberOptions = {
     decimalSeparator?: string;
 
     /**
-     * The maximum number of decimal places to preserve in the formatted value.
-     * The default is `0`, which omits the fractional portion.
+     * The maximum number of decimal places to preserve in the formatted
+     * value. The default is `0`, which omits the fractional portion.
      */
     decimalPlaces?: number;
 };

@@ -1,4 +1,9 @@
-import type { Facilis } from './types';
+import type {
+    FormatDefinition,
+    FormatFactory,
+    FormatInstance,
+    FormatResult,
+} from './types';
 
 /**
  * Creates a reusable format factory from a format definition.
@@ -6,9 +11,9 @@ import type { Facilis } from './types';
  * @since 0.0.1
  */
 export function defineFormat(
-    definition: Facilis.FormatDefinition
-): Facilis.FormatFactory {
-    return function createFormatInstance(): Facilis.FormatInstance {
+    definition: FormatDefinition
+): FormatFactory {
+    return function createFormatInstance(): FormatInstance {
         const {
             name,
             normalizeValue,
@@ -31,7 +36,7 @@ export function defineFormat(
                     formattedValue,
                 });
 
-                const result: Facilis.FormatResult = {
+                const result: FormatResult = {
                     formattedValue,
                     selectionStart: selection.selectionStart,
                     selectionEnd: selection.selectionEnd,

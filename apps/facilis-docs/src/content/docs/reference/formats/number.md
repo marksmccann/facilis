@@ -4,7 +4,8 @@ description: Create a numeric format instance with configurable decimal places, 
 ---
 
 `number()` creates a numeric format with optional decimal places, configurable
-decimal and thousands separators, and optional negative-value support.
+decimal and thousands separators, optional blur-time decimal padding, and
+optional negative-value support.
 
 [Play with the demos &rarr;](/facilis/demos/formats/number/)
 
@@ -17,6 +18,10 @@ With `number()`:
 With `number({ decimalPlaces: 2 })`:
 
 - `12345.67` becomes `12345.67`
+
+With `number({ decimalPlaces: 0, padDecimalPlaces: 2 })`:
+
+- `12345` becomes `12345.00` after blur
 
 With `number({ decimalPlaces: 2, thousandsSeparator: ',' })`:
 
@@ -52,6 +57,11 @@ const groupedDecimalFormat = number({
     thousandsSeparator: ',',
 });
 
+const blurPaddedIntegerFormat = number({
+    decimalPlaces: 0,
+    padDecimalPlaces: 2,
+});
+
 const localizedDecimalFormat = number({
     decimalPlaces: 2,
     decimalSeparator: ',',
@@ -76,6 +86,29 @@ const decimalFormat = number({ decimalPlaces: 2 });
 
 With raw input `12345.67`, `integerFormat` becomes `1234567`, while
 `decimalFormat` becomes `12345.67`.
+
+### `padDecimalPlaces`
+
+Controls the minimum number of decimal places that should exist after blur.
+
+Default: `0`
+
+Example:
+
+```ts
+const integerFormat = number({
+    decimalPlaces: 0,
+    padDecimalPlaces: 2,
+});
+
+const decimalFormat = number({
+    decimalPlaces: 2,
+    padDecimalPlaces: 2,
+});
+```
+
+With raw input `12345`, `integerFormat` becomes `12345.00` after blur. With
+raw input `12345.5`, `decimalFormat` becomes `12345.50` after blur.
 
 ### `decimalSeparator`
 
@@ -137,5 +170,7 @@ With raw input `-12345`, `defaultNumberFormat` formats as `12345`, while
   greater than `0`.
 - Inserts the configured thousands separator into the whole portion during
   formatting.
+- Pads the fractional portion with trailing zeroes on blur when
+  `padDecimalPlaces` is greater than `0`.
 - Preserves a lone `-` or partial decimal value like `-,` while typing when
   the corresponding options allow them.

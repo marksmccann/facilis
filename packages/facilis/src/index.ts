@@ -1,7 +1,7 @@
 export { defineFormat } from './defineFormat';
+export { formatBlurValueForNumber } from './formatBlurValueForNumber';
 export { formatValueForNumber } from './formatValueForNumber';
-export type { FormatValueForNumberOptions } from './formatValueForNumber';
 export { normalizeValueForNumber } from './normalizeValueForNumber';
-export type { NormalizeValueForNumberOptions } from './normalizeValueForNumber';
-export { resolveSelectionByCharacterMatch } from './resolveSelectionByCharacterMatch';
-export type { Facilis } from './types';
+export { resolveSelectionForCharacterMatch } from './resolveSelectionForCharacterMatch';
+export { resolveSelectionForNumber } from './resolveSelectionForNumber';
+export type * from './types';

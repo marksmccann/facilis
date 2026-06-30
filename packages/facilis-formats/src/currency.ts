@@ -1,9 +1,10 @@
 import {
     defineFormat,
+    formatBlurValueForNumber,
     formatValueForNumber,
     normalizeValueForNumber,
-    resolveSelectionByCharacterMatch,
-    type Facilis,
+    resolveSelectionForNumber,
+    type FormatInstance,
 } from 'facilis';
 
 /**
@@ -53,7 +54,7 @@ function normalizeCurrencyOptions(options: CurrencyOptions = {}) {
  * Creates a formatter for currency values with comma-separated thousands,
  * an optional configurable currency symbol, and configurable decimal display.
  */
-export function currency(options?: CurrencyOptions): Facilis.FormatInstance {
+export function currency(options?: CurrencyOptions): FormatInstance {
     const currencyOptions = normalizeCurrencyOptions(options);
     const { decimalSeparator, includeCents, symbol, thousandsSeparator } =
         currencyOptions;
@@ -67,8 +68,6 @@ export function currency(options?: CurrencyOptions): Facilis.FormatInstance {
             });
         },
         formatValue({ normalizedValue }) {
-            if (normalizedValue === '') return '';
-
             const formattedValue = formatValueForNumber(normalizedValue, {
                 decimalSeparator,
                 decimalPlaces: includeCents ? 2 : 0,
@@ -77,30 +76,19 @@ export function currency(options?: CurrencyOptions): Facilis.FormatInstance {
 
             return `${symbol}${formattedValue}`;
         },
+        resolveSelection(context) {
+            return resolveSelectionForNumber(context, {
+                allowDecimal: includeCents,
+                decimalSeparator,
+            });
+        },
         formatBlurValue({ formattedValue }) {
-            if (formattedValue === '') return '';
-
             if (!includeCents) return formattedValue;
 
-            if (!formattedValue.includes(decimalSeparator)) {
-                return `${formattedValue}${decimalSeparator}00`;
-            }
-
-            const parts = formattedValue.split(decimalSeparator);
-            const [integerPart = '', fractionalPart = ''] = parts;
-
-            return `${integerPart}${decimalSeparator}${fractionalPart.padEnd(2, '0').slice(0, 2)}`;
-        },
-        resolveSelection(context) {
-            const escapedDecimalSeparator = decimalSeparator.replace(
-                /[.*+?^${}()|[\]\\]/g,
-                '\\$&'
-            );
-            const expression =
-                !includeCents
-                    ? /\d/
-                    : new RegExp(`[\\d${escapedDecimalSeparator}]`);
-            return resolveSelectionByCharacterMatch(expression, context);
+            return formatBlurValueForNumber(formattedValue, {
+                decimalSeparator,
+                padDecimalPlaces: 2,
+            });
         },
     })();
 }

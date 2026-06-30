@@ -15,6 +15,14 @@ import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
     </article>
 
     <article class="demo-card">
+        <h2>Blur padding</h2>
+        <p>Pad the fractional portion on blur when the resting value should settle to a fixed decimal length.</p>
+        <label class="demo-label" for="number-padded">Blur-padded number</label>
+        <input class="demo-input" id="number-padded" data-demo-number-padded type="text" placeholder="Try 12345 and blur" />
+        <p class="demo-note">This scenario uses <code>decimalPlaces: 0</code> and <code>padDecimalPlaces: 2</code> so <code>12345</code> becomes <code>12345.00</code> on blur.</p>
+    </article>
+
+    <article class="demo-card">
         <h2>Thousands separators</h2>
         <p>Enable grouped thousands and preserve up to two decimal places for a more display-oriented numeric value.</p>
         <label class="demo-label" for="number-grouped">Grouped number</label>

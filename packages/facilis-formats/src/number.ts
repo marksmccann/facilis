@@ -1,9 +1,10 @@
 import {
     defineFormat,
+    formatBlurValueForNumber,
     formatValueForNumber,
     normalizeValueForNumber,
-    resolveSelectionByCharacterMatch,
-    type Facilis,
+    resolveSelectionForNumber,
+    type FormatInstance,
 } from 'facilis';
 
 /**
@@ -17,6 +18,12 @@ export type NumberOptions = {
      * which produces an integer-only format.
      */
     decimalPlaces?: number;
+
+    /**
+     * The minimum number of decimal places that should exist after blur. The
+     * default is `0`, which leaves the fractional portion unchanged on blur.
+     */
+    padDecimalPlaces?: number;
 
     /**
      * The separator to use between the whole and fractional portions of the
@@ -44,6 +51,7 @@ function normalizeNumberOptions(options: NumberOptions = {}) {
     return {
         allowNegative: options.allowNegative ?? false,
         decimalPlaces: Math.max(0, options.decimalPlaces ?? 0),
+        padDecimalPlaces: Math.max(0, options.padDecimalPlaces ?? 0),
         decimalSeparator: options.decimalSeparator ?? '.',
         thousandsSeparator: options.thousandsSeparator ?? '',
     };
@@ -54,11 +62,12 @@ function normalizeNumberOptions(options: NumberOptions = {}) {
  *
  * @since 0.0.1
  */
-export function number(options?: NumberOptions): Facilis.FormatInstance {
+export function number(options?: NumberOptions): FormatInstance {
     const numberOptions = normalizeNumberOptions(options);
     const {
         allowNegative,
         decimalPlaces,
+        padDecimalPlaces,
         decimalSeparator,
         thousandsSeparator,
     } = numberOptions;
@@ -80,20 +89,17 @@ export function number(options?: NumberOptions): Facilis.FormatInstance {
             });
         },
         resolveSelection(context) {
-            const escapedDecimalSeparator = decimalSeparator.replace(
-                /[.*+?^${}()|[\]\\]/g,
-                '\\$&'
-            );
-            const expression =
-                decimalPlaces > 0
-                    ? allowNegative
-                        ? new RegExp(`[\\d${escapedDecimalSeparator}-]`)
-                        : new RegExp(`[\\d${escapedDecimalSeparator}]`)
-                    : allowNegative
-                      ? /[\d-]/
-                      : /\d/;
-
-            return resolveSelectionByCharacterMatch(expression, context);
+            return resolveSelectionForNumber(context, {
+                allowDecimal: decimalPlaces > 0,
+                allowNegative,
+                decimalSeparator,
+            });
+        },
+        formatBlurValue({ formattedValue }) {
+            return formatBlurValueForNumber(formattedValue, {
+                decimalSeparator,
+                padDecimalPlaces,
+            });
         },
     })();
 }

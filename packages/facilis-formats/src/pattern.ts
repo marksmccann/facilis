@@ -1,4 +1,4 @@
-import { defineFormat, type Facilis } from 'facilis';
+import { defineFormat, type FormatInstance } from 'facilis';
 import { reporter } from './reporter';
 
 /**
@@ -322,9 +322,9 @@ function getSelectionPosition(
  *
  * @since 0.0.1
  */
-export function pattern(input: string): Facilis.FormatInstance;
-export function pattern(input: PatternOptions): Facilis.FormatInstance;
-export function pattern(input: PatternInput): Facilis.FormatInstance {
+export function pattern(input: string): FormatInstance;
+export function pattern(input: PatternOptions): FormatInstance;
+export function pattern(input: PatternInput): FormatInstance {
     const patternOptions = normalizePatternOptions(input);
     const patternParts = parsePattern(patternOptions);
 

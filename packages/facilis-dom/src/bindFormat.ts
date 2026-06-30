@@ -1,4 +1,4 @@
-import type { Facilis } from 'facilis';
+import type { FormatInstance } from 'facilis';
 import { reporter } from './reporter';
 
 /**
@@ -50,7 +50,7 @@ function resolveInput(target: Element | string): HTMLInputElement {
  */
 export function bindFormat(
     target: Element | string,
-    format: Facilis.FormatInstance
+    format: FormatInstance
 ): () => void {
     const input = resolveInput(target);
     const handleInput = () => {
