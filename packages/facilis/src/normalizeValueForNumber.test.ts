@@ -83,6 +83,23 @@ describe('normalizeValueForNumber', () => {
         ).toBe('-,');
     });
 
+    it('trims unnecessary leading zeros from an integer value', () => {
+        expect(
+            normalizeValueForNumber('00012', {
+                trimLeadingZeros: true,
+            })
+        ).toBe('12');
+    });
+
+    it('trims unnecessary leading zeros from a decimal value', () => {
+        expect(
+            normalizeValueForNumber('00012.34', {
+                decimalPlaces: 2,
+                trimLeadingZeros: true,
+            })
+        ).toBe('12.34');
+    });
+
     it('clamps values above the configured maximum', () => {
         expect(
             normalizeValueForNumber('101', {

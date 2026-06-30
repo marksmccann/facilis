@@ -237,6 +237,39 @@ describe('number', () => {
         });
     });
 
+    it('preserves a completed decimal value while typing when leading-zero insertion is configured', () => {
+        const format = number({
+            decimalPlaces: 2,
+            insertLeadingZero: true,
+        });
+
+        expect(
+            applyInput(format, {
+                value: '.5',
+            })
+        ).toEqual({
+            formattedValue: '.5',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
+    it('trims unnecessary leading zeros while typing', () => {
+        const format = number({
+            trimLeadingZeros: true,
+        });
+
+        expect(
+            applyInput(format, {
+                value: '00012',
+            })
+        ).toEqual({
+            formattedValue: '12',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
     it('clamps values above the configured maximum while typing', () => {
         const format = number({
             max: 100,
@@ -347,6 +380,23 @@ describe('number', () => {
             })
         ).toEqual({
             formattedValue: '1234.56',
+            selectionStart: null,
+            selectionEnd: null,
+        });
+    });
+
+    it('inserts a leading zero on blur when configured', () => {
+        const format = number({
+            decimalPlaces: 2,
+            insertLeadingZero: true,
+        });
+
+        expect(
+            applyBlur(format, {
+                value: '.5',
+            })
+        ).toEqual({
+            formattedValue: '0.5',
             selectionStart: null,
             selectionEnd: null,
         });

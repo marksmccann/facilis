@@ -67,6 +67,17 @@ export function mountNumberDemo() {
             thousandsSeparator: ',',
         })
     );
+    bind('[data-demo-number-leading-zero]', () =>
+        number({
+            decimalPlaces: 2,
+            insertLeadingZero: true,
+        })
+    );
+    bind('[data-demo-number-trim-zeros]', () =>
+        number({
+            trimLeadingZeros: true,
+        })
+    );
     bind('[data-demo-number-max]', () =>
         number({
             max: 100,

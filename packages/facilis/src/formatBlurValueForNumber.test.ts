@@ -47,11 +47,36 @@ describe('formatBlurValueForNumber', () => {
         ).toBe('1.234,50');
     });
 
+    it('inserts a leading zero into a completed decimal value on blur', () => {
+        expect(
+            formatBlurValueForNumber('.5', {
+                insertLeadingZero: true,
+            })
+        ).toBe('0.5');
+    });
+
+    it('inserts a leading zero into a completed negative decimal value on blur', () => {
+        expect(
+            formatBlurValueForNumber('-.5', {
+                decimalSeparator: '.',
+                insertLeadingZero: true,
+            })
+        ).toBe('-0.5');
+    });
+
     it('preserves partial values that do not contain digits', () => {
         expect(
             formatBlurValueForNumber('-', {
                 padDecimalPlaces: 2,
             })
         ).toBe('-');
+    });
+
+    it('preserves partial decimal values while blurring', () => {
+        expect(
+            formatBlurValueForNumber('.', {
+                insertLeadingZero: true,
+            })
+        ).toBe('.');
     });
 });

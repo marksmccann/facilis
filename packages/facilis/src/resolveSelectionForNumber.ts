@@ -1,7 +1,4 @@
-import type {
-    FormatSelectionContext,
-    FormatSelectionResult,
-} from './types';
+import type { FormatSelectionContext, FormatSelectionResult } from './types';
 import { resolveSelectionForCharacterMatch } from './resolveSelectionForCharacterMatch';
 
 /**
@@ -44,9 +41,7 @@ function normalizeOptions(options: ResolveSelectionForNumberOptions = {}) {
  * Creates the regular expression used to preserve meaningful numeric
  * characters while resolving selection.
  */
-function createCharacterMatch(
-    options: ResolveSelectionForNumberOptions = {}
-) {
+function createCharacterMatch(options: ResolveSelectionForNumberOptions = {}) {
     const { allowDecimal, allowNegative, decimalSeparator } =
         normalizeOptions(options);
     let characters = '\\d';

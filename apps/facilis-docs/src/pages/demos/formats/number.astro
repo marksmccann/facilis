@@ -55,6 +55,22 @@ import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
     </article>
 
     <article class="demo-card">
+        <h2>Leading zero insertion</h2>
+        <p>Keep shorthand decimals easy to edit while typing, then settle them to a zero-prefixed value on blur.</p>
+        <label class="demo-label" for="number-leading-zero">Shorthand decimal</label>
+        <input class="demo-input" id="number-leading-zero" data-demo-number-leading-zero type="text" placeholder="Try .5" />
+        <p class="demo-note">This scenario uses <code>decimalPlaces: 2</code> and <code>insertLeadingZero: true</code>, so <code>.5</code> stays editable while typing and becomes <code>0.5</code> after blur.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Trim leading zeros</h2>
+        <p>Collapse unnecessary integer padding while preserving the one zero that still carries numeric meaning.</p>
+        <label class="demo-label" for="number-trim-zeros">Trimmed integer</label>
+        <input class="demo-input" id="number-trim-zeros" data-demo-number-trim-zeros type="text" placeholder="Try 00012" />
+        <p class="demo-note">This scenario uses <code>trimLeadingZeros: true</code>, so values like <code>00012</code> become <code>12</code> while a single <code>0</code> remains intact.</p>
+    </article>
+
+    <article class="demo-card">
         <h2>Maximum clamp</h2>
         <p>Clamp the value to a maximum as soon as typing resolves to a complete number above the allowed range.</p>
         <label class="demo-label" for="number-max">Maximum 100</label>

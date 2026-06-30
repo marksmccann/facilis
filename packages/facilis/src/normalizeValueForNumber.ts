@@ -23,6 +23,13 @@ export type NormalizeValueForNumberOptions = {
     allowNegative?: boolean;
 
     /**
+     * Whether to trim unnecessary leading zeros from the integer portion of
+     * the normalized value, such as converting `00012` to `12`. The default
+     * is `false`.
+     */
+    trimLeadingZeros?: boolean;
+
+    /**
      * The minimum numeric value allowed during normalization. When the
      * normalized value resolves to a complete number below this boundary, it
      * is clamped to the minimum.
@@ -47,6 +54,7 @@ function normalizeOptions(options: NormalizeValueForNumberOptions = {}) {
         decimalPlaces: Math.max(0, options.decimalPlaces ?? 0),
         max: options.max,
         min: options.min,
+        trimLeadingZeros: options.trimLeadingZeros ?? false,
     };
 }
 
@@ -92,6 +100,36 @@ function normalizeDecimalValue(
     const fractionalValue = fractionalCharacters.slice(0, decimalPlaces);
 
     return `${integerDigits}${decimalSeparator}${fractionalValue}`;
+}
+
+/**
+ * Trims unnecessary leading zeros from the integer portion while preserving a
+ * single meaningful zero for values like `0`, `0.5`, and `0.`.
+ */
+function trimLeadingZerosFromNormalizedValue(
+    normalizedValue: string,
+    decimalSeparator: string
+) {
+    const isNegative = normalizedValue.startsWith('-');
+    const unsignedValue = normalizedValue.replace(/^-?/, '');
+    const firstDecimalIndex = unsignedValue.indexOf(decimalSeparator);
+    const hasDecimal = firstDecimalIndex !== -1;
+    let integerDigits = unsignedValue;
+    let fractionalPortion = '';
+
+    if (unsignedValue === '') {
+        return normalizedValue;
+    }
+
+    if (hasDecimal) {
+        integerDigits = unsignedValue.slice(0, firstDecimalIndex);
+        fractionalPortion = unsignedValue.slice(firstDecimalIndex);
+    }
+
+    const trimmedIntegerDigits = integerDigits.replace(/^0+(?=\d)/u, '');
+    const nextUnsignedValue = `${trimmedIntegerDigits}${fractionalPortion}`;
+
+    return isNegative ? `-${nextUnsignedValue}` : nextUnsignedValue;
 }
 
 /**
@@ -199,8 +237,14 @@ export function normalizeValueForNumber(
     rawValue: string,
     options?: NormalizeValueForNumberOptions
 ) {
-    const { allowNegative, decimalPlaces, decimalSeparator, max, min } =
-        normalizeOptions(options);
+    const {
+        allowNegative,
+        decimalPlaces,
+        decimalSeparator,
+        max,
+        min,
+        trimLeadingZeros,
+    } = normalizeOptions(options);
     const normalizedCharacters = normalizeCharacters(
         rawValue,
         decimalSeparator
@@ -230,6 +274,13 @@ export function normalizeValueForNumber(
 
     if (allowNegative && hasLeadingNegativeSign) {
         normalizedValue = `-${normalizedValue}`;
+    }
+
+    if (trimLeadingZeros) {
+        normalizedValue = trimLeadingZerosFromNormalizedValue(
+            normalizedValue,
+            decimalSeparator
+        );
     }
 
     return clampNormalizedValue(normalizedValue, {

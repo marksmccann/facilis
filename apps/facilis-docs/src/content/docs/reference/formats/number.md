@@ -1,11 +1,12 @@
 ---
 title: number
-description: Create a numeric format instance with configurable decimal places, separators, range limits, and negative-value support.
+description: Create a numeric format instance with configurable decimal places, separators, range limits, zero normalization, and negative-value support.
 ---
 
 `number()` creates a numeric format with optional decimal places, configurable
 decimal and thousands separators, optional live range limits, optional
-blur-time decimal padding, and optional negative-value support.
+zero normalization, optional blur-time decimal padding, and optional
+negative-value support.
 
 [Play with the demos &rarr;](/facilis/demos/formats/number/)
 
@@ -43,6 +44,14 @@ With `number({ decimalPlaces: 2, max: 10 })`:
 
 - `10.5` becomes `10` while typing
 
+With `number({ decimalPlaces: 2, insertLeadingZero: true })`:
+
+- `.5` becomes `0.5` after blur
+
+With `number({ trimLeadingZeros: true })`:
+
+- `00012` becomes `12` while typing
+
 ## Signature
 
 ```ts
@@ -79,6 +88,15 @@ const localizedDecimalFormat = number({
 const clampedNumberFormat = number({
     min: 0,
     max: 100,
+});
+
+const shorthandDecimalFormat = number({
+    decimalPlaces: 2,
+    insertLeadingZero: true,
+});
+
+const trimmedIntegerFormat = number({
+    trimLeadingZeros: true,
 });
 ```
 
@@ -175,6 +193,42 @@ const signedNumberFormat = number({ allowNegative: true });
 With raw input `-12345`, `defaultNumberFormat` formats as `12345`, while
 `signedNumberFormat` formats as `-12345`.
 
+### `insertLeadingZero`
+
+Controls whether decimals without an integer portion gain a leading zero after
+blur.
+
+Default: `false`
+
+Example:
+
+```ts
+const shorthandDecimalFormat = number({
+    decimalPlaces: 2,
+    insertLeadingZero: true,
+});
+```
+
+With raw input `.5`, this formats as `0.5`. Partial values like `.` remain
+editable while typing and settle to `0.5` after blur.
+
+### `trimLeadingZeros`
+
+Controls whether unnecessary leading zeros are removed from the integer
+portion while typing.
+
+Default: `false`
+
+Example:
+
+```ts
+const trimmedIntegerFormat = number({
+    trimLeadingZeros: true,
+});
+```
+
+With raw input `00012`, this formats as `12`.
+
 ### `min`
 
 Sets the minimum numeric value allowed while typing.
@@ -218,6 +272,10 @@ complete number.
   greater than `0`.
 - Inserts the configured thousands separator into the whole portion during
   formatting.
+- Inserts a leading zero into completed decimals like `.5` when
+  `insertLeadingZero` is `true`.
+- Removes unnecessary leading zeros from the integer portion when
+  `trimLeadingZeros` is `true`.
 - Clamps complete numeric values to `min` and `max` immediately during input
   normalization when those range limits are configured.
 - Pads the fractional portion with trailing zeroes on blur when

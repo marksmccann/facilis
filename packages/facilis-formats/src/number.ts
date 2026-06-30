@@ -44,6 +44,19 @@ export type NumberOptions = {
     allowNegative?: boolean;
 
     /**
+     * Whether to insert a leading zero on blur when the value contains a
+     * decimal without an integer portion, such as converting `.5` to `0.5`.
+     * The default is `false`.
+     */
+    insertLeadingZero?: boolean;
+
+    /**
+     * Whether to trim unnecessary leading zeros from the integer portion,
+     * such as converting `00012` to `12`. The default is `false`.
+     */
+    trimLeadingZeros?: boolean;
+
+    /**
      * The minimum numeric value allowed while typing. Values below this
      * boundary clamp to the minimum as soon as they resolve to a complete
      * number.
@@ -67,9 +80,11 @@ function normalizeNumberOptions(options: NumberOptions = {}) {
         decimalPlaces: Math.max(0, options.decimalPlaces ?? 0),
         padDecimalPlaces: Math.max(0, options.padDecimalPlaces ?? 0),
         decimalSeparator: options.decimalSeparator ?? '.',
+        insertLeadingZero: options.insertLeadingZero ?? false,
         max: options.max,
         min: options.min,
         thousandsSeparator: options.thousandsSeparator ?? '',
+        trimLeadingZeros: options.trimLeadingZeros ?? false,
     };
 }
 
@@ -85,9 +100,11 @@ export function number(options?: NumberOptions): FormatInstance {
         decimalPlaces,
         padDecimalPlaces,
         decimalSeparator,
+        insertLeadingZero,
         max,
         min,
         thousandsSeparator,
+        trimLeadingZeros,
     } = numberOptions;
 
     return defineFormat({
@@ -99,6 +116,7 @@ export function number(options?: NumberOptions): FormatInstance {
                 decimalSeparator,
                 max,
                 min,
+                trimLeadingZeros,
             });
         },
         formatValue({ normalizedValue }) {
@@ -118,6 +136,7 @@ export function number(options?: NumberOptions): FormatInstance {
         formatBlurValue({ formattedValue }) {
             return formatBlurValueForNumber(formattedValue, {
                 decimalSeparator,
+                insertLeadingZero,
                 padDecimalPlaces,
             });
         },
