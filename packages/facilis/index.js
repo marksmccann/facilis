@@ -1,6 +1,10 @@
 export { defineFormat } from './src/index.ts';
 export { formatBlurValueForNumber } from './src/index.ts';
+export { formatValueForPattern } from './src/index.ts';
 export { formatValueForNumber } from './src/index.ts';
+export { normalizeValueForPattern } from './src/index.ts';
 export { normalizeValueForNumber } from './src/index.ts';
+export { parsePatternOptions } from './src/index.ts';
 export { resolveSelectionForCharacterMatch } from './src/index.ts';
+export { resolveSelectionForPattern } from './src/index.ts';
 export { resolveSelectionForNumber } from './src/index.ts';

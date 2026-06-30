@@ -77,38 +77,6 @@ export type FormatSelectionResult = {
 };
 
 /**
- * The configuration options for numeric selection resolution.
- *
- * @since 0.0.1
- */
-export type ResolveSelectionForNumberOptions =
-    import('./resolveSelectionForNumber').ResolveSelectionForNumberOptions;
-
-/**
- * The configuration options for numeric blur-value formatting.
- *
- * @since 0.0.1
- */
-export type FormatBlurValueForNumberOptions =
-    import('./formatBlurValueForNumber').FormatBlurValueForNumberOptions;
-
-/**
- * The configuration options for numeric value formatting.
- *
- * @since 0.0.1
- */
-export type FormatValueForNumberOptions =
-    import('./formatValueForNumber').FormatValueForNumberOptions;
-
-/**
- * The configuration options for numeric value normalization.
- *
- * @since 0.0.1
- */
-export type NormalizeValueForNumberOptions =
-    import('./normalizeValueForNumber').NormalizeValueForNumberOptions;
-
-/**
  * A stateful format instance driven by adapters/plugins.
  *
  * @since 0.0.1
@@ -128,3 +96,9 @@ export type FormatInstance = {
  * @since 0.0.1
  */
 export type FormatFactory = () => FormatInstance;
+
+export type * from './formatBlurValueForNumber';
+export type * from './formatValueForNumber';
+export type * from './normalizeValueForNumber';
+export type * from './parsePatternOptions';
+export type * from './resolveSelectionForNumber';

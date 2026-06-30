@@ -30,7 +30,11 @@
     "formatter"
   ],
   "license": "MIT",
+  "dependencies": {
+    "runtime-reporter": "^0.10.1"
+  },
   "devDependencies": {
+    "@types/node": "^26.0.1",
     "facilis-testing": "0.0.1",
     "vitest": "^4.1.9"
   }

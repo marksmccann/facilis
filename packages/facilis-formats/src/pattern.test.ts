@@ -165,7 +165,7 @@ describe('pattern', () => {
 
     it('fails on invalid pattern input', () => {
         expect(() => pattern('')).toThrowError(
-            '[facilis-formats] ERR01: Pattern formats require a non-empty pattern string.'
+            '[facilis] ERR01: Pattern formats require a non-empty pattern string.'
         );
         expect(() =>
             pattern({
@@ -173,7 +173,7 @@ describe('pattern', () => {
                 tokens: {},
             })
         ).toThrowError(
-            '[facilis-formats] ERR02: Pattern formats require at least one token definition.'
+            '[facilis] ERR02: Pattern formats require at least one token definition.'
         );
         expect(() =>
             pattern({
@@ -185,7 +185,7 @@ describe('pattern', () => {
                 },
             })
         ).toThrowError(
-            '[facilis-formats] ERR03: Pattern format token keys must be a single character each.'
+            '[facilis] ERR03: Pattern format token keys must be a single character each.'
         );
         expect(() =>
             pattern({
@@ -197,7 +197,7 @@ describe('pattern', () => {
                 },
             })
         ).toThrowError(
-            '[facilis-formats] ERR04: Pattern formats require the pattern string to include at least one token.'
+            '[facilis] ERR04: Pattern formats require the pattern string to include at least one token.'
         );
     });
 });
