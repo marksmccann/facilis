@@ -46,6 +46,7 @@ export default defineConfig({
                             label: 'domesticPhoneNumber',
                             slug: 'reference/formats/domestic-phone-number',
                         },
+                        { label: 'number', slug: 'reference/formats/number' },
                         { label: 'pattern', slug: 'reference/formats/pattern' },
                     ],
                 },

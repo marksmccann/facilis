@@ -1,15 +1,10 @@
 import {
     defineFormat,
+    formatValueForNumber,
+    normalizeValueForNumber,
     resolveSelectionByCharacterMatch,
     type Facilis,
 } from 'facilis';
-
-/**
- * Controls whether a currency format should include cents.
- *
- * @since 0.0.1
- */
-export type CurrencyCents = 'always' | 'never';
 
 /**
  * The configuration options for a currency format.
@@ -22,20 +17,35 @@ export type CurrencyOptions = {
      * string to omit the symbol entirely.
      */
     symbol?: string;
+
     /**
-     * Controls whether cents are included in the formatted value.
+     * The separator to use between the whole and fractional portions of the
+     * formatted value. The default is `'.'`.
      */
-    cents?: CurrencyCents;
+    decimalSeparator?: string;
+
+    /**
+     * The separator to use between digit groups in the whole portion of the
+     * formatted value. The default is `','`.
+     */
+    thousandsSeparator?: string;
+
+    /**
+     * Controls whether the formatted value includes cents.
+     */
+    includeCents?: boolean;
 };
 
 /**
- * Applies the default currency symbol and cents mode when an option is
+ * Applies the default currency symbol and cents behavior when an option is
  * omitted.
  */
 function normalizeCurrencyOptions(options: CurrencyOptions = {}) {
     return {
+        decimalSeparator: options.decimalSeparator ?? '.',
+        includeCents: options.includeCents ?? true,
         symbol: options.symbol ?? '$',
-        cents: options.cents ?? 'always',
+        thousandsSeparator: options.thousandsSeparator ?? ',',
     };
 }
 
@@ -45,58 +55,51 @@ function normalizeCurrencyOptions(options: CurrencyOptions = {}) {
  */
 export function currency(options?: CurrencyOptions): Facilis.FormatInstance {
     const currencyOptions = normalizeCurrencyOptions(options);
-    const { symbol, cents } = currencyOptions;
+    const { decimalSeparator, includeCents, symbol, thousandsSeparator } =
+        currencyOptions;
 
     return defineFormat({
         name: 'currency',
         normalizeValue({ rawValue }) {
-            const cleaned = rawValue.replace(/[^\d.]/g, '');
-            const firstDecimalIndex = cleaned.indexOf('.');
-
-            if (firstDecimalIndex === -1) {
-                return cleaned.replace(/\./g, '');
-            }
-
-            const integerPart = cleaned.slice(0, firstDecimalIndex);
-
-            if (cents === 'never') {
-                return integerPart.replace(/\./g, '');
-            }
-
-            const afterFirstDecimal = cleaned.slice(firstDecimalIndex + 1);
-            const fractionalPart = afterFirstDecimal.replace(/\./g, '');
-
-            return `${integerPart}.${fractionalPart.slice(0, 2)}`;
+            return normalizeValueForNumber(rawValue, {
+                decimalSeparator,
+                decimalPlaces: includeCents ? 2 : 0,
+            });
         },
         formatValue({ normalizedValue }) {
             if (normalizedValue === '') return '';
 
-            const commasRegex = /\B(?=(\d{3})+(?!\d))/g;
-            const hasDecimal = normalizedValue.includes('.');
-            const parts = normalizedValue.split('.');
-            const [integerPart = '', fractionalPart = ''] = parts;
-            const formattedInteger = integerPart.replace(commasRegex, ',');
+            const formattedValue = formatValueForNumber(normalizedValue, {
+                decimalSeparator,
+                decimalPlaces: includeCents ? 2 : 0,
+                thousandsSeparator,
+            });
 
-            if (!hasDecimal || cents === 'never') {
-                return `${symbol}${formattedInteger}`;
-            }
-
-            return `${symbol}${formattedInteger}.${fractionalPart}`;
+            return `${symbol}${formattedValue}`;
         },
         formatBlurValue({ formattedValue }) {
             if (formattedValue === '') return '';
 
-            if (cents === 'never') return formattedValue;
+            if (!includeCents) return formattedValue;
 
-            if (!formattedValue.includes('.')) return `${formattedValue}.00`;
+            if (!formattedValue.includes(decimalSeparator)) {
+                return `${formattedValue}${decimalSeparator}00`;
+            }
 
-            const parts = formattedValue.split('.');
+            const parts = formattedValue.split(decimalSeparator);
             const [integerPart = '', fractionalPart = ''] = parts;
 
-            return `${integerPart}.${fractionalPart.padEnd(2, '0').slice(0, 2)}`;
+            return `${integerPart}${decimalSeparator}${fractionalPart.padEnd(2, '0').slice(0, 2)}`;
         },
         resolveSelection(context) {
-            const expression = cents === 'never' ? /\d/ : /[\d.]/;
+            const escapedDecimalSeparator = decimalSeparator.replace(
+                /[.*+?^${}()|[\]\\]/g,
+                '\\$&'
+            );
+            const expression =
+                !includeCents
+                    ? /\d/
+                    : new RegExp(`[\\d${escapedDecimalSeparator}]`);
             return resolveSelectionByCharacterMatch(expression, context);
         },
     })();

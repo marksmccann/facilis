@@ -92,8 +92,8 @@ export function mountPrototypeDemo() {
     bindFormat(
         '[data-facilis-currency-input]',
         currency({
+            includeCents: true,
             symbol: '$',
-            cents: 'always',
         })
     );
     bindFormat('[data-facilis-date-input]', dateFormat());

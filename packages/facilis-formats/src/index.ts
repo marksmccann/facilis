@@ -1,6 +1,8 @@
 export { currency } from './currency';
-export type { CurrencyCents, CurrencyOptions } from './currency';
+export type { CurrencyOptions } from './currency';
 export { domesticPhoneNumber } from './domesticPhoneNumber';
+export { number } from './number';
+export type { NumberOptions } from './number';
 export { pattern } from './pattern';
 export type {
     PatternInput,

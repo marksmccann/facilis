@@ -87,6 +87,42 @@ describe('currency', () => {
         });
     });
 
+    it('supports custom decimal and thousands separators', () => {
+        const format = currency({
+            decimalSeparator: ',',
+            symbol: '€',
+            thousandsSeparator: '.',
+        });
+
+        expect(
+            applyInput(format, {
+                value: '1234,56',
+            })
+        ).toEqual({
+            formattedValue: '€1.234,56',
+            selectionStart: 9,
+            selectionEnd: 9,
+        });
+    });
+
+    it('pads the fractional part on blur with a custom decimal separator', () => {
+        const format = currency({
+            decimalSeparator: ',',
+            symbol: '€',
+            thousandsSeparator: '.',
+        });
+
+        expect(
+            applyBlur(format, {
+                value: '€1.234,5',
+            })
+        ).toEqual({
+            formattedValue: '€1.234,50',
+            selectionStart: null,
+            selectionEnd: null,
+        });
+    });
+
     it('supports a custom symbol', () => {
         const format = currency({
             symbol: '€',
@@ -119,9 +155,9 @@ describe('currency', () => {
         });
     });
 
-    it('supports disabling decimals entirely', () => {
+    it('ignores decimal separators when includeCents is false', () => {
         const format = currency({
-            cents: 'never',
+            includeCents: false,
         });
 
         expect(
@@ -129,9 +165,9 @@ describe('currency', () => {
                 value: '1234.56',
             })
         ).toEqual({
-            formattedValue: '$1,234',
-            selectionStart: 6,
-            selectionEnd: 6,
+            formattedValue: '$123,456',
+            selectionStart: 8,
+            selectionEnd: 8,
         });
     });
 });

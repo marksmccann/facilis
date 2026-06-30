@@ -2,6 +2,7 @@ import { bindFormat } from '../../../../packages/facilis-dom/src/index.ts';
 import {
     currency,
     domesticPhoneNumber,
+    number,
     pattern,
 } from '../../../../packages/facilis-formats/src/index.ts';
 
@@ -12,9 +13,53 @@ function bind(target: string, factory: () => ReturnType<typeof currency>) {
 export function mountCurrencyDemo() {
     bind('[data-demo-currency-default]', () => currency());
     bind('[data-demo-currency-euro]', () => currency({ symbol: '€' }));
-    bind('[data-demo-currency-whole]', () => currency({ cents: 'never' }));
+    bind('[data-demo-currency-separators]', () =>
+        currency({
+            decimalSeparator: ',',
+            symbol: '€',
+            thousandsSeparator: '.',
+        })
+    );
+    bind('[data-demo-currency-whole]', () =>
+        currency({ includeCents: false })
+    );
+    bind('[data-demo-currency-plain-groups]', () =>
+        currency({
+            thousandsSeparator: '',
+        })
+    );
     bind('[data-demo-currency-bare]', () =>
-        currency({ symbol: '', cents: 'never' })
+        currency({ includeCents: false, symbol: '' })
+    );
+}
+
+export function mountNumberDemo() {
+    bind('[data-demo-number-default]', () => number());
+    bind('[data-demo-number-grouped]', () =>
+        number({
+            decimalPlaces: 2,
+            thousandsSeparator: ',',
+        })
+    );
+    bind('[data-demo-number-separators]', () =>
+        number({
+            decimalPlaces: 2,
+            decimalSeparator: ',',
+            thousandsSeparator: '.',
+        })
+    );
+    bind('[data-demo-number-plain-groups]', () =>
+        number({
+            decimalPlaces: 2,
+            thousandsSeparator: '',
+        })
+    );
+    bind('[data-demo-number-negative]', () =>
+        number({
+            allowNegative: true,
+            decimalPlaces: 2,
+            thousandsSeparator: ',',
+        })
     );
 }
 

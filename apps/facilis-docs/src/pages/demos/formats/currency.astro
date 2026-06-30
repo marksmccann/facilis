@@ -23,11 +23,27 @@ import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
     </article>
 
     <article class="demo-card">
+        <h2>Custom separators</h2>
+        <p>Swap both separators when the surrounding UI expects grouped thousands with <code>.</code> and decimals with <code>,</code>.</p>
+        <label class="demo-label" for="currency-separators">Localized separators</label>
+        <input class="demo-input" id="currency-separators" data-demo-currency-separators type="text" placeholder="Try 12345,6" />
+        <p class="demo-note">This scenario uses the symbol: <code>€</code>, the thousands separator: <code>.</code>, and the decimal separator: <code>,</code>.</p>
+    </article>
+
+    <article class="demo-card">
         <h2>No cents</h2>
-        <p>Disable decimals entirely when you only want whole-number currency formatting.</p>
+        <p>Disable cents entirely when you want decimal separators ignored and only the remaining digits preserved.</p>
         <label class="demo-label" for="currency-whole">Whole-number currency</label>
         <input class="demo-input" id="currency-whole" data-demo-currency-whole type="text" placeholder="Try 12345.6" />
-        <p class="demo-note">This scenario disables cents.</p>
+        <p class="demo-note">This scenario sets <code>includeCents</code> to <code>false</code>, so <code>12345.6</code> becomes <code>$123,456</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>No thousands separator</h2>
+        <p>Remove digit grouping entirely when you want a continuous currency string instead of grouped thousands.</p>
+        <label class="demo-label" for="currency-plain-groups">Ungrouped currency</label>
+        <input class="demo-input" id="currency-plain-groups" data-demo-currency-plain-groups type="text" placeholder="Try 12345.6" />
+        <p class="demo-note">This scenario sets the thousands separator to an empty string.</p>
     </article>
 
     <article class="demo-card">
@@ -35,7 +51,7 @@ import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
         <p>Omit the symbol entirely when the surrounding UI already makes the unit obvious.</p>
         <label class="demo-label" for="currency-bare">Bare numeric output</label>
         <input class="demo-input" id="currency-bare" data-demo-currency-bare type="text" placeholder="Try 12345.6" />
-        <p class="demo-note">This scenario omits the symbol and disables cents.</p>
+        <p class="demo-note">This scenario omits the symbol and sets <code>includeCents</code> to <code>false</code>, so <code>12345.6</code> becomes <code>123456</code>.</p>
     </article>
 
     <script>

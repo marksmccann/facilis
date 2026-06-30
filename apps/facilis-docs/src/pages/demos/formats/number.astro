@@ -1,0 +1,54 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/number/"
+    title="number() Demo"
+>
+    <article class="demo-card">
+        <h2>Default formatting</h2>
+        <p>The default number format keeps a plain integer string without grouping or a fractional portion.</p>
+        <label class="demo-label" for="number-default">Type a number</label>
+        <input class="demo-input" id="number-default" data-demo-number-default type="text" placeholder="Try 12345" />
+        <p class="demo-note">Try <code>12345</code> to see the default number formatting.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Thousands separators</h2>
+        <p>Enable grouped thousands and preserve up to two decimal places for a more display-oriented numeric value.</p>
+        <label class="demo-label" for="number-grouped">Grouped number</label>
+        <input class="demo-input" id="number-grouped" data-demo-number-grouped type="text" placeholder="Try 12345.67" />
+        <p class="demo-note">This scenario uses the thousands separator: <code>,</code> and the decimal separator: <code>.</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Custom separators</h2>
+        <p>Swap both separators when the surrounding UI expects grouped thousands with <code>.</code> and decimals with <code>,</code>.</p>
+        <label class="demo-label" for="number-separators">Localized separators</label>
+        <input class="demo-input" id="number-separators" data-demo-number-separators type="text" placeholder="Try 12345,67" />
+        <p class="demo-note">This scenario uses the thousands separator: <code>.</code> and the decimal separator: <code>,</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>No thousands separator</h2>
+        <p>Leave the digits ungrouped while still preserving a fractional portion when grouping would add unnecessary visual noise.</p>
+        <label class="demo-label" for="number-plain-groups">Ungrouped decimal number</label>
+        <input class="demo-input" id="number-plain-groups" data-demo-number-plain-groups type="text" placeholder="Try 12345.67" />
+        <p class="demo-note">This scenario sets the thousands separator to an empty string.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Negative values</h2>
+        <p>Preserve a leading minus sign when the format should support signed numeric input.</p>
+        <label class="demo-label" for="number-negative">Signed number</label>
+        <input class="demo-input" id="number-negative" data-demo-number-negative type="text" placeholder="Try -12345.67" />
+        <p class="demo-note">This scenario enables negative values and uses grouped thousands with up to two decimal places.</p>
+    </article>
+
+    <script>
+        import { mountNumberDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountNumberDemo();
+    </script>
+</FormatDemoLayout>

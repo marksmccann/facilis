@@ -11,7 +11,7 @@ first-party exports from `facilis-formats`.
 ## Package
 
 ```ts
-import { currency, domesticPhoneNumber, pattern } from 'facilis-formats';
+import { currency, domesticPhoneNumber, number, pattern } from 'facilis-formats';
 ```
 
 Use `facilis-formats` when you want ready-made format definitions instead of
@@ -22,13 +22,18 @@ building a custom one directly with `defineFormat()`.
 <CardGrid>
     <LinkCard
         title="currency"
-        description="Currency formatting with configurable symbol and cents behavior."
+        description="Currency formatting with configurable symbol, separators, and optional cents."
         href="/facilis/reference/formats/currency/"
     />
     <LinkCard
         title="domesticPhoneNumber"
         description="A dedicated 10-digit domestic phone number format."
         href="/facilis/reference/formats/domestic-phone-number/"
+    />
+    <LinkCard
+        title="number"
+        description="Numeric formatting with configurable decimal places, separators, and negative-value support."
+        href="/facilis/reference/formats/number/"
     />
     <LinkCard
         title="pattern"
