@@ -5,7 +5,6 @@ import {
 import { bindFormat } from '../../../../packages/facilis-dom/src/index.ts';
 import {
     currency,
-    domesticPhoneNumber,
     pattern,
 } from '../../../../packages/facilis-formats/src/index.ts';
 
@@ -85,10 +84,6 @@ export function mountPrototypeDemo() {
     });
 
     bindFormat('[data-facilis-pattern-input]', pattern('(###) ###-####'));
-    bindFormat(
-        '[data-facilis-domestic-phone-number-input]',
-        domesticPhoneNumber()
-    );
     bindFormat(
         '[data-facilis-currency-input]',
         currency({

@@ -42,10 +42,6 @@ export default defineConfig({
                     items: [
                         { label: 'Formats Overview', slug: 'reference/formats' },
                         { label: 'currency', slug: 'reference/formats/currency' },
-                        {
-                            label: 'domesticPhoneNumber',
-                            slug: 'reference/formats/domestic-phone-number',
-                        },
                         { label: 'number', slug: 'reference/formats/number' },
                         { label: 'pattern', slug: 'reference/formats/pattern' },
                     ],

@@ -16,18 +16,6 @@ bindFormat(input, currency({ symbol: '€' }));
 bindFormat(input, currency({ symbol: '', includeCents: false }));
 ```
 
-## `domesticPhoneNumber`
-
-Create a dedicated formatter for a 10-digit domestic phone number in the
-`(###) ###-####` format.
-
-```ts
-import { bindFormat } from 'facilis-dom';
-import { domesticPhoneNumber } from 'facilis-formats';
-
-bindFormat(input, domesticPhoneNumber());
-```
-
 ## `pattern`
 
 Create a format from either a pattern string with preset tokens or an explicit

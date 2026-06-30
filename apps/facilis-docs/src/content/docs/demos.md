@@ -12,7 +12,6 @@ experiments can share the same deployment target.
 Dedicated format demos live at:
 
 - `/facilis/demos/formats/currency/`
-- `/facilis/demos/formats/domestic-phone-number/`
 - `/facilis/demos/formats/number/`
 - `/facilis/demos/formats/pattern/`
 

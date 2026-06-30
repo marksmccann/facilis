@@ -1,7 +1,6 @@
 import { bindFormat } from '../../../../packages/facilis-dom/src/index.ts';
 import {
     currency,
-    domesticPhoneNumber,
     number,
     pattern,
 } from '../../../../packages/facilis-formats/src/index.ts';
@@ -95,11 +94,6 @@ export function mountNumberDemo() {
             max: 10,
         })
     );
-}
-
-export function mountDomesticPhoneNumberDemo() {
-    bind('[data-demo-phone-basic]', () => domesticPhoneNumber());
-    bind('[data-demo-phone-paste]', () => domesticPhoneNumber());
 }
 
 export function mountPatternDemo() {
