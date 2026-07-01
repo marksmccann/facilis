@@ -1,0 +1,54 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/"
+    title="date() Demo"
+>
+    <article class="demo-card">
+        <h2>Full date</h2>
+        <p>Use the default slash-separated full-date pattern when the input should accept month, day, and a four-digit year.</p>
+        <label class="demo-label" for="date-default">Month, day, year</label>
+        <input class="demo-input" id="date-default" data-demo-date-default type="text" placeholder="Try 12312026" />
+        <p class="demo-note">This scenario uses <code>pattern: 'MM/DD/YYYY'</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Month and year</h2>
+        <p>Use a partial date pattern when the input only needs one month segment and a short year segment.</p>
+        <label class="demo-label" for="date-month-year">Month and year</label>
+        <input class="demo-input" id="date-month-year" data-demo-date-month-year type="text" placeholder="Try 1226" />
+        <p class="demo-note">This scenario uses <code>pattern: 'MM/YY'</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Custom separator</h2>
+        <p>Keep the canonical slash-based pattern while rendering the final value with a different separator.</p>
+        <label class="demo-label" for="date-year-month">Year and month</label>
+        <input class="demo-input" id="date-year-month" data-demo-date-year-month type="text" placeholder="Try 202401" />
+        <p class="demo-note">This scenario uses <code>pattern: 'YYYY/MM'</code> with <code>separator: '-'</code>, so <code>202401</code> becomes <code>2024-01</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Leading zero insertion</h2>
+        <p>Opt into safe live zero insertion for single-digit month and day values that cannot naturally grow into another valid two-digit segment.</p>
+        <label class="demo-label" for="date-leading-zero">Smart leading zeros</label>
+        <input class="demo-input" id="date-leading-zero" data-demo-date-leading-zero type="text" placeholder="Try 4052026" />
+        <p class="demo-note">This scenario uses <code>pattern: 'MM/DD/YYYY'</code> with <code>insertLeadingZero: true</code>, so values like <code>4052026</code> become <code>04/05/2026</code> while typing.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Strict month and day</h2>
+        <p>Opt into stricter typing when obviously invalid month and day values should be rejected instead of being preserved while the user types.</p>
+        <label class="demo-label" for="date-strict-month-and-day">Strict month and day</label>
+        <input class="demo-input" id="date-strict-month-and-day" data-demo-date-strict-month-and-day type="text" placeholder="Try 13 or 1239" />
+        <p class="demo-note">This scenario uses <code>pattern: 'MM/DD/YYYY'</code> with <code>strictMonthAndDay: true</code>, so inputs like <code>13</code> for the month or <code>39</code> for the day are rejected while typing.</p>
+    </article>
+
+    <script>
+        import { mountDateDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountDateDemo();
+    </script>
+</FormatDemoLayout>

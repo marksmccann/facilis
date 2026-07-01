@@ -1,11 +1,15 @@
 export * from './defineFormat';
 export * from './formatBlurValueForNumber';
+export * from './formatValueForDate';
 export * from './formatValueForPattern';
 export * from './formatValueForNumber';
 export * from './normalizeValueForPattern';
 export * from './normalizeValueForNumber';
+export * from './normalizeValueForDate';
+export * from './parseDateOptions';
 export * from './parsePatternOptions';
 export * from './resolveSelectionForCharacters';
+export * from './resolveSelectionForDate';
 export * from './resolveSelectionForPattern';
 export * from './resolveSelectionForNumber';
 export type * from './types';

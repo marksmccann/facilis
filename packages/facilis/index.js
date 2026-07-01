@@ -1,10 +1,14 @@
 export { defineFormat } from './src/index.ts';
 export { formatBlurValueForNumber } from './src/index.ts';
+export { formatValueForDate } from './src/index.ts';
 export { formatValueForPattern } from './src/index.ts';
 export { formatValueForNumber } from './src/index.ts';
 export { normalizeValueForPattern } from './src/index.ts';
 export { normalizeValueForNumber } from './src/index.ts';
+export { normalizeValueForDate } from './src/index.ts';
+export { parseDateOptions } from './src/index.ts';
 export { parsePatternOptions } from './src/index.ts';
 export { resolveSelectionForCharacters } from './src/index.ts';
+export { resolveSelectionForDate } from './src/index.ts';
 export { resolveSelectionForPattern } from './src/index.ts';
 export { resolveSelectionForNumber } from './src/index.ts';

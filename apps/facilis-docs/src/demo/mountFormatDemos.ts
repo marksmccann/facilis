@@ -1,6 +1,7 @@
 import { bindFormat } from '../../../../packages/facilis-dom/src/index.ts';
 import {
     currency,
+    date,
     number,
     pattern,
     text,
@@ -30,6 +31,37 @@ export function mountCurrencyDemo() {
     );
     bind('[data-demo-currency-bare]', () =>
         currency({ includeCents: false, symbol: '' })
+    );
+}
+
+export function mountDateDemo() {
+    bind('[data-demo-date-default]', () =>
+        date({
+            pattern: 'MM/DD/YYYY',
+        })
+    );
+    bind('[data-demo-date-month-year]', () =>
+        date({
+            pattern: 'MM/YY',
+        })
+    );
+    bind('[data-demo-date-year-month]', () =>
+        date({
+            pattern: 'YYYY/MM',
+            separator: '-',
+        })
+    );
+    bind('[data-demo-date-leading-zero]', () =>
+        date({
+            pattern: 'MM/DD/YYYY',
+            insertLeadingZero: true,
+        })
+    );
+    bind('[data-demo-date-strict-month-and-day]', () =>
+        date({
+            pattern: 'MM/DD/YYYY',
+            strictMonthAndDay: true,
+        })
     );
 }
 
