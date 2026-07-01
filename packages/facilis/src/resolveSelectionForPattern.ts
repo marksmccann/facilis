@@ -1,6 +1,10 @@
 import type { PatternPart } from './parsePatternOptions';
 import type { FormatSelectionContext, FormatSelectionResult } from './types';
 
+export type ResolveSelectionForPatternOptions = {
+    patternParts: PatternPart[];
+};
+
 /**
  * Returns only the token parts from the parsed pattern.
  */
@@ -102,8 +106,10 @@ function getSelectionPosition(
  */
 export function resolveSelectionForPattern(
     context: FormatSelectionContext,
-    patternParts: PatternPart[]
+    options: ResolveSelectionForPatternOptions
 ): FormatSelectionResult {
+    const { patternParts } = options;
+
     return {
         selectionStart: getSelectionPosition(
             context.normalizedValue,

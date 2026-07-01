@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { resolveSelectionForCharacters } from './resolveSelectionForCharacters';
+import { resolveSelectionForText } from './resolveSelectionForText';
 
-describe('resolveSelectionForCharacters', () => {
+describe('resolveSelectionForText', () => {
     it('maps matched characters onto the formatted value', () => {
         expect(
-            resolveSelectionForCharacters(
+            resolveSelectionForText(
                 {
                     rawValue: '(123) 4',
                     rawSelectionStart: 7,
@@ -12,7 +12,9 @@ describe('resolveSelectionForCharacters', () => {
                     normalizedValue: '1234',
                     formattedValue: '(123) 4',
                 },
-                /\d/
+                {
+                    characterMatches: /\d/,
+                }
             )
         ).toEqual({
             selectionStart: 7,
@@ -22,7 +24,7 @@ describe('resolveSelectionForCharacters', () => {
 
     it('clamps the selection count to the normalized value length', () => {
         expect(
-            resolveSelectionForCharacters(
+            resolveSelectionForText(
                 {
                     rawValue: '(123) 456999',
                     rawSelectionStart: 12,
@@ -30,7 +32,9 @@ describe('resolveSelectionForCharacters', () => {
                     normalizedValue: '123456',
                     formattedValue: '(123) 456',
                 },
-                /\d/
+                {
+                    characterMatches: /\d/,
+                }
             )
         ).toEqual({
             selectionStart: 9,
@@ -40,7 +44,7 @@ describe('resolveSelectionForCharacters', () => {
 
     it('returns zeroed selections when no matched characters precede the cursor', () => {
         expect(
-            resolveSelectionForCharacters(
+            resolveSelectionForText(
                 {
                     rawValue: '(',
                     rawSelectionStart: 1,
@@ -48,7 +52,9 @@ describe('resolveSelectionForCharacters', () => {
                     normalizedValue: '',
                     formattedValue: '',
                 },
-                /\d/
+                {
+                    characterMatches: /\d/,
+                }
             )
         ).toEqual({
             selectionStart: 0,
@@ -58,7 +64,7 @@ describe('resolveSelectionForCharacters', () => {
 
     it('supports selection ranges with non-digit match rules', () => {
         expect(
-            resolveSelectionForCharacters(
+            resolveSelectionForText(
                 {
                     rawValue: 'ab-',
                     rawSelectionStart: 1,
@@ -66,7 +72,9 @@ describe('resolveSelectionForCharacters', () => {
                     normalizedValue: 'ab',
                     formattedValue: 'AB',
                 },
-                /[a-z]/i
+                {
+                    characterMatches: /[a-z]/i,
+                }
             )
         ).toEqual({
             selectionStart: 1,

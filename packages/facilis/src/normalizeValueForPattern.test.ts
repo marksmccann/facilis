@@ -11,8 +11,11 @@ describe('normalizeValueForPattern', () => {
             },
         });
 
-        expect(normalizeValueForPattern('1a2b3c4d5e6f7g8h9i0', patternParts)).toBe(
-            '1234567890'
-        );
+        expect(
+            normalizeValueForPattern(
+                { rawValue: '1a2b3c4d5e6f7g8h9i0' },
+                { patternParts }
+            )
+        ).toBe('1234567890');
     });
 });

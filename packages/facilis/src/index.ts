@@ -5,7 +5,7 @@ export * from './formatValueForNumber';
 export * from './normalizeValueForPattern';
 export * from './normalizeValueForNumber';
 export * from './parsePatternOptions';
-export * from './resolveSelectionForCharacters';
+export * from './resolveSelectionForText';
 export * from './resolveSelectionForPattern';
 export * from './resolveSelectionForNumber';
 export type * from './types';

@@ -5,6 +5,6 @@ export { formatValueForNumber } from './src/index.ts';
 export { normalizeValueForPattern } from './src/index.ts';
 export { normalizeValueForNumber } from './src/index.ts';
 export { parsePatternOptions } from './src/index.ts';
-export { resolveSelectionForCharacters } from './src/index.ts';
+export { resolveSelectionForText } from './src/index.ts';
 export { resolveSelectionForPattern } from './src/index.ts';
 export { resolveSelectionForNumber } from './src/index.ts';

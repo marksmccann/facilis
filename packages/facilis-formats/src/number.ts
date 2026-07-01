@@ -109,8 +109,8 @@ export function number(options?: NumberOptions): FormatInstance {
 
     return defineFormat({
         name: 'number',
-        normalizeValue({ rawValue }) {
-            return normalizeValueForNumber(rawValue, {
+        normalizeValue(context) {
+            return normalizeValueForNumber(context, {
                 allowNegative,
                 decimalPlaces,
                 decimalSeparator,
@@ -119,8 +119,8 @@ export function number(options?: NumberOptions): FormatInstance {
                 trimLeadingZeros,
             });
         },
-        formatValue({ normalizedValue }) {
-            return formatValueForNumber(normalizedValue, {
+        formatValue(context) {
+            return formatValueForNumber(context, {
                 decimalPlaces,
                 decimalSeparator,
                 thousandsSeparator,
@@ -133,8 +133,8 @@ export function number(options?: NumberOptions): FormatInstance {
                 decimalSeparator,
             });
         },
-        formatBlurValue({ formattedValue }) {
-            return formatBlurValueForNumber(formattedValue, {
+        formatBlurValue(context) {
+            return formatBlurValueForNumber(context, {
                 decimalSeparator,
                 insertLeadingZero,
                 padDecimalPlaces,

@@ -73,14 +73,14 @@ export function pattern(input: PatternInput): FormatInstance {
 
     return defineFormat({
         name: 'pattern',
-        normalizeValue({ rawValue }) {
-            return normalizeValueForPattern(rawValue, patternParts);
+        normalizeValue(context) {
+            return normalizeValueForPattern(context, { patternParts });
         },
-        formatValue({ normalizedValue }) {
-            return formatValueForPattern(normalizedValue, patternParts);
+        formatValue(context) {
+            return formatValueForPattern(context, { patternParts });
         },
         resolveSelection(context) {
-            return resolveSelectionForPattern(context, patternParts);
+            return resolveSelectionForPattern(context, { patternParts });
         },
     })();
 }

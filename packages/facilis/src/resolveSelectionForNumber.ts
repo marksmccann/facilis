@@ -1,5 +1,5 @@
 import type { FormatSelectionContext, FormatSelectionResult } from './types';
-import { resolveSelectionForCharacters } from './resolveSelectionForCharacters';
+import { resolveSelectionForText } from './resolveSelectionForText';
 
 /**
  * The configuration options for numeric selection resolution.
@@ -67,8 +67,7 @@ export function resolveSelectionForNumber(
     context: FormatSelectionContext,
     options?: ResolveSelectionForNumberOptions
 ): FormatSelectionResult {
-    return resolveSelectionForCharacters(
-        context,
-        createCharacterMatch(options)
-    );
+    return resolveSelectionForText(context, {
+        characterMatches: createCharacterMatch(options),
+    });
 }

@@ -1,3 +1,5 @@
+import type { FormatValueContext } from './types';
+
 /**
  * The configuration options for numeric value formatting.
  *
@@ -50,9 +52,11 @@ function formatInteger(integerDigits: string, thousandsSeparator: string) {
  * @since 0.0.1
  */
 export function formatValueForNumber(
-    normalizedValue: string,
+    context: FormatValueContext,
     options?: FormatValueForNumberOptions
 ) {
+    const { normalizedValue } = context;
+
     if (normalizedValue === '' || normalizedValue === '-') {
         return normalizedValue;
     }

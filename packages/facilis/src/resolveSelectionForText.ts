@@ -1,7 +1,17 @@
-import type {
-    FormatSelectionContext,
-    FormatSelectionResult,
-} from './types';
+import type { FormatSelectionContext, FormatSelectionResult } from './types';
+
+/**
+ * The configuration options for text-based selection resolution.
+ *
+ * @since 0.0.1
+ */
+export type ResolveSelectionForTextOptions = {
+    /**
+     * The regular expression that determines which characters should count as
+     * meaningful while resolving the next selection range.
+     */
+    characterMatches: RegExp;
+};
 
 /**
  * Counts how many characters in the provided value satisfy the match rule.
@@ -51,41 +61,43 @@ function getFormattedSelectionPosition(
 }
 
 /**
- * Resolves the next selection range by counting how many characters match the
- * provided regular expression before the raw selection and mapping that count
- * onto the formatted value.
+ * Resolves the next selection range for text-oriented formats by counting how
+ * many meaningful characters appear before the raw selection and mapping that
+ * count onto the formatted value.
  *
  * @since 0.0.1
  */
-export function resolveSelectionForCharacters(
+export function resolveSelectionForText(
     context: FormatSelectionContext,
-    characterMatch: RegExp
+    options: ResolveSelectionForTextOptions
 ): FormatSelectionResult {
+    const { characterMatches } = options;
+
     const selectionStartCount = Math.min(
         countMatchedCharacters(
             context.rawValue.slice(0, context.rawSelectionStart),
-            characterMatch
+            characterMatches
         ),
-        countMatchedCharacters(context.normalizedValue, characterMatch)
+        countMatchedCharacters(context.normalizedValue, characterMatches)
     );
     const selectionEndCount = Math.min(
         countMatchedCharacters(
             context.rawValue.slice(0, context.rawSelectionEnd),
-            characterMatch
+            characterMatches
         ),
-        countMatchedCharacters(context.normalizedValue, characterMatch)
+        countMatchedCharacters(context.normalizedValue, characterMatches)
     );
 
     return {
         selectionStart: getFormattedSelectionPosition(
             context.formattedValue,
             selectionStartCount,
-            characterMatch
+            characterMatches
         ),
         selectionEnd: getFormattedSelectionPosition(
             context.formattedValue,
             selectionEndCount,
-            characterMatch
+            characterMatches
         ),
     };
 }

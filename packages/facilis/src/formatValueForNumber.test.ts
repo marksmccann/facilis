@@ -3,12 +3,12 @@ import { formatValueForNumber } from './formatValueForNumber';
 
 describe('formatValueForNumber', () => {
     it('returns integer values unchanged by default', () => {
-        expect(formatValueForNumber('1234')).toBe('1234');
+        expect(formatValueForNumber({ normalizedValue: '1234' })).toBe('1234');
     });
 
     it('supports thousands separators', () => {
         expect(
-            formatValueForNumber('1234567', {
+            formatValueForNumber({ normalizedValue: '1234567' }, {
                 thousandsSeparator: ',',
             })
         ).toBe('1,234,567');
@@ -16,7 +16,7 @@ describe('formatValueForNumber', () => {
 
     it('preserves fractional digits up to the configured decimal places', () => {
         expect(
-            formatValueForNumber('1234.567', {
+            formatValueForNumber({ normalizedValue: '1234.567' }, {
                 decimalPlaces: 2,
             })
         ).toBe('1234.56');
@@ -24,7 +24,7 @@ describe('formatValueForNumber', () => {
 
     it('formats grouped decimal values', () => {
         expect(
-            formatValueForNumber('1234567.89', {
+            formatValueForNumber({ normalizedValue: '1234567.89' }, {
                 decimalPlaces: 2,
                 thousandsSeparator: ',',
             })
@@ -33,7 +33,7 @@ describe('formatValueForNumber', () => {
 
     it('supports a custom decimal separator', () => {
         expect(
-            formatValueForNumber('1234567,89', {
+            formatValueForNumber({ normalizedValue: '1234567,89' }, {
                 decimalPlaces: 2,
                 decimalSeparator: ',',
                 thousandsSeparator: '.',
@@ -43,7 +43,7 @@ describe('formatValueForNumber', () => {
 
     it('preserves a negative sign when present', () => {
         expect(
-            formatValueForNumber('-1234567.89', {
+            formatValueForNumber({ normalizedValue: '-1234567.89' }, {
                 decimalPlaces: 2,
                 thousandsSeparator: ',',
             })
@@ -52,7 +52,7 @@ describe('formatValueForNumber', () => {
 
     it('omits the fractional portion when decimal places are disabled', () => {
         expect(
-            formatValueForNumber('1234.56', {
+            formatValueForNumber({ normalizedValue: '1234.56' }, {
                 decimalPlaces: 0,
                 thousandsSeparator: ',',
             })
@@ -61,7 +61,7 @@ describe('formatValueForNumber', () => {
 
     it('preserves in-progress negative values', () => {
         expect(
-            formatValueForNumber('-', {
+            formatValueForNumber({ normalizedValue: '-' }, {
                 decimalPlaces: 2,
                 thousandsSeparator: ',',
             })
@@ -70,7 +70,7 @@ describe('formatValueForNumber', () => {
 
     it('preserves a custom decimal separator for partial decimal values', () => {
         expect(
-            formatValueForNumber('-,', {
+            formatValueForNumber({ normalizedValue: '-,' }, {
                 decimalPlaces: 2,
                 decimalSeparator: ',',
             })

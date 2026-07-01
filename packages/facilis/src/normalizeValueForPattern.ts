@@ -1,4 +1,9 @@
 import type { PatternPart } from './parsePatternOptions';
+import type { NormalizeValueContext } from './types';
+
+export type NormalizeValueForPatternOptions = {
+    patternParts: PatternPart[];
+};
 
 /**
  * Returns only the token parts from the parsed pattern.
@@ -26,9 +31,11 @@ function characterMatchesToken(
  * @since 0.0.1
  */
 export function normalizeValueForPattern(
-    rawValue: string,
-    patternParts: PatternPart[]
+    context: NormalizeValueContext,
+    options: NormalizeValueForPatternOptions
 ) {
+    const { rawValue } = context;
+    const { patternParts } = options;
     const tokenParts = getTokenParts(patternParts);
     let tokenIndex = 0;
     let normalizedValue = '';

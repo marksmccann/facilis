@@ -1,5 +1,5 @@
 import { defineFormat, type FormatInstance } from 'facilis';
-import { resolveSelectionForCharacters } from 'facilis';
+import { resolveSelectionForText } from 'facilis';
 
 /**
  * The configuration options for a text format.
@@ -46,7 +46,9 @@ export function text(options: TextOptions): FormatInstance {
             return normalizedValue;
         },
         resolveSelection(context) {
-            return resolveSelectionForCharacters(context, matches);
+            return resolveSelectionForText(context, {
+                characterMatches: matches,
+            });
         },
     })();
 }

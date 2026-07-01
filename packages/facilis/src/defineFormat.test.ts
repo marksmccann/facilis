@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { applyBlur, applyInput } from 'facilis-testing';
 import { defineFormat } from './defineFormat';
-import { resolveSelectionForCharacters } from './resolveSelectionForCharacters';
+import { resolveSelectionForText } from './resolveSelectionForText';
 
 function createPhoneLikeFormat() {
     return defineFormat({
@@ -27,7 +27,9 @@ function createPhoneLikeFormat() {
             return formattedValue === '' ? '' : `${formattedValue}!`;
         },
         resolveSelection(context) {
-            return resolveSelectionForCharacters(context, /\d/);
+            return resolveSelectionForText(context, {
+                characterMatches: /\d/,
+            });
         },
     })();
 }
@@ -121,7 +123,9 @@ describe('defineFormat', () => {
                 return normalizedValue;
             },
             resolveSelection(context) {
-                return resolveSelectionForCharacters(context, /[a-z]/i);
+                return resolveSelectionForText(context, {
+                    characterMatches: /[a-z]/i,
+                });
             },
         });
 

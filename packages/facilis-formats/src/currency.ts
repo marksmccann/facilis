@@ -61,14 +61,14 @@ export function currency(options?: CurrencyOptions): FormatInstance {
 
     return defineFormat({
         name: 'currency',
-        normalizeValue({ rawValue }) {
-            return normalizeValueForNumber(rawValue, {
+        normalizeValue(context) {
+            return normalizeValueForNumber(context, {
                 decimalSeparator,
                 decimalPlaces: includeCents ? 2 : 0,
             });
         },
-        formatValue({ normalizedValue }) {
-            const formattedValue = formatValueForNumber(normalizedValue, {
+        formatValue(context) {
+            const formattedValue = formatValueForNumber(context, {
                 decimalSeparator,
                 decimalPlaces: includeCents ? 2 : 0,
                 thousandsSeparator,
@@ -82,10 +82,10 @@ export function currency(options?: CurrencyOptions): FormatInstance {
                 decimalSeparator,
             });
         },
-        formatBlurValue({ formattedValue }) {
-            if (!includeCents) return formattedValue;
+        formatBlurValue(context) {
+            if (!includeCents) return context.formattedValue;
 
-            return formatBlurValueForNumber(formattedValue, {
+            return formatBlurValueForNumber(context, {
                 decimalSeparator,
                 padDecimalPlaces: 2,
             });

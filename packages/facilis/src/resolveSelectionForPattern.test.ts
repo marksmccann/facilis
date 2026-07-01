@@ -20,7 +20,7 @@ describe('resolveSelectionForPattern', () => {
                     normalizedValue: '1234567',
                     formattedValue: '(123) 456-7',
                 },
-                patternParts
+                { patternParts }
             )
         ).toEqual({
             selectionStart: 11,

@@ -3,12 +3,12 @@ import { normalizeValueForNumber } from './normalizeValueForNumber';
 
 describe('normalizeValueForNumber', () => {
     it('keeps only digits by default', () => {
-        expect(normalizeValueForNumber('1a2b3c4')).toBe('1234');
+        expect(normalizeValueForNumber({ rawValue: '1a2b3c4' })).toBe('1234');
     });
 
     it('supports decimal precision when configured', () => {
         expect(
-            normalizeValueForNumber('1234.567', {
+            normalizeValueForNumber({ rawValue: '1234.567' }, {
                 decimalPlaces: 2,
             })
         ).toBe('1234.56');
@@ -16,7 +16,7 @@ describe('normalizeValueForNumber', () => {
 
     it('supports a custom decimal separator', () => {
         expect(
-            normalizeValueForNumber('1234,567', {
+            normalizeValueForNumber({ rawValue: '1234,567' }, {
                 decimalPlaces: 2,
                 decimalSeparator: ',',
             })
@@ -25,7 +25,7 @@ describe('normalizeValueForNumber', () => {
 
     it('keeps only the first decimal point when decimals are enabled', () => {
         expect(
-            normalizeValueForNumber('12.3.4', {
+            normalizeValueForNumber({ rawValue: '12.3.4' }, {
                 decimalPlaces: 2,
             })
         ).toBe('12.34');
@@ -33,7 +33,7 @@ describe('normalizeValueForNumber', () => {
 
     it('preserves a leading minus sign when negative values are allowed', () => {
         expect(
-            normalizeValueForNumber('-1234', {
+            normalizeValueForNumber({ rawValue: '-1234' }, {
                 allowNegative: true,
             })
         ).toBe('-1234');
@@ -41,7 +41,7 @@ describe('normalizeValueForNumber', () => {
 
     it('ignores minus signs when negative values are not allowed', () => {
         expect(
-            normalizeValueForNumber('-1234', {
+            normalizeValueForNumber({ rawValue: '-1234' }, {
                 allowNegative: false,
             })
         ).toBe('1234');
@@ -49,7 +49,7 @@ describe('normalizeValueForNumber', () => {
 
     it('preserves a negative decimal value when enabled', () => {
         expect(
-            normalizeValueForNumber('-1234.567', {
+            normalizeValueForNumber({ rawValue: '-1234.567' }, {
                 allowNegative: true,
                 decimalPlaces: 2,
             })
@@ -58,7 +58,7 @@ describe('normalizeValueForNumber', () => {
 
     it('preserves a lone minus sign as an in-progress negative value', () => {
         expect(
-            normalizeValueForNumber('-', {
+            normalizeValueForNumber({ rawValue: '-' }, {
                 allowNegative: true,
             })
         ).toBe('-');
@@ -66,7 +66,7 @@ describe('normalizeValueForNumber', () => {
 
     it('preserves a negative partial decimal as an in-progress value', () => {
         expect(
-            normalizeValueForNumber('-.', {
+            normalizeValueForNumber({ rawValue: '-.' }, {
                 allowNegative: true,
                 decimalPlaces: 2,
             })
@@ -75,7 +75,7 @@ describe('normalizeValueForNumber', () => {
 
     it('preserves a negative partial decimal with a custom separator', () => {
         expect(
-            normalizeValueForNumber('-,', {
+            normalizeValueForNumber({ rawValue: '-,' }, {
                 allowNegative: true,
                 decimalPlaces: 2,
                 decimalSeparator: ',',
@@ -85,7 +85,7 @@ describe('normalizeValueForNumber', () => {
 
     it('trims unnecessary leading zeros from an integer value', () => {
         expect(
-            normalizeValueForNumber('00012', {
+            normalizeValueForNumber({ rawValue: '00012' }, {
                 trimLeadingZeros: true,
             })
         ).toBe('12');
@@ -93,7 +93,7 @@ describe('normalizeValueForNumber', () => {
 
     it('trims unnecessary leading zeros from a decimal value', () => {
         expect(
-            normalizeValueForNumber('00012.34', {
+            normalizeValueForNumber({ rawValue: '00012.34' }, {
                 decimalPlaces: 2,
                 trimLeadingZeros: true,
             })
@@ -102,7 +102,7 @@ describe('normalizeValueForNumber', () => {
 
     it('clamps values above the configured maximum', () => {
         expect(
-            normalizeValueForNumber('101', {
+            normalizeValueForNumber({ rawValue: '101' }, {
                 max: 100,
             })
         ).toBe('100');
@@ -110,7 +110,7 @@ describe('normalizeValueForNumber', () => {
 
     it('clamps values below the configured minimum', () => {
         expect(
-            normalizeValueForNumber('-5', {
+            normalizeValueForNumber({ rawValue: '-5' }, {
                 allowNegative: true,
                 min: 0,
             })
@@ -119,7 +119,7 @@ describe('normalizeValueForNumber', () => {
 
     it('preserves partial decimal values before they resolve to a complete number', () => {
         expect(
-            normalizeValueForNumber('10.', {
+            normalizeValueForNumber({ rawValue: '10.' }, {
                 decimalPlaces: 2,
                 max: 10,
             })
@@ -128,7 +128,7 @@ describe('normalizeValueForNumber', () => {
 
     it('clamps decimal values and trims trailing zero padding', () => {
         expect(
-            normalizeValueForNumber('10.5', {
+            normalizeValueForNumber({ rawValue: '10.5' }, {
                 decimalPlaces: 2,
                 max: 10,
             })
@@ -137,7 +137,7 @@ describe('normalizeValueForNumber', () => {
 
     it('clamps decimal values with a custom separator', () => {
         expect(
-            normalizeValueForNumber('10,5', {
+            normalizeValueForNumber({ rawValue: '10,5' }, {
                 decimalPlaces: 2,
                 decimalSeparator: ',',
                 max: 10,

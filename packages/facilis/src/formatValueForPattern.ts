@@ -1,4 +1,9 @@
 import type { PatternPart } from './parsePatternOptions';
+import type { FormatValueContext } from './types';
+
+export type FormatValueForPatternOptions = {
+    patternParts: PatternPart[];
+};
 
 /**
  * Builds the formatted value by filling token parts from the normalized value
@@ -7,9 +12,12 @@ import type { PatternPart } from './parsePatternOptions';
  * @since 0.0.1
  */
 export function formatValueForPattern(
-    normalizedValue: string,
-    patternParts: PatternPart[]
+    context: FormatValueContext,
+    options: FormatValueForPatternOptions
 ) {
+    const { normalizedValue } = context;
+    const { patternParts } = options;
+
     if (normalizedValue === '') return '';
 
     let formattedValue = '';

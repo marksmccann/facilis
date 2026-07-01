@@ -11,8 +11,11 @@ describe('formatValueForPattern', () => {
             },
         });
 
-        expect(formatValueForPattern('1234567', patternParts)).toBe(
-            '(123) 456-7'
-        );
+        expect(
+            formatValueForPattern(
+                { normalizedValue: '1234567' },
+                { patternParts }
+            )
+        ).toBe('(123) 456-7');
     });
 });

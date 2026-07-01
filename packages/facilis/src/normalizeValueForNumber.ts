@@ -1,3 +1,5 @@
+import type { NormalizeValueContext } from './types';
+
 /**
  * The configuration options for numeric value normalization.
  *
@@ -234,9 +236,10 @@ function clampNormalizedValue(
  * @since 0.0.1
  */
 export function normalizeValueForNumber(
-    rawValue: string,
+    context: NormalizeValueContext,
     options?: NormalizeValueForNumberOptions
 ) {
+    const { rawValue } = context;
     const {
         allowNegative,
         decimalPlaces,

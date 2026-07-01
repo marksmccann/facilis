@@ -7,11 +7,11 @@ export type FormatDefinition = {
     /** The unique name of the format. */
     name: string;
     /** Produces the normalized value from the raw input value. */
-    normalizeValue: (context: { rawValue: string }) => string;
+    normalizeValue: (context: NormalizeValueContext) => string;
     /** Produces the live formatted value from the normalized value. */
-    formatValue: (context: { normalizedValue: string }) => string;
+    formatValue: (context: FormatValueContext) => string;
     /** Produces the formatted value that should be applied on blur. */
-    formatBlurValue?: (context: { formattedValue: string }) => string;
+    formatBlurValue?: (context: FormatBlurValueContext) => string;
     /** Resolves the next selection range after live formatting. */
     resolveSelection: (
         context: FormatSelectionContext
@@ -44,6 +44,36 @@ export type FormatResult = {
     selectionStart: number | null;
     /** The next selection end that should be applied to the input. */
     selectionEnd: number | null;
+};
+
+/**
+ * The raw value available to normalization helpers.
+ *
+ * @since 0.0.1
+ */
+export type NormalizeValueContext = {
+    /** The current raw input value before normalization is applied. */
+    rawValue: string;
+};
+
+/**
+ * The normalized value available to live-formatting helpers.
+ *
+ * @since 0.0.1
+ */
+export type FormatValueContext = {
+    /** The normalized value produced from the raw input. */
+    normalizedValue: string;
+};
+
+/**
+ * The formatted value available to blur-formatting helpers.
+ *
+ * @since 0.0.1
+ */
+export type FormatBlurValueContext = {
+    /** The formatted value produced during live input formatting. */
+    formattedValue: string;
 };
 
 /**
@@ -96,3 +126,5 @@ export type FormatInstance = {
  * @since 0.0.1
  */
 export type FormatFactory = () => FormatInstance;
+
+export type * from './resolveSelectionForText';

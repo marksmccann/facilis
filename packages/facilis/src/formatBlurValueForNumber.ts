@@ -1,3 +1,5 @@
+import type { FormatBlurValueContext } from './types';
+
 /**
  * The configuration options for numeric blur-value formatting.
  *
@@ -71,9 +73,10 @@ function insertLeadingZeroIntoBlurValue(
  * @since 0.0.1
  */
 export function formatBlurValueForNumber(
-    formattedValue: string,
+    context: FormatBlurValueContext,
     options?: FormatBlurValueForNumberOptions
 ) {
+    let { formattedValue } = context;
     const normalizedOptions = normalizeOptions(options);
     const { decimalSeparator, insertLeadingZero, padDecimalPlaces } =
         normalizedOptions;
