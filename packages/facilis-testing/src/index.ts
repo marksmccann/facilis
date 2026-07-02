@@ -10,7 +10,7 @@ type FormatInput = {
     selectionEnd: number | null;
 };
 
-type FormatInstance = {
+type Format = {
     onInput(options: FormatInput): FormatResult;
     onBlur(options: FormatInput): FormatResult;
 };
@@ -25,7 +25,7 @@ function resolveSelection(value: string, selection?: number | null) {
     return selection ?? value.length;
 }
 
-export function applyInput(format: FormatInstance, options: InputOptions) {
+export function applyInput(format: Format, options: InputOptions) {
     return format.onInput({
         value: options.value,
         selectionStart: resolveSelection(options.value, options.selectionStart),
@@ -33,7 +33,7 @@ export function applyInput(format: FormatInstance, options: InputOptions) {
     });
 }
 
-export function applyBlur(format: FormatInstance, options: InputOptions) {
+export function applyBlur(format: Format, options: InputOptions) {
     return format.onBlur({
         value: options.value,
         selectionStart: resolveSelection(options.value, options.selectionStart),
@@ -41,7 +41,7 @@ export function applyBlur(format: FormatInstance, options: InputOptions) {
     });
 }
 
-export function typeCharacters(format: FormatInstance, characters: string) {
+export function typeCharacters(format: Format, characters: string) {
     let formattedValue = '';
     let selectionStart = 0;
     let selectionEnd = 0;

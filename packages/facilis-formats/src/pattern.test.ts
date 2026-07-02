@@ -1,203 +1,70 @@
 import { describe, expect, it } from 'vitest';
-import { applyBlur, applyInput, typeCharacters } from 'facilis-testing';
 import { pattern } from './pattern';
 
 describe('pattern', () => {
-    it('formats a phone pattern while keeping the cursor after each typed digit', () => {
-        const format = pattern('(###) ###-####');
-
-        expect(typeCharacters(format, '1234567890')).toEqual([
-            {
-                formattedValue: '(1',
-                selectionStart: 2,
-                selectionEnd: 2,
-            },
-            {
-                formattedValue: '(12',
-                selectionStart: 3,
-                selectionEnd: 3,
-            },
-            {
-                formattedValue: '(123',
-                selectionStart: 4,
-                selectionEnd: 4,
-            },
-            {
-                formattedValue: '(123) 4',
-                selectionStart: 7,
-                selectionEnd: 7,
-            },
-            {
-                formattedValue: '(123) 45',
-                selectionStart: 8,
-                selectionEnd: 8,
-            },
-            {
-                formattedValue: '(123) 456',
-                selectionStart: 9,
-                selectionEnd: 9,
-            },
-            {
-                formattedValue: '(123) 456-7',
-                selectionStart: 11,
-                selectionEnd: 11,
-            },
-            {
-                formattedValue: '(123) 456-78',
-                selectionStart: 12,
-                selectionEnd: 12,
-            },
-            {
-                formattedValue: '(123) 456-789',
-                selectionStart: 13,
-                selectionEnd: 13,
-            },
-            {
-                formattedValue: '(123) 456-7890',
-                selectionStart: 14,
-                selectionEnd: 14,
-            },
-        ]);
-    });
-
-    it('keeps shorthand and explicit token definitions in sync', () => {
-        const shorthand = pattern('(###) ###-####');
-        const explicit = pattern({
-            pattern: '(###) ###-####',
-            tokens: {
-                '#': {
-                    matches: /\d/,
-                },
-            },
-        });
+    it('fills token slots in order and inserts literals', () => {
+        const format = pattern('###-##');
 
         expect(
-            typeCharacters(shorthand, '1234567890').map((result) => ({
-                formattedValue: result.formattedValue,
-                selectionStart: result.selectionStart,
-                selectionEnd: result.selectionEnd,
-            }))
-        ).toEqual(
-            typeCharacters(explicit, '1234567890').map((result) => ({
-                formattedValue: result.formattedValue,
-                selectionStart: result.selectionStart,
-                selectionEnd: result.selectionEnd,
-            }))
-        );
+            format.onInput({
+                value: '12345',
+                selectionStart: 5,
+                selectionEnd: 5,
+            })
+        ).toEqual({
+            formattedValue: '123-45',
+            selectionStart: 6,
+            selectionEnd: 6,
+        });
     });
 
-    it('uses the preset tokens when object input omits tokens', () => {
-        const shorthand = pattern('**-##');
-        const explicit = pattern({
-            pattern: '**-##',
-        });
+    it('ignores raw characters that do not match the next token slot', () => {
+        const format = pattern('###-##');
 
         expect(
-            applyInput(shorthand, {
-                value: 'ab12',
-                selectionStart: 4,
-                selectionEnd: 4,
+            format.onInput({
+                value: '12a34',
+                selectionStart: 5,
+                selectionEnd: 5,
             })
-        ).toEqual(
-            applyInput(explicit, {
-                value: 'ab12',
-                selectionStart: 4,
-                selectionEnd: 4,
-            })
-        );
+        ).toEqual({
+            formattedValue: '123-4',
+            selectionStart: 5,
+            selectionEnd: 5,
+        });
     });
 
-    it('supports custom tokens', () => {
+    it('supports explicit token definitions for mixed token types', () => {
         const format = pattern({
-            pattern: 'AA-##',
+            pattern: '##-AA',
             tokens: {
-                A: {
-                    matches: /[a-z]/i,
-                },
-                '#': {
-                    matches: /\d/,
-                },
+                '#': { matches: /\d/ },
+                A: { matches: /[A-Z]/i },
             },
         });
 
         expect(
-            applyInput(format, {
-                value: 'ab12',
-                selectionStart: 4,
+            format.onInput({
+                value: '1a2Bc',
+                selectionStart: 5,
+                selectionEnd: 5,
+            }).formattedValue
+        ).toBe('12-Bc');
+    });
+
+    it('uses the same value pipeline on blur and clears selection', () => {
+        const format = pattern('###-##');
+
+        expect(
+            format.onBlur({
+                value: '12a34',
+                selectionStart: 1,
                 selectionEnd: 4,
             })
         ).toEqual({
-            formattedValue: 'ab-12',
-            selectionStart: 5,
-            selectionEnd: 5,
-        });
-    });
-
-    it('uses the preset any-character token in string shorthand mode', () => {
-        const format = pattern('**-##');
-
-        expect(
-            applyInput(format, {
-                value: 'ab12',
-                selectionStart: 4,
-                selectionEnd: 4,
-            })
-        ).toEqual({
-            formattedValue: 'ab-12',
-            selectionStart: 5,
-            selectionEnd: 5,
-        });
-    });
-
-    it('returns the formatted value unchanged on blur', () => {
-        const format = pattern('(###) ###-####');
-
-        expect(
-            applyBlur(format, {
-                value: '(123) 456-7890',
-            })
-        ).toEqual({
-            formattedValue: '(123) 456-7890',
+            formattedValue: '123-4',
             selectionStart: null,
             selectionEnd: null,
         });
-    });
-
-    it('fails on invalid pattern input', () => {
-        expect(() => pattern('')).toThrowError(
-            '[facilis] ERR01: Pattern formats require a non-empty pattern string.'
-        );
-        expect(() =>
-            pattern({
-                pattern: '###',
-                tokens: {},
-            })
-        ).toThrowError(
-            '[facilis] ERR02: Pattern formats require at least one token definition.'
-        );
-        expect(() =>
-            pattern({
-                pattern: '###',
-                tokens: {
-                    '##': {
-                        matches: /\d/,
-                    },
-                },
-            })
-        ).toThrowError(
-            '[facilis] ERR03: Pattern format token keys must be a single character each.'
-        );
-        expect(() =>
-            pattern({
-                pattern: 'phone',
-                tokens: {
-                    '#': {
-                        matches: /\d/,
-                    },
-                },
-            })
-        ).toThrowError(
-            '[facilis] ERR04: Pattern formats require the pattern string to include at least one token.'
-        );
     });
 });

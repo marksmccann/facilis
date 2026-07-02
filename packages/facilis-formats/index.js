@@ -1,1 +1,1 @@
-export { pattern } from './src/pattern.ts';
+export * from './src/index.ts';

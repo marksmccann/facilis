@@ -43,7 +43,7 @@ text({
 ## Signature
 
 ```ts
-function text(options: TextOptions): Facilis.FormatInstance;
+function text(options: TextOptions): Facilis.Format;
 ```
 
 ## Import

@@ -1,11 +1,2 @@
 export * from './defineFormat';
-export * from './formatBlurValueForNumber';
-export * from './formatValueForPattern';
-export * from './formatValueForNumber';
-export * from './normalizeValueForPattern';
-export * from './normalizeValueForNumber';
-export * from './parsePatternOptions';
-export * from './resolveSelectionForText';
-export * from './resolveSelectionForPattern';
-export * from './resolveSelectionForNumber';
 export type * from './types';

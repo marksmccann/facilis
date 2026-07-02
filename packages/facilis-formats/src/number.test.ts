@@ -1,108 +1,88 @@
 import { describe, expect, it } from 'vitest';
-import { applyBlur, applyInput, typeCharacters } from 'facilis-testing';
 import { number } from './number';
 
 describe('number', () => {
-    it('formats integer input by default', () => {
-        const format = number();
-
-        expect(typeCharacters(format, '1234')).toEqual([
-            {
-                formattedValue: '1',
-                selectionStart: 1,
-                selectionEnd: 1,
-            },
-            {
-                formattedValue: '12',
-                selectionStart: 2,
-                selectionEnd: 2,
-            },
-            {
-                formattedValue: '123',
-                selectionStart: 3,
-                selectionEnd: 3,
-            },
-            {
-                formattedValue: '1234',
-                selectionStart: 4,
-                selectionEnd: 4,
-            },
-        ]);
-    });
-
-    it('ignores non-digit characters from the raw input', () => {
+    it('keeps digits in the order they were entered', () => {
         const format = number();
 
         expect(
-            applyInput(format, {
-                value: '1a2b3c4',
-            })
-        ).toEqual({
-            formattedValue: '1234',
-            selectionStart: 4,
-            selectionEnd: 4,
-        });
-    });
-
-    it('supports decimal precision when configured', () => {
-        const format = number({
-            decimalPlaces: 2,
-        });
-
-        expect(
-            applyInput(format, {
-                value: '1234.567',
-            })
-        ).toEqual({
-            formattedValue: '1234.56',
-            selectionStart: 7,
-            selectionEnd: 7,
-        });
-    });
-
-    it('supports thousands separators for integer values', () => {
-        const format = number({
-            thousandsSeparator: ',',
-        });
-
-        expect(typeCharacters(format, '1234')).toEqual([
-            {
-                formattedValue: '1',
-                selectionStart: 1,
-                selectionEnd: 1,
-            },
-            {
-                formattedValue: '12',
-                selectionStart: 2,
-                selectionEnd: 2,
-            },
-            {
-                formattedValue: '123',
-                selectionStart: 3,
-                selectionEnd: 3,
-            },
-            {
-                formattedValue: '1,234',
+            format.onInput({
+                value: '12345',
                 selectionStart: 5,
                 selectionEnd: 5,
-            },
-        ]);
+            })
+        ).toEqual({
+            formattedValue: '12345',
+            selectionStart: 5,
+            selectionEnd: 5,
+        });
     });
 
-    it('supports thousands separators for decimal values', () => {
+    it('removes non-digit characters from the value', () => {
+        const format = number();
+
+        expect(
+            format.onInput({
+                value: '1a2-b3',
+                selectionStart: 6,
+                selectionEnd: 6,
+            })
+        ).toEqual({
+            formattedValue: '123',
+            selectionStart: 3,
+            selectionEnd: 3,
+        });
+    });
+
+    it('uses the same pipeline on blur and clears selection', () => {
+        const format = number();
+
+        expect(
+            format.onBlur({
+                value: '1a2-b3',
+                selectionStart: 1,
+                selectionEnd: 5,
+            })
+        ).toEqual({
+            formattedValue: '123',
+            selectionStart: null,
+            selectionEnd: null,
+        });
+    });
+
+    it('preserves one decimal separator when decimals are enabled', () => {
         const format = number({
             decimalPlaces: 2,
-            thousandsSeparator: ',',
         });
 
         expect(
-            applyInput(format, {
-                value: '1234.56',
+            format.onInput({
+                value: '12.34',
+                selectionStart: 5,
+                selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '1,234.56',
-            selectionStart: 8,
-            selectionEnd: 8,
+            formattedValue: '12.34',
+            selectionStart: 5,
+            selectionEnd: 5,
+        });
+    });
+
+    it('keeps only the first decimal separator when decimals are enabled', () => {
+        const format = number({
+            decimalPlaces: 2,
+        });
+
+        expect(
+            format.onInput({
+                value: '1.2.3',
+                selectionStart: 5,
+                selectionEnd: 5,
+            })
+        ).toEqual({
+            formattedValue: '1.23',
+            selectionStart: 4,
+            selectionEnd: 4,
         });
     });
 
@@ -113,42 +93,28 @@ describe('number', () => {
         });
 
         expect(
-            applyInput(format, {
-                value: '1234,56',
+            format.onInput({
+                value: '12,34',
+                selectionStart: 5,
+                selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '1234,56',
-            selectionStart: 7,
-            selectionEnd: 7,
+            formattedValue: '12,34',
+            selectionStart: 5,
+            selectionEnd: 5,
         });
     });
 
-    it('supports grouped custom separators without moving the cursor before the decimal', () => {
-        const format = number({
-            decimalPlaces: 2,
-            decimalSeparator: ',',
-            thousandsSeparator: '.',
-        });
-
-        expect(
-            applyInput(format, {
-                value: '1234,56',
-            })
-        ).toEqual({
-            formattedValue: '1.234,56',
-            selectionStart: 8,
-            selectionEnd: 8,
-        });
-    });
-
-    it('keeps only the first decimal point when decimals are enabled', () => {
+    it('ignores extra fractional digits beyond decimalPlaces', () => {
         const format = number({
             decimalPlaces: 2,
         });
 
         expect(
-            applyInput(format, {
-                value: '12.3.4',
+            format.onInput({
+                value: '12.345',
+                selectionStart: 6,
+                selectionEnd: 6,
             })
         ).toEqual({
             formattedValue: '12.34',
@@ -157,243 +123,87 @@ describe('number', () => {
         });
     });
 
-    it('preserves a leading minus sign when negative values are allowed', () => {
+    it('still allows unlimited whole digits when decimalPlaces is set', () => {
         const format = number({
-            allowNegative: true,
-        });
-
-        expect(
-            applyInput(format, {
-                value: '-1234',
-            })
-        ).toEqual({
-            formattedValue: '-1234',
-            selectionStart: 5,
-            selectionEnd: 5,
-        });
-    });
-
-    it('ignores a minus sign when negative values are not allowed', () => {
-        const format = number();
-
-        expect(
-            applyInput(format, {
-                value: '-1234',
-            })
-        ).toEqual({
-            formattedValue: '1234',
-            selectionStart: 4,
-            selectionEnd: 4,
-        });
-    });
-
-    it('preserves a negative decimal when enabled', () => {
-        const format = number({
-            allowNegative: true,
             decimalPlaces: 2,
         });
 
         expect(
-            applyInput(format, {
-                value: '-1234.567',
+            format.onInput({
+                value: '12345.67',
+                selectionStart: 8,
+                selectionEnd: 8,
             })
         ).toEqual({
-            formattedValue: '-1234.56',
+            formattedValue: '12345.67',
             selectionStart: 8,
             selectionEnd: 8,
         });
     });
 
-    it('preserves a lone minus sign as an in-progress value', () => {
+    it('preserves one leading minus sign when negative values are enabled', () => {
         const format = number({
             allowNegative: true,
         });
 
         expect(
-            applyInput(format, {
-                value: '-',
+            format.onInput({
+                value: '-123',
+                selectionStart: 4,
+                selectionEnd: 4,
             })
         ).toEqual({
-            formattedValue: '-',
-            selectionStart: 1,
-            selectionEnd: 1,
+            formattedValue: '-123',
+            selectionStart: 4,
+            selectionEnd: 4,
         });
     });
 
-    it('preserves a negative partial decimal as an in-progress value', () => {
-        const format = number({
-            allowNegative: true,
-            decimalPlaces: 2,
-        });
-
-        expect(
-            applyInput(format, {
-                value: '-.',
-            })
-        ).toEqual({
-            formattedValue: '-.',
-            selectionStart: 2,
-            selectionEnd: 2,
-        });
-    });
-
-    it('preserves a completed decimal value while typing when leading-zero insertion is configured', () => {
-        const format = number({
-            decimalPlaces: 2,
-            insertLeadingZero: true,
-        });
-
-        expect(
-            applyInput(format, {
-                value: '.5',
-            })
-        ).toEqual({
-            formattedValue: '.5',
-            selectionStart: 2,
-            selectionEnd: 2,
-        });
-    });
-
-    it('trims unnecessary leading zeros while typing', () => {
-        const format = number({
-            trimLeadingZeros: true,
-        });
-
-        expect(
-            applyInput(format, {
-                value: '00012',
-            })
-        ).toEqual({
-            formattedValue: '12',
-            selectionStart: 2,
-            selectionEnd: 2,
-        });
-    });
-
-    it('clamps values above the configured maximum while typing', () => {
-        const format = number({
-            max: 100,
-        });
-
-        expect(
-            applyInput(format, {
-                value: '101',
-            })
-        ).toEqual({
-            formattedValue: '100',
-            selectionStart: 3,
-            selectionEnd: 3,
-        });
-    });
-
-    it('clamps values below the configured minimum while typing', () => {
-        const format = number({
-            allowNegative: true,
-            min: 0,
-        });
-
-        expect(
-            applyInput(format, {
-                value: '-5',
-            })
-        ).toEqual({
-            formattedValue: '0',
-            selectionStart: 1,
-            selectionEnd: 1,
-        });
-    });
-
-    it('preserves a trailing decimal separator before the value is complete', () => {
-        const format = number({
-            decimalPlaces: 2,
-            max: 10,
-        });
-
-        expect(
-            applyInput(format, {
-                value: '10.',
-            })
-        ).toEqual({
-            formattedValue: '10.',
-            selectionStart: 3,
-            selectionEnd: 3,
-        });
-    });
-
-    it('clamps decimal values to the configured maximum while typing', () => {
-        const format = number({
-            decimalPlaces: 2,
-            max: 10,
-        });
-
-        expect(
-            applyInput(format, {
-                value: '10.5',
-            })
-        ).toEqual({
-            formattedValue: '10',
-            selectionStart: 2,
-            selectionEnd: 2,
-        });
-    });
-
-    it('clamps decimal values with a custom separator while typing', () => {
-        const format = number({
-            decimalPlaces: 2,
-            decimalSeparator: ',',
-            max: 10,
-        });
-
-        expect(
-            applyInput(format, {
-                value: '10,5',
-            })
-        ).toEqual({
-            formattedValue: '10',
-            selectionStart: 2,
-            selectionEnd: 2,
-        });
-    });
-
-    it('returns the formatted value unchanged on blur', () => {
+    it('ignores a minus sign when negative values are disabled', () => {
         const format = number();
 
         expect(
-            applyBlur(format, {
-                value: '1234',
+            format.onInput({
+                value: '-123',
+                selectionStart: 4,
+                selectionEnd: 4,
             })
         ).toEqual({
-            formattedValue: '1234',
-            selectionStart: null,
-            selectionEnd: null,
+            formattedValue: '123',
+            selectionStart: 3,
+            selectionEnd: 3,
         });
     });
 
-    it('returns the decimal-formatted value unchanged on blur', () => {
+    it('ignores minus signs that do not appear at the start', () => {
         const format = number({
-            decimalPlaces: 2,
+            allowNegative: true,
         });
 
         expect(
-            applyBlur(format, {
-                value: '1234.56',
+            format.onInput({
+                value: '1-2-3',
+                selectionStart: 5,
+                selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '1234.56',
-            selectionStart: null,
-            selectionEnd: null,
+            formattedValue: '123',
+            selectionStart: 3,
+            selectionEnd: 3,
         });
     });
 
-    it('inserts a leading zero on blur when configured', () => {
+    it('inserts a leading zero on blur for decimal-only values', () => {
         const format = number({
             decimalPlaces: 2,
             insertLeadingZero: true,
         });
 
         expect(
-            applyBlur(format, {
+            format.onBlur({
                 value: '.5',
+                selectionStart: 2,
+                selectionEnd: 2,
             })
         ).toEqual({
             formattedValue: '0.5',
@@ -402,55 +212,211 @@ describe('number', () => {
         });
     });
 
-    it('returns the grouped formatted value unchanged on blur', () => {
+    it('inserts a leading zero on blur for negative decimal-only values', () => {
         const format = number({
+            allowNegative: true,
             decimalPlaces: 2,
-            thousandsSeparator: ',',
+            insertLeadingZero: true,
         });
 
         expect(
-            applyBlur(format, {
-                value: '1,234.56',
+            format.onBlur({
+                value: '-.5',
+                selectionStart: 3,
+                selectionEnd: 3,
             })
         ).toEqual({
-            formattedValue: '1,234.56',
+            formattedValue: '-0.5',
             selectionStart: null,
             selectionEnd: null,
         });
     });
 
-    it('pads a missing fractional portion on blur when configured', () => {
+    it('leaves the value unchanged on blur when insertLeadingZero is disabled', () => {
         const format = number({
-            decimalPlaces: 0,
-            padDecimalPlaces: 2,
+            decimalPlaces: 2,
         });
 
         expect(
-            applyBlur(format, {
-                value: '1234',
+            format.onBlur({
+                value: '.5',
+                selectionStart: 2,
+                selectionEnd: 2,
             })
         ).toEqual({
-            formattedValue: '1234.00',
+            formattedValue: '.5',
             selectionStart: null,
             selectionEnd: null,
         });
     });
 
-    it('pads an incomplete fractional portion on blur when configured', () => {
+    it('pads an existing fractional portion on blur', () => {
         const format = number({
             decimalPlaces: 2,
             padDecimalPlaces: 2,
-            thousandsSeparator: ',',
         });
 
         expect(
-            applyBlur(format, {
-                value: '1,234.5',
+            format.onBlur({
+                value: '1.5',
+                selectionStart: 3,
+                selectionEnd: 3,
             })
         ).toEqual({
-            formattedValue: '1,234.50',
+            formattedValue: '1.50',
             selectionStart: null,
             selectionEnd: null,
+        });
+    });
+
+    it('creates a fractional portion on blur when one does not exist', () => {
+        const format = number({
+            decimalPlaces: 2,
+            padDecimalPlaces: 2,
+        });
+
+        expect(
+            format.onBlur({
+                value: '1',
+                selectionStart: 1,
+                selectionEnd: 1,
+            })
+        ).toEqual({
+            formattedValue: '1.00',
+            selectionStart: null,
+            selectionEnd: null,
+        });
+    });
+
+    it('leaves longer fractional portions unchanged on blur', () => {
+        const format = number({
+            decimalPlaces: 4,
+            padDecimalPlaces: 2,
+        });
+
+        expect(
+            format.onBlur({
+                value: '1.234',
+                selectionStart: 5,
+                selectionEnd: 5,
+            })
+        ).toEqual({
+            formattedValue: '1.234',
+            selectionStart: null,
+            selectionEnd: null,
+        });
+    });
+
+    it('composes leading-zero insertion with decimal padding on blur', () => {
+        const format = number({
+            decimalPlaces: 2,
+            insertLeadingZero: true,
+            padDecimalPlaces: 2,
+        });
+
+        expect(
+            format.onBlur({
+                value: '.5',
+                selectionStart: 2,
+                selectionEnd: 2,
+            })
+        ).toEqual({
+            formattedValue: '0.50',
+            selectionStart: null,
+            selectionEnd: null,
+        });
+    });
+
+    it('trims unnecessary leading zeros from whole numbers while typing', () => {
+        const format = number({
+            trimLeadingZeros: true,
+        });
+
+        expect(
+            format.onInput({
+                value: '00012',
+                selectionStart: 5,
+                selectionEnd: 5,
+            })
+        ).toEqual({
+            formattedValue: '12',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
+    it('preserves a single zero when the integer portion is all zeros', () => {
+        const format = number({
+            trimLeadingZeros: true,
+        });
+
+        expect(
+            format.onInput({
+                value: '000',
+                selectionStart: 3,
+                selectionEnd: 3,
+            })
+        ).toEqual({
+            formattedValue: '0',
+            selectionStart: 1,
+            selectionEnd: 1,
+        });
+    });
+
+    it('trims leading zeros before a fractional portion while typing', () => {
+        const format = number({
+            decimalPlaces: 2,
+            trimLeadingZeros: true,
+        });
+
+        expect(
+            format.onInput({
+                value: '000.5',
+                selectionStart: 5,
+                selectionEnd: 5,
+            })
+        ).toEqual({
+            formattedValue: '0.5',
+            selectionStart: 3,
+            selectionEnd: 3,
+        });
+    });
+
+    it('preserves an in-progress zero before the decimal separator', () => {
+        const format = number({
+            decimalPlaces: 2,
+            trimLeadingZeros: true,
+        });
+
+        expect(
+            format.onInput({
+                value: '0.',
+                selectionStart: 2,
+                selectionEnd: 2,
+            })
+        ).toEqual({
+            formattedValue: '0.',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
+    it('trims unnecessary leading zeros after a minus sign', () => {
+        const format = number({
+            allowNegative: true,
+            trimLeadingZeros: true,
+        });
+
+        expect(
+            format.onInput({
+                value: '-00012',
+                selectionStart: 6,
+                selectionEnd: 6,
+            })
+        ).toEqual({
+            formattedValue: '-12',
+            selectionStart: 3,
+            selectionEnd: 3,
         });
     });
 });

@@ -28,7 +28,7 @@ With:
 pattern({
     pattern: 'AA-####',
     tokens: {
-        A: { matches: /[A-Z]/ },
+        A: { matches: /[A-Z]/i },
         '#': { matches: /\d/ },
     },
 });
@@ -39,8 +39,8 @@ pattern({
 ## Signature
 
 ```ts
-function pattern(input: string): Facilis.FormatInstance;
-function pattern(input: PatternOptions): Facilis.FormatInstance;
+function pattern(input: string): Facilis.Format;
+function pattern(input: PatternOptions): Facilis.Format;
 ```
 
 ## Import
@@ -57,7 +57,7 @@ const phonePattern = pattern('(###) ###-####');
 const codePattern = pattern({
     pattern: 'AA-####',
     tokens: {
-        A: { matches: /[A-Z]/ },
+        A: { matches: /[A-Z]/i },
         '#': { matches: /\d/ },
     },
 });
@@ -118,7 +118,7 @@ Example:
 const codePattern = pattern({
     pattern: 'AA-####',
     tokens: {
-        A: { matches: /[A-Z]/ },
+        A: { matches: /[A-Z]/i },
         '#': { matches: /\d/ },
     },
 });

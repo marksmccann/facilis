@@ -1,63 +1,57 @@
-import type {
-    FormatDefinition,
-    FormatFactory,
-    FormatInstance,
-    FormatResult,
-} from './types';
+import type { FormatDefinition, Format } from './types';
+import resolveSelectionBoundary from './resolveSelectionBoundary';
+import runBlur from './runBlur';
+import runFormat from './runFormat';
+import runNormalize from './runNormalize';
 
 /**
- * Creates a reusable format factory from a format definition.
+ * Creates a reusable format from a format definition.
  *
  * @since 0.0.1
  */
-export function defineFormat(
-    definition: FormatDefinition
-): FormatFactory {
-    return function createFormatInstance(): FormatInstance {
-        const {
-            name,
-            normalizeValue,
-            formatValue,
-            formatBlurValue = ({ formattedValue }) => formattedValue,
-            resolveSelection,
-        } = definition;
+export function defineFormat(definition: FormatDefinition): Format {
+    return {
+        name: definition.name,
+        onInput(input) {
+            const { normalizedValue, rawToNormalized } = runNormalize(
+                definition,
+                input
+            );
+            const { formattedValue, normalizedToFormatted } = runFormat(
+                definition,
+                normalizedValue
+            );
+            const normalizedSelectionStart = resolveSelectionBoundary(
+                rawToNormalized,
+                input.selectionStart
+            );
+            const normalizedSelectionEnd = resolveSelectionBoundary(
+                rawToNormalized,
+                input.selectionEnd
+            );
 
-        return {
-            name,
-            onInput(options) {
-                const rawValue = options.value;
-                const normalizedValue = normalizeValue({ rawValue });
-                const formattedValue = formatValue({ normalizedValue });
-                const selection = resolveSelection({
-                    rawValue,
-                    rawSelectionStart: options.selectionStart ?? 0,
-                    rawSelectionEnd: options.selectionEnd ?? 0,
-                    normalizedValue,
-                    formattedValue,
-                });
+            return {
+                formattedValue,
+                selectionStart: resolveSelectionBoundary(
+                    normalizedToFormatted,
+                    normalizedSelectionStart
+                ),
+                selectionEnd: resolveSelectionBoundary(
+                    normalizedToFormatted,
+                    normalizedSelectionEnd
+                ),
+            };
+        },
+        onBlur(input) {
+            const { normalizedValue } = runNormalize(definition, input);
+            const { formattedValue } = runFormat(definition, normalizedValue);
+            const { blurredValue } = runBlur(definition, formattedValue);
 
-                const result: FormatResult = {
-                    formattedValue,
-                    selectionStart: selection.selectionStart,
-                    selectionEnd: selection.selectionEnd,
-                };
-
-                return result;
-            },
-            onBlur(options) {
-                const rawValue = options.value;
-                const normalizedValue = normalizeValue({ rawValue });
-                const formattedValue = formatValue({ normalizedValue });
-                const finalizedValue = formatBlurValue({
-                    formattedValue,
-                });
-
-                return {
-                    formattedValue: finalizedValue,
-                    selectionStart: null,
-                    selectionEnd: null,
-                };
-            },
-        };
+            return {
+                formattedValue: blurredValue,
+                selectionStart: null,
+                selectionEnd: null,
+            };
+        },
     };
 }

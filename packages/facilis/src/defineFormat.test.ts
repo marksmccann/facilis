@@ -1,148 +1,174 @@
 import { describe, expect, it } from 'vitest';
-import { applyBlur, applyInput } from 'facilis-testing';
 import { defineFormat } from './defineFormat';
-import { resolveSelectionForText } from './resolveSelectionForText';
-
-function createPhoneLikeFormat() {
-    return defineFormat({
-        name: 'phone-like',
-        normalizeValue({ rawValue }) {
-            return rawValue.replace(/[^\d]/g, '').slice(0, 6);
-        },
-        formatValue({ normalizedValue }) {
-            const area = normalizedValue.slice(0, 3);
-            const local = normalizedValue.slice(3, 6);
-
-            if (normalizedValue.length === 0) {
-                return '';
-            }
-
-            if (normalizedValue.length <= 3) {
-                return `(${area}`;
-            }
-
-            return `(${area}) ${local}`;
-        },
-        formatBlurValue({ formattedValue }) {
-            return formattedValue === '' ? '' : `${formattedValue}!`;
-        },
-        resolveSelection(context) {
-            return resolveSelectionForText(context, {
-                characterMatches: /\d/,
-            });
-        },
-    })();
-}
 
 describe('defineFormat', () => {
-    it('formats input and keeps the cursor after the corresponding meaningful character', () => {
-        const format = createPhoneLikeFormat();
+    it('normalizes raw input before formatting it', () => {
+        const format = defineFormat({
+            name: 'letters-only',
+            normalize(character, state) {
+                if (/[a-z]/i.test(character)) {
+                    state.append(character.toUpperCase());
+                }
+            },
+            format(character, state) {
+                state.append(`[${character}]`);
+                state.advance();
+            },
+        });
 
-        expect(
-            applyInput(format, {
-                value: '(123) 4',
-                selectionStart: 7,
-                selectionEnd: 7,
-            })
-        ).toEqual({
-            formattedValue: '(123) 4',
-            selectionStart: 7,
-            selectionEnd: 7,
+        const result = format.onInput({
+            value: 'a1b',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+
+        expect(result).toEqual({
+            formattedValue: '[A][B]',
+            selectionStart: 3,
+            selectionEnd: 3,
         });
     });
 
-    it('normalizes pasted raw input before formatting', () => {
-        const format = createPhoneLikeFormat();
+    it('supports replacing the normalized value while normalizing', () => {
+        const format = defineFormat({
+            name: 'replace-normalized',
+            normalize(character, state) {
+                if (character === '#') {
+                    state.replace('!');
+                    return;
+                }
 
-        expect(
-            applyInput(format, {
-                value: '1a2b3c4',
-                selectionStart: 7,
-                selectionEnd: 7,
-            })
-        ).toEqual({
-            formattedValue: '(123) 4',
-            selectionStart: 7,
-            selectionEnd: 7,
+                state.append(character);
+            },
+            format(character, state) {
+                state.append(character);
+                state.advance();
+            },
+        });
+
+        const result = format.onInput({
+            value: 'ab#c',
+            selectionStart: 4,
+            selectionEnd: 4,
+        });
+
+        expect(result).toEqual({
+            formattedValue: '!c',
+            selectionStart: 2,
+            selectionEnd: 2,
         });
     });
 
-    it('clamps the selection to the normalized value length', () => {
-        const format = createPhoneLikeFormat();
+    it('creates isolated format instances', () => {
+        const format = defineFormat({
+            name: 'isolated',
+            normalize(character, state) {
+                state.append(character);
+            },
+            format(character, state) {
+                state.append(`${state.index}:${character}`);
+                state.advance();
+            },
+        });
 
         expect(
-            applyInput(format, {
-                value: '(123) 456999',
-                selectionStart: 12,
-                selectionEnd: 12,
-            })
-        ).toEqual({
-            formattedValue: '(123) 456',
-            selectionStart: 9,
-            selectionEnd: 9,
-        });
+            format.onInput({
+                value: 'ab',
+                selectionStart: null,
+                selectionEnd: null,
+            }).formattedValue
+        ).toBe('0:a1:b');
+
+        expect(
+            format.onInput({
+                value: 'c',
+                selectionStart: null,
+                selectionEnd: null,
+            }).formattedValue
+        ).toBe('0:c');
     });
 
-    it('returns zeroed selections when no meaningful characters precede the cursor', () => {
-        const format = createPhoneLikeFormat();
+    it('runs the same pipeline on blur before clearing selection', () => {
+        const format = defineFormat({
+            name: 'blur-pipeline',
+            normalize(character, state) {
+                if (/\d/.test(character)) {
+                    state.append(character);
+                }
+            },
+            format(character, state) {
+                state.append(`[${character}]`);
+                state.advance();
+            },
+        });
 
         expect(
-            applyInput(format, {
-                value: '(',
+            format.onBlur({
+                value: 'a1b2',
                 selectionStart: 1,
-                selectionEnd: 1,
+                selectionEnd: 3,
             })
         ).toEqual({
-            formattedValue: '',
-            selectionStart: 0,
-            selectionEnd: 0,
-        });
-    });
-
-    it('applies blur formatting and clears the selection', () => {
-        const format = createPhoneLikeFormat();
-
-        expect(
-            applyBlur(format, {
-                value: '1234',
-            })
-        ).toEqual({
-            formattedValue: '(123) 4!',
+            formattedValue: '[1][2]',
             selectionStart: null,
             selectionEnd: null,
         });
     });
 
-    it('creates isolated instances from the same factory', () => {
-        const createFormat = defineFormat({
-            name: 'identity',
-            normalizeValue({ rawValue }) {
-                return rawValue.toUpperCase();
+    it('maps selection ranges through normalization and formatting', () => {
+        const format = defineFormat({
+            name: 'selection-range',
+            normalize(character, state) {
+                if (/[a-z]/i.test(character)) {
+                    state.append(character.toUpperCase());
+                }
             },
-            formatValue({ normalizedValue }) {
-                return normalizedValue;
-            },
-            resolveSelection(context) {
-                return resolveSelectionForText(context, {
-                    characterMatches: /[a-z]/i,
-                });
+            format(character, state) {
+                state.append(`[${character}]`);
+                state.advance();
             },
         });
 
-        const first = createFormat();
-        const second = createFormat();
-
-        expect(first).not.toBe(second);
-        expect(first.name).toBe('identity');
-        expect(second.name).toBe('identity');
         expect(
-            applyInput(first, {
-                value: 'ab',
+            format.onInput({
+                value: 'a1bc',
+                selectionStart: 1,
+                selectionEnd: 4,
             })
         ).toEqual({
-            formattedValue: 'AB',
-            selectionStart: 2,
-            selectionEnd: 2,
+            formattedValue: '[A][B][C]',
+            selectionStart: 3,
+            selectionEnd: 9,
+        });
+    });
+
+    it('runs the blur stage on blur when one exists', () => {
+        const format = defineFormat({
+            name: 'blur-on-blur',
+            normalize(character, state) {
+                if (/[a-z]/i.test(character)) {
+                    state.append(character.toUpperCase());
+                }
+            },
+            format(character, state) {
+                state.append(character);
+                state.advance();
+            },
+            blur(context) {
+                return `<${context.formattedValue}>`;
+            },
+        });
+
+        expect(
+            format.onBlur({
+                value: 'ab1',
+                selectionStart: 0,
+                selectionEnd: 2,
+            })
+        ).toEqual({
+            formattedValue: '<AB>',
+            selectionStart: null,
+            selectionEnd: null,
         });
     });
 });

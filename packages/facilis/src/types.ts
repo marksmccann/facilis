@@ -1,21 +1,49 @@
 /**
- * Defines the behavior for a single reusable format.
+ * The full state available while normalizing one raw character.
  *
  * @since 0.0.1
  */
-export type FormatDefinition = {
-    /** The unique name of the format. */
-    name: string;
-    /** Produces the normalized value from the raw input value. */
-    normalizeValue: (context: NormalizeValueContext) => string;
-    /** Produces the live formatted value from the normalized value. */
-    formatValue: (context: FormatValueContext) => string;
-    /** Produces the formatted value that should be applied on blur. */
-    formatBlurValue?: (context: FormatBlurValueContext) => string;
-    /** Resolves the next selection range after live formatting. */
-    resolveSelection: (
-        context: FormatSelectionContext
-    ) => FormatSelectionResult;
+export type NormalizeState = {
+    /** The current raw character position being processed. */
+    index: number;
+    /** The full raw input value. */
+    rawValue: string;
+    /** The normalized value built so far. */
+    normalized: string;
+    /** Appends text to the normalized value being built. */
+    append: (text: string) => void;
+    /** Replaces the normalized value built so far. */
+    replace: (text: string) => void;
+};
+
+/**
+ * The full state available while formatting one normalized character.
+ *
+ * @since 0.0.1
+ */
+export type FormatState = {
+    /** The current formatting item position being processed. */
+    index: number;
+    /** The full normalized value being formatted. */
+    normalized: string;
+    /** The formatted value built so far. */
+    formatted: string;
+    /** The current normalized cursor position while formatting. */
+    normalizedPosition: number;
+    /** Appends visible text to the formatted value being built. */
+    append: (text: string) => void;
+    /** Advances the normalized cursor position by the provided amount. */
+    advance: (amount?: number) => void;
+};
+
+/**
+ * The context available while producing a blur-time formatted value.
+ *
+ * @since 0.0.1
+ */
+export type BlurContext = {
+    /** The formatted value produced during live input formatting. */
+    formattedValue: string;
 };
 
 /**
@@ -47,84 +75,31 @@ export type FormatResult = {
 };
 
 /**
- * The raw value available to normalization helpers.
+ * Defines the behavior for a single reusable format.
  *
  * @since 0.0.1
  */
-export type NormalizeValueContext = {
-    /** The current raw input value before normalization is applied. */
-    rawValue: string;
+export type FormatDefinition = {
+    /** The unique name of the format. */
+    name: string;
+    /** Produces the normalized value while processing one raw character. */
+    normalize: (character: string, state: NormalizeState) => void;
+    /** Contributes visible text while formatting one normalized character. */
+    format: (character: string, state: FormatState) => void;
+    /** Produces the formatted value that should be applied on blur. */
+    blur?: (context: BlurContext) => string;
 };
 
 /**
- * The normalized value available to live-formatting helpers.
+ * A reusable format driven by adapters/plugins.
  *
  * @since 0.0.1
  */
-export type FormatValueContext = {
-    /** The normalized value produced from the raw input. */
-    normalizedValue: string;
-};
-
-/**
- * The formatted value available to blur-formatting helpers.
- *
- * @since 0.0.1
- */
-export type FormatBlurValueContext = {
-    /** The formatted value produced during live input formatting. */
-    formattedValue: string;
-};
-
-/**
- * The runtime values available when resolving the next selection range.
- *
- * @since 0.0.1
- */
-export type FormatSelectionContext = {
-    /** The current raw input value before formatting is applied. */
-    rawValue: string;
-    /** The current raw selection start before formatting is applied. */
-    rawSelectionStart: number;
-    /** The current raw selection end before formatting is applied. */
-    rawSelectionEnd: number;
-    /** The normalized value produced from the raw input. */
-    normalizedValue: string;
-    /** The formatted value produced from the normalized value. */
-    formattedValue: string;
-};
-
-/**
- * The resolved selection range returned by a format selection strategy.
- *
- * @since 0.0.1
- */
-export type FormatSelectionResult = {
-    /** The next selection start that should be applied to the input. */
-    selectionStart: number | null;
-    /** The next selection end that should be applied to the input. */
-    selectionEnd: number | null;
-};
-
-/**
- * A stateful format instance driven by adapters/plugins.
- *
- * @since 0.0.1
- */
-export type FormatInstance = {
-    /** The name of the format the instance belongs to */
+export type Format = {
+    /** The name of the format */
     name: string;
     /** Handles live input formatting. */
-    onInput(options: FormatInput): FormatResult;
+    onInput(input: FormatInput): FormatResult;
     /** Handles formatting that should occur on blur. */
-    onBlur(options: FormatInput): FormatResult;
+    onBlur(input: FormatInput): FormatResult;
 };
-
-/**
- * Factory returned by defineFormat that creates isolated format instances.
- *
- * @since 0.0.1
- */
-export type FormatFactory = () => FormatInstance;
-
-export type * from './resolveSelectionForText';

@@ -41,7 +41,7 @@ With `currency({ symbol: '', includeCents: false })`:
 ## Signature
 
 ```ts
-function currency(options?: CurrencyOptions): Facilis.FormatInstance;
+function currency(options?: CurrencyOptions): Facilis.Format;
 ```
 
 ## Import

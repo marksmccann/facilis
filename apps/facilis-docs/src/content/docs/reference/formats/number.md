@@ -55,7 +55,7 @@ With `number({ trimLeadingZeros: true })`:
 ## Signature
 
 ```ts
-function number(options?: NumberOptions): Facilis.FormatInstance;
+function number(options?: NumberOptions): Facilis.Format;
 ```
 
 ## Import
