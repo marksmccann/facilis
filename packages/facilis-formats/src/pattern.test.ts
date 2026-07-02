@@ -67,4 +67,52 @@ describe('pattern', () => {
             selectionEnd: null,
         });
     });
+
+    it('shows the next literal as soon as the preceding token group is filled', () => {
+        const format = pattern('##/##');
+
+        expect(
+            format.onInput({
+                value: '12',
+                selectionStart: 2,
+                selectionEnd: 2,
+            })
+        ).toEqual({
+            formattedValue: '12/',
+            selectionStart: 3,
+            selectionEnd: 3,
+        });
+    });
+
+    it('lets users type into a literal boundary without losing progress', () => {
+        const format = pattern('##/##');
+
+        expect(
+            format.onInput({
+                value: '12/',
+                selectionStart: 3,
+                selectionEnd: 3,
+            })
+        ).toEqual({
+            formattedValue: '12/',
+            selectionStart: 3,
+            selectionEnd: 3,
+        });
+    });
+
+    it('accepts a leading literal when the pattern starts with one', () => {
+        const format = pattern('(###) ###-####');
+
+        expect(
+            format.onInput({
+                value: '(',
+                selectionStart: 1,
+                selectionEnd: 1,
+            })
+        ).toEqual({
+            formattedValue: '(',
+            selectionStart: 1,
+            selectionEnd: 1,
+        });
+    });
 });

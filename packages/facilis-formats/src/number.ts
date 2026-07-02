@@ -1,12 +1,9 @@
 import { defineFormat, type Format } from 'facilis';
-import clampCompleteNumberValue from './internal/clampCompleteNumberValue';
 import countFractionDigits from './internal/countFractionDigits';
 import insertLeadingZeroOnBlur from './internal/insertLeadingZeroOnBlur';
 import isDecimalSeparator from './internal/isDecimalSeparator';
 import isDigit from './internal/isDigit';
-import isNegativeSign from './internal/isNegativeSign';
 import padDecimalPlacesOnBlur from './internal/padDecimalPlacesOnBlur';
-import shouldClampNumberValue from './internal/shouldClampNumberValue';
 import shouldInsertThousandsSeparator from './internal/shouldInsertThousandsSeparator';
 import trimLeadingZerosInValue from './internal/trimLeadingZerosInValue';
 
@@ -91,6 +88,70 @@ function normalizeNumberOptions(options: NumberOptions = {}) {
         thousandsSeparator: options.thousandsSeparator ?? '',
         trimLeadingZeros: options.trimLeadingZeros ?? false,
     };
+}
+
+/**
+ * Determines whether a character is a minus sign.
+ *
+ * @private
+ */
+function isNegativeSign(character: string) {
+    return character === '-';
+}
+
+/**
+ * Clamps a complete numeric value to the configured numeric bounds.
+ *
+ * @private
+ */
+function clampCompleteNumberValue(
+    value: string,
+    decimalSeparator: string,
+    min?: number,
+    max?: number
+) {
+    if (
+        value.length === 0 ||
+        value === '-' ||
+        value.endsWith(decimalSeparator)
+    ) {
+        return value;
+    }
+
+    const numericValue = Number(value.replace(decimalSeparator, '.'));
+
+    if (!Number.isFinite(numericValue)) {
+        return value;
+    }
+
+    if (min !== undefined && numericValue < min) {
+        return String(min);
+    }
+
+    if (max !== undefined && numericValue > max) {
+        return String(max);
+    }
+
+    return value;
+}
+
+/**
+ * Determines whether the current normalized value is complete enough to clamp.
+ *
+ * @private
+ */
+function shouldClampNumberValue(
+    value: string,
+    decimalPlaces: number,
+    decimalSeparator: string
+) {
+    const shouldClampInteger = decimalPlaces === 0;
+    const shouldClampDecimal =
+        decimalPlaces > 0 &&
+        value.includes(decimalSeparator) &&
+        !value.endsWith(decimalSeparator);
+
+    return shouldClampInteger || shouldClampDecimal;
 }
 
 /**

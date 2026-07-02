@@ -1,3 +1,4 @@
+export * from './credit-card';
 export * from './currency';
 export * from './number';
 export * from './pattern';

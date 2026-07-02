@@ -1,4 +1,5 @@
 import type { FormatDefinition, Format } from './types';
+import resolveLiteralDeletionSelection from './resolveLiteralDeletionSelection';
 import resolveSelectionBoundary from './resolveSelectionBoundary';
 import runBlur from './runBlur';
 import runFormat from './runFormat';
@@ -29,17 +30,28 @@ export function defineFormat(definition: FormatDefinition): Format {
                 rawToNormalized,
                 input.selectionEnd
             );
+            const defaultSelectionStart = resolveSelectionBoundary(
+                normalizedToFormatted,
+                normalizedSelectionStart
+            );
+            const defaultSelectionEnd = resolveSelectionBoundary(
+                normalizedToFormatted,
+                normalizedSelectionEnd
+            );
+            const literalDeletionResult = resolveLiteralDeletionSelection(
+                input,
+                formattedValue
+            );
 
             return {
-                formattedValue,
-                selectionStart: resolveSelectionBoundary(
-                    normalizedToFormatted,
-                    normalizedSelectionStart
-                ),
-                selectionEnd: resolveSelectionBoundary(
-                    normalizedToFormatted,
-                    normalizedSelectionEnd
-                ),
+                formattedValue:
+                    literalDeletionResult?.formattedValue ?? formattedValue,
+                selectionStart:
+                    literalDeletionResult?.selectionStart ??
+                    defaultSelectionStart,
+                selectionEnd:
+                    literalDeletionResult?.selectionEnd ??
+                    defaultSelectionEnd,
             };
         },
         onBlur(input) {

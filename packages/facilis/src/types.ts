@@ -58,6 +58,14 @@ export type FormatInput = {
     selectionStart: number | null;
     /** The end of the current selection, if one exists. */
     selectionEnd: number | null;
+    /** The platform-specific input action that produced this value, if known. */
+    inputType?: string;
+    /** The previous value before the platform applied the current edit, if known. */
+    previousValue?: string;
+    /** The previous selection start before the current edit, if known. */
+    previousSelectionStart?: number | null;
+    /** The previous selection end before the current edit, if known. */
+    previousSelectionEnd?: number | null;
 };
 
 /**

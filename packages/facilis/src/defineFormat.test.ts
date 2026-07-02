@@ -171,4 +171,74 @@ describe('defineFormat', () => {
             selectionEnd: null,
         });
     });
+
+    it('removes a reinserted literal run on backspace when edit context is provided', () => {
+        const format = defineFormat({
+            name: 'literal-delete-backward',
+            normalize(character, state) {
+                if (/\d/.test(character)) {
+                    state.append(character);
+                }
+            },
+            format(character, state) {
+                state.append(character);
+                state.advance();
+
+                if (state.index === 1) {
+                    state.append('/ ');
+                }
+            },
+        });
+
+        expect(
+            format.onInput({
+                value: '1234',
+                selectionStart: 3,
+                selectionEnd: 3,
+                inputType: 'deleteContentBackward',
+                previousValue: '12/ 34',
+                previousSelectionStart: 4,
+                previousSelectionEnd: 4,
+            })
+        ).toEqual({
+            formattedValue: '1234',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
+    it('removes a reinserted literal run on forward delete when edit context is provided', () => {
+        const format = defineFormat({
+            name: 'literal-delete-forward',
+            normalize(character, state) {
+                if (/\d/.test(character)) {
+                    state.append(character);
+                }
+            },
+            format(character, state) {
+                state.append(character);
+                state.advance();
+
+                if (state.index === 1) {
+                    state.append('/ ');
+                }
+            },
+        });
+
+        expect(
+            format.onInput({
+                value: '1234',
+                selectionStart: 2,
+                selectionEnd: 2,
+                inputType: 'deleteContentForward',
+                previousValue: '12/ 34',
+                previousSelectionStart: 2,
+                previousSelectionEnd: 2,
+            })
+        ).toEqual({
+            formattedValue: '1234',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
 });
