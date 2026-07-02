@@ -419,4 +419,251 @@ describe('number', () => {
             selectionEnd: 3,
         });
     });
+
+    it('inserts thousands separators into the integer portion', () => {
+        const format = number({
+            thousandsSeparator: ',',
+        });
+
+        expect(
+            format.onInput({
+                value: '12345',
+                selectionStart: 5,
+                selectionEnd: 5,
+            })
+        ).toEqual({
+            formattedValue: '12,345',
+            selectionStart: 6,
+            selectionEnd: 6,
+        });
+    });
+
+    it('leaves the fractional portion unchanged when grouping', () => {
+        const format = number({
+            decimalPlaces: 2,
+            thousandsSeparator: ',',
+        });
+
+        expect(
+            format.onInput({
+                value: '12345.67',
+                selectionStart: 8,
+                selectionEnd: 8,
+            })
+        ).toEqual({
+            formattedValue: '12,345.67',
+            selectionStart: 9,
+            selectionEnd: 9,
+        });
+    });
+
+    it('preserves a leading minus sign when grouping', () => {
+        const format = number({
+            allowNegative: true,
+            thousandsSeparator: ',',
+        });
+
+        expect(
+            format.onInput({
+                value: '-12345',
+                selectionStart: 6,
+                selectionEnd: 6,
+            })
+        ).toEqual({
+            formattedValue: '-12,345',
+            selectionStart: 7,
+            selectionEnd: 7,
+        });
+    });
+
+    it('maps selection through inserted thousands separators', () => {
+        const format = number({
+            thousandsSeparator: ',',
+        });
+
+        expect(
+            format.onInput({
+                value: '12345',
+                selectionStart: 2,
+                selectionEnd: 4,
+            })
+        ).toEqual({
+            formattedValue: '12,345',
+            selectionStart: 2,
+            selectionEnd: 5,
+        });
+    });
+
+    it('clamps complete integers to the configured minimum while typing', () => {
+        const format = number({
+            allowNegative: true,
+            min: 0,
+        });
+
+        expect(
+            format.onInput({
+                value: '-5',
+                selectionStart: 2,
+                selectionEnd: 2,
+            })
+        ).toEqual({
+            formattedValue: '0',
+            selectionStart: 1,
+            selectionEnd: 1,
+        });
+    });
+
+    it('clamps complete integers to the configured maximum while typing', () => {
+        const format = number({
+            max: 100,
+        });
+
+        expect(
+            format.onInput({
+                value: '150',
+                selectionStart: 3,
+                selectionEnd: 3,
+            })
+        ).toEqual({
+            formattedValue: '100',
+            selectionStart: 3,
+            selectionEnd: 3,
+        });
+    });
+
+    it('does not clamp an incomplete minus sign while typing', () => {
+        const format = number({
+            allowNegative: true,
+            min: 0,
+        });
+
+        expect(
+            format.onInput({
+                value: '-',
+                selectionStart: 1,
+                selectionEnd: 1,
+            })
+        ).toEqual({
+            formattedValue: '-',
+            selectionStart: 1,
+            selectionEnd: 1,
+        });
+    });
+
+    it('clamps complete decimal values to the configured maximum while typing', () => {
+        const format = number({
+            decimalPlaces: 2,
+            max: 10,
+        });
+
+        expect(
+            format.onInput({
+                value: '12.5',
+                selectionStart: 4,
+                selectionEnd: 4,
+            })
+        ).toEqual({
+            formattedValue: '10',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
+    it('clamps complete decimal values to the configured minimum while typing', () => {
+        const format = number({
+            allowNegative: true,
+            decimalPlaces: 2,
+            min: 0,
+        });
+
+        expect(
+            format.onInput({
+                value: '-1.5',
+                selectionStart: 4,
+                selectionEnd: 4,
+            })
+        ).toEqual({
+            formattedValue: '0',
+            selectionStart: 1,
+            selectionEnd: 1,
+        });
+    });
+
+    it('does not clamp values that end with the decimal separator', () => {
+        const format = number({
+            decimalPlaces: 2,
+            max: 10,
+        });
+
+        expect(
+            format.onInput({
+                value: '12.',
+                selectionStart: 3,
+                selectionEnd: 3,
+            })
+        ).toEqual({
+            formattedValue: '12.',
+            selectionStart: 3,
+            selectionEnd: 3,
+        });
+    });
+
+    it('supports decimal clamping with a custom decimal separator', () => {
+        const format = number({
+            decimalPlaces: 2,
+            decimalSeparator: ',',
+            max: 10,
+        });
+
+        expect(
+            format.onInput({
+                value: '12,5',
+                selectionStart: 4,
+                selectionEnd: 4,
+            })
+        ).toEqual({
+            formattedValue: '10',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
+    it('does not clamp an incomplete negative decimal while typing', () => {
+        const format = number({
+            allowNegative: true,
+            decimalPlaces: 2,
+            min: 0,
+        });
+
+        expect(
+            format.onInput({
+                value: '-.',
+                selectionStart: 2,
+                selectionEnd: 2,
+            })
+        ).toEqual({
+            formattedValue: '-.',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
+    it('leaves in-range decimal values unchanged while typing', () => {
+        const format = number({
+            decimalPlaces: 2,
+            max: 10,
+        });
+
+        expect(
+            format.onInput({
+                value: '9.5',
+                selectionStart: 3,
+                selectionEnd: 3,
+            })
+        ).toEqual({
+            formattedValue: '9.5',
+            selectionStart: 3,
+            selectionEnd: 3,
+        });
+    });
 });

@@ -1,4 +1,14 @@
 import { defineFormat, type Format } from 'facilis';
+import clampCompleteNumberValue from './internal/clampCompleteNumberValue';
+import countFractionDigits from './internal/countFractionDigits';
+import insertLeadingZeroOnBlur from './internal/insertLeadingZeroOnBlur';
+import isDecimalSeparator from './internal/isDecimalSeparator';
+import isDigit from './internal/isDigit';
+import isNegativeSign from './internal/isNegativeSign';
+import padDecimalPlacesOnBlur from './internal/padDecimalPlacesOnBlur';
+import shouldClampNumberValue from './internal/shouldClampNumberValue';
+import shouldInsertThousandsSeparator from './internal/shouldInsertThousandsSeparator';
+import trimLeadingZerosInValue from './internal/trimLeadingZerosInValue';
 
 /**
  * The configuration options for a number format.
@@ -84,125 +94,6 @@ function normalizeNumberOptions(options: NumberOptions = {}) {
 }
 
 /**
- * Determines whether a character is an ASCII digit.
- *
- * @private
- */
-function isDigit(character: string) {
-    return /\d/.test(character);
-}
-
-/**
- * Determines whether a character is the configured decimal separator.
- *
- * @private
- */
-function isDecimalSeparator(character: string, decimalSeparator: string) {
-    return character === decimalSeparator;
-}
-
-/**
- * Determines whether a character is a minus sign.
- *
- * @private
- */
-function isNegativeSign(character: string) {
-    return character === '-';
-}
-
-/**
- * Counts the digits that currently exist after the decimal separator.
- *
- * @private
- */
-function countFractionDigits(value: string, decimalSeparator: string) {
-    const separatorIndex = value.indexOf(decimalSeparator);
-    if (separatorIndex === -1) return 0;
-    const startOfFraction = separatorIndex + decimalSeparator.length;
-    return value.slice(startOfFraction).length;
-}
-
-/**
- * Inserts a leading zero before a decimal-only value when configured to do so.
- *
- * @private
- */
-function insertLeadingZeroOnBlur(
-    value: string,
-    decimalSeparator: string,
-    allowNegative: boolean
-) {
-    if (value.startsWith(decimalSeparator)) {
-        return `0${value}`;
-    }
-
-    if (allowNegative && value.startsWith(`-${decimalSeparator}`)) {
-        return `-0${value.slice(1)}`;
-    }
-
-    return value;
-}
-
-/**
- * Pads the fractional portion on blur until the configured width is reached.
- *
- * @private
- */
-function padDecimalPlacesOnBlur(
-    value: string,
-    decimalSeparator: string,
-    padDecimalPlaces: number
-) {
-    if (padDecimalPlaces <= 0) {
-        return value;
-    }
-
-    if (!value.includes(decimalSeparator)) {
-        return `${value}${decimalSeparator}${'0'.repeat(padDecimalPlaces)}`;
-    }
-
-    const fractionDigitCount = countFractionDigits(value, decimalSeparator);
-
-    if (fractionDigitCount >= padDecimalPlaces) {
-        return value;
-    }
-
-    return `${value}${'0'.repeat(padDecimalPlaces - fractionDigitCount)}`;
-}
-
-/**
- * Trims unnecessary leading zeros from the integer portion of a value.
- *
- * @private
- */
-function trimLeadingZerosInValue(
-    value: string,
-    decimalSeparator: string,
-    allowNegative: boolean
-) {
-    const sign = allowNegative && value.startsWith('-') ? '-' : '';
-    const unsignedValue = sign ? value.slice(1) : value;
-    const separatorIndex = unsignedValue.indexOf(decimalSeparator);
-    const hasFraction = separatorIndex !== -1;
-    const integerPart = hasFraction
-        ? unsignedValue.slice(0, separatorIndex)
-        : unsignedValue;
-    const fractionalPart = hasFraction
-        ? unsignedValue.slice(separatorIndex)
-        : '';
-
-    if (integerPart.length === 0) {
-        return `${sign}${unsignedValue}`;
-    }
-
-    if (/^0+$/.test(integerPart)) {
-        return `${sign}0${fractionalPart}`;
-    }
-
-    return `${sign}${integerPart.replace(/^0+/, '')}${fractionalPart}`;
-}
-
-/**
  * Creates a formatter for numeric input.
  *
  * @since 0.0.1
@@ -213,7 +104,10 @@ export function number(options?: NumberOptions): Format {
         decimalSeparator,
         decimalPlaces,
         insertLeadingZero,
+        max,
+        min,
         padDecimalPlaces,
+        thousandsSeparator,
         trimLeadingZeros,
     } = normalizeNumberOptions(options);
 
@@ -260,6 +154,23 @@ export function number(options?: NumberOptions): Format {
                     state.replace(trimmedValue);
                 }
 
+                if (
+                    shouldClampNumberValue(
+                        state.normalized,
+                        decimalPlaces,
+                        decimalSeparator
+                    )
+                ) {
+                    const clampedValue = clampCompleteNumberValue(
+                        state.normalized,
+                        decimalSeparator,
+                        min,
+                        max
+                    );
+
+                    state.replace(clampedValue);
+                }
+
                 return;
             }
 
@@ -284,6 +195,19 @@ export function number(options?: NumberOptions): Format {
             }
         },
         format(character, state) {
+            if (
+                thousandsSeparator &&
+                isDigit(character) &&
+                shouldInsertThousandsSeparator(
+                    state.normalized,
+                    state.normalizedPosition,
+                    decimalSeparator,
+                    allowNegative
+                )
+            ) {
+                state.append(thousandsSeparator);
+            }
+
             state.append(character);
             state.advance();
         },
