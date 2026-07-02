@@ -12,7 +12,7 @@ describe('pattern', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '123-45',
+            value: '123-45',
             selectionStart: 6,
             selectionEnd: 6,
         });
@@ -28,7 +28,7 @@ describe('pattern', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '123-4',
+            value: '123-4',
             selectionStart: 5,
             selectionEnd: 5,
         });
@@ -48,7 +48,7 @@ describe('pattern', () => {
                 value: '1a2Bc',
                 selectionStart: 5,
                 selectionEnd: 5,
-            }).formattedValue
+            }).value
         ).toBe('12-Bc');
     });
 
@@ -62,7 +62,7 @@ describe('pattern', () => {
                 selectionEnd: 4,
             })
         ).toEqual({
-            formattedValue: '123-4',
+            value: '123-4',
             selectionStart: null,
             selectionEnd: null,
         });

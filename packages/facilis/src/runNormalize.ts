@@ -1,4 +1,9 @@
-import type { FormatDefinition, FormatInput } from './types';
+import type {
+    FormatDefinition,
+    InputSnapshot,
+    EditState,
+    EditKind,
+} from './types';
 
 /**
  * The output of one normalize stage run, including the normalized value and a
@@ -20,6 +25,32 @@ type RunNormalizeResult = {
 };
 
 /**
+ * Resolves the edit transition that should be exposed while normalizing the
+ * current snapshot.
+ *
+ * @private
+ */
+function resolveEditState(
+    inputType: string | null,
+    previous: InputSnapshot,
+    current: InputSnapshot
+): EditState {
+    let kind: EditKind = 'unknown';
+
+    if (inputType === 'deleteContentBackward') {
+        kind = 'delete-backward';
+    } else if (inputType === 'deleteContentForward') {
+        kind = 'delete-forward';
+    } else if (previous.selectionStart !== previous.selectionEnd) {
+        kind = 'replace';
+    } else if (inputType?.startsWith('insert')) {
+        kind = 'insert';
+    }
+
+    return { kind, inputType, previous, current };
+}
+
+/**
  * Runs one format definition's normalize stage across the raw input value and
  * returns the normalized result plus a raw-to-normalized boundary map.
  *
@@ -27,15 +58,19 @@ type RunNormalizeResult = {
  */
 export default function runNormalize(
     definition: FormatDefinition,
-    input: FormatInput
+    inputType: string | null,
+    previous: InputSnapshot,
+    current: InputSnapshot
 ): RunNormalizeResult {
     let normalized = '';
     const rawToNormalized = [0];
+    const edit = resolveEditState(inputType, previous, current);
 
-    for (const [index, character] of Array.from(input.value).entries()) {
+    for (const [index, character] of Array.from(current.value).entries()) {
         definition.normalize(character, {
             index,
-            rawValue: input.value,
+            rawValue: current.value,
+            edit,
             get normalized() {
                 return normalized;
             },

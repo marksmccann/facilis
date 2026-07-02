@@ -1,51 +1,26 @@
-import type { Format } from 'facilis';
-import { reporter } from './reporter';
+import type { Format, InputSnapshot } from 'facilis';
+import resolveInput from './resolveInput';
 
 /**
- * Resolves either a direct DOM target or a selector string to the single input
- * element that `bindFormat` should attach to.
+ * Writes one format result back to the input element.
+ *
+ * @private
  */
-function resolveInput(target: Element | string): HTMLInputElement {
-    if (typeof target !== 'string') {
-        if (!(target instanceof HTMLInputElement)) {
-            reporter.fail('ERR02', {
-                tagName: target.tagName.toLowerCase(),
-            });
-        }
+function updateInput(
+    input: HTMLInputElement,
+    result: ReturnType<Format['onInput']>
+) {
+    input.value = result.value;
 
-        return target as HTMLInputElement;
+    if (result.selectionStart !== null && result.selectionEnd !== null) {
+        input.setSelectionRange(result.selectionStart, result.selectionEnd);
     }
-
-    const elements = document.querySelectorAll(target);
-
-    if (elements.length === 0) {
-        reporter.fail('ERR01', {
-            selector: target,
-        });
-    }
-
-    if (elements.length > 1) {
-        reporter.warn('WARN01', {
-            selector: target,
-            count: elements.length,
-        });
-    }
-
-    const input = elements[0];
-
-    if (!(input instanceof HTMLInputElement)) {
-        reporter.fail('ERR03', {
-            selector: target,
-            tagName: input.tagName.toLowerCase(),
-        });
-    }
-
-    return input as HTMLInputElement;
 }
 
 /**
  * Binds a format instance to an input element or selector and applies
  * formatting on `input` and `blur`.
+ *
  * @since 0.0.1
  */
 export function bindFormat(
@@ -53,32 +28,35 @@ export function bindFormat(
     format: Format
 ): () => void {
     const input = resolveInput(target);
-    const handleInput = () => {
-        const result = format.onInput({
+    let inputSnapshot: InputSnapshot = format.onMount({
+        value: input.value,
+        selectionStart: input.selectionStart,
+        selectionEnd: input.selectionEnd,
+    });
+
+    const handleInput = (event: InputEvent) => {
+        const inputType = event.inputType ?? null;
+
+        inputSnapshot = format.onInput(inputType, inputSnapshot, {
             value: input.value,
             selectionStart: input.selectionStart,
             selectionEnd: input.selectionEnd,
         });
 
-        input.value = result.formattedValue;
-
-        if (result.selectionStart !== null && result.selectionEnd !== null) {
-            input.setSelectionRange(result.selectionStart, result.selectionEnd);
-        }
+        updateInput(input, inputSnapshot);
     };
+
     const handleBlur = () => {
-        const result = format.onBlur({
+        inputSnapshot = format.onBlur({
             value: input.value,
             selectionStart: input.selectionStart,
             selectionEnd: input.selectionEnd,
         });
 
-        input.value = result.formattedValue;
-
-        if (result.selectionStart !== null && result.selectionEnd !== null) {
-            input.setSelectionRange(result.selectionStart, result.selectionEnd);
-        }
+        updateInput(input, inputSnapshot);
     };
+
+    updateInput(input, inputSnapshot);
 
     input.addEventListener('input', handleInput);
     input.addEventListener('blur', handleBlur);

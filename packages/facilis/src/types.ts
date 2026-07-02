@@ -1,4 +1,47 @@
 /**
+ * Describes one value and selection snapshot at a point in time.
+ *
+ * @since 0.0.1
+ */
+export type InputSnapshot = {
+    /** The current value being processed. */
+    value: string;
+    /** The start of the current selection, if one exists. */
+    selectionStart: number | null;
+    /** The end of the current selection, if one exists. */
+    selectionEnd: number | null;
+};
+
+/**
+ * Describes the semantic kind of edit that produced the current input state.
+ *
+ * @since 0.0.1
+ */
+export type EditKind =
+    | 'insert'
+    | 'delete-backward'
+    | 'delete-forward'
+    | 'replace'
+    | 'unknown';
+
+/**
+ * Describes the current edit transition, including the previous committed
+ * snapshot and the current browser snapshot.
+ *
+ * @since 0.0.1
+ */
+export type EditState = {
+    /** The normalized semantic kind of edit that occurred. */
+    kind: EditKind;
+    /** The platform-specific native input action, if known. */
+    inputType: string | null;
+    /** The previous committed snapshot. */
+    previous: InputSnapshot;
+    /** The current browser snapshot. */
+    current: InputSnapshot;
+};
+
+/**
  * The full state available while normalizing one raw character.
  *
  * @since 0.0.1
@@ -8,6 +51,8 @@ export type NormalizeState = {
     index: number;
     /** The full raw input value. */
     rawValue: string;
+    /** The current edit transition being normalized. */
+    edit: EditState;
     /** The normalized value built so far. */
     normalized: string;
     /** Appends text to the normalized value being built. */
@@ -47,34 +92,6 @@ export type BlurContext = {
 };
 
 /**
- * Describes the current input value and selection being processed.
- *
- * @since 0.0.1
- */
-export type FormatInput = {
-    /** The current value being processed. */
-    value: string;
-    /** The start of the current selection, if one exists. */
-    selectionStart: number | null;
-    /** The end of the current selection, if one exists. */
-    selectionEnd: number | null;
-};
-
-/**
- * The minimal result returned after applying a format transition.
- *
- * @since 0.0.1
- */
-export type FormatResult = {
-    /** The value that should be written back to the input. */
-    formattedValue: string;
-    /** The next selection start that should be applied to the input. */
-    selectionStart: number | null;
-    /** The next selection end that should be applied to the input. */
-    selectionEnd: number | null;
-};
-
-/**
  * Defines the behavior for a single reusable format.
  *
  * @since 0.0.1
@@ -98,8 +115,14 @@ export type FormatDefinition = {
 export type Format = {
     /** The name of the format */
     name: string;
+    /** Synchronizes the initial mounted value with the format. */
+    onMount(data: InputSnapshot): InputSnapshot;
     /** Handles live input formatting. */
-    onInput(input: FormatInput): FormatResult;
+    onInput(
+        inputType: string | null,
+        previous: InputSnapshot,
+        current: InputSnapshot
+    ): InputSnapshot;
     /** Handles formatting that should occur on blur. */
-    onBlur(input: FormatInput): FormatResult;
+    onBlur(data: InputSnapshot): InputSnapshot;
 };

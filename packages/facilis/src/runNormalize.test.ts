@@ -18,11 +18,20 @@ describe('runNormalize', () => {
         };
 
         expect(
-            runNormalize(definition, {
-                value: 'a1b',
-                selectionStart: null,
-                selectionEnd: null,
-            })
+            runNormalize(
+                definition,
+                null,
+                {
+                    value: 'a1b',
+                    selectionStart: null,
+                    selectionEnd: null,
+                },
+                {
+                    value: 'a1b',
+                    selectionStart: null,
+                    selectionEnd: null,
+                }
+            )
         ).toEqual({
             normalizedValue: 'AB',
             rawToNormalized: [0, 1, 1, 2],
@@ -43,11 +52,20 @@ describe('runNormalize', () => {
             },
         };
 
-        const result = runNormalize(definition, {
-            value: 'abc',
-            selectionStart: null,
-            selectionEnd: null,
-        });
+        const result = runNormalize(
+            definition,
+            null,
+            {
+                value: 'abc',
+                selectionStart: null,
+                selectionEnd: null,
+            },
+            {
+                value: 'abc',
+                selectionStart: null,
+                selectionEnd: null,
+            }
+        );
 
         expect(seen).toEqual(['0:', '1:a', '2:ab']);
         expect(result.rawToNormalized).toEqual([0, 1, 2, 3]);
@@ -71,11 +89,20 @@ describe('runNormalize', () => {
         };
 
         expect(
-            runNormalize(definition, {
-                value: 'ab#c',
-                selectionStart: null,
-                selectionEnd: null,
-            })
+            runNormalize(
+                definition,
+                null,
+                {
+                    value: 'ab#c',
+                    selectionStart: null,
+                    selectionEnd: null,
+                },
+                {
+                    value: 'ab#c',
+                    selectionStart: null,
+                    selectionEnd: null,
+                }
+            )
         ).toEqual({
             normalizedValue: '!c',
             rawToNormalized: [0, 1, 2, 1, 2],

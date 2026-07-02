@@ -12,7 +12,7 @@ describe('number', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '12345',
+            value: '12345',
             selectionStart: 5,
             selectionEnd: 5,
         });
@@ -28,7 +28,7 @@ describe('number', () => {
                 selectionEnd: 6,
             })
         ).toEqual({
-            formattedValue: '123',
+            value: '123',
             selectionStart: 3,
             selectionEnd: 3,
         });
@@ -44,7 +44,7 @@ describe('number', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '123',
+            value: '123',
             selectionStart: null,
             selectionEnd: null,
         });
@@ -62,7 +62,7 @@ describe('number', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '12.34',
+            value: '12.34',
             selectionStart: 5,
             selectionEnd: 5,
         });
@@ -80,7 +80,7 @@ describe('number', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '1.23',
+            value: '1.23',
             selectionStart: 4,
             selectionEnd: 4,
         });
@@ -99,7 +99,7 @@ describe('number', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '12,34',
+            value: '12,34',
             selectionStart: 5,
             selectionEnd: 5,
         });
@@ -117,7 +117,7 @@ describe('number', () => {
                 selectionEnd: 6,
             })
         ).toEqual({
-            formattedValue: '12.34',
+            value: '12.34',
             selectionStart: 5,
             selectionEnd: 5,
         });
@@ -135,7 +135,7 @@ describe('number', () => {
                 selectionEnd: 8,
             })
         ).toEqual({
-            formattedValue: '12345.67',
+            value: '12345.67',
             selectionStart: 8,
             selectionEnd: 8,
         });
@@ -153,7 +153,7 @@ describe('number', () => {
                 selectionEnd: 4,
             })
         ).toEqual({
-            formattedValue: '-123',
+            value: '-123',
             selectionStart: 4,
             selectionEnd: 4,
         });
@@ -169,7 +169,7 @@ describe('number', () => {
                 selectionEnd: 4,
             })
         ).toEqual({
-            formattedValue: '123',
+            value: '123',
             selectionStart: 3,
             selectionEnd: 3,
         });
@@ -187,7 +187,7 @@ describe('number', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '123',
+            value: '123',
             selectionStart: 3,
             selectionEnd: 3,
         });
@@ -206,7 +206,7 @@ describe('number', () => {
                 selectionEnd: 2,
             })
         ).toEqual({
-            formattedValue: '0.5',
+            value: '0.5',
             selectionStart: null,
             selectionEnd: null,
         });
@@ -226,7 +226,7 @@ describe('number', () => {
                 selectionEnd: 3,
             })
         ).toEqual({
-            formattedValue: '-0.5',
+            value: '-0.5',
             selectionStart: null,
             selectionEnd: null,
         });
@@ -244,7 +244,7 @@ describe('number', () => {
                 selectionEnd: 2,
             })
         ).toEqual({
-            formattedValue: '.5',
+            value: '.5',
             selectionStart: null,
             selectionEnd: null,
         });
@@ -263,7 +263,7 @@ describe('number', () => {
                 selectionEnd: 3,
             })
         ).toEqual({
-            formattedValue: '1.50',
+            value: '1.50',
             selectionStart: null,
             selectionEnd: null,
         });
@@ -282,7 +282,7 @@ describe('number', () => {
                 selectionEnd: 1,
             })
         ).toEqual({
-            formattedValue: '1.00',
+            value: '1.00',
             selectionStart: null,
             selectionEnd: null,
         });
@@ -301,7 +301,7 @@ describe('number', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '1.234',
+            value: '1.234',
             selectionStart: null,
             selectionEnd: null,
         });
@@ -321,7 +321,7 @@ describe('number', () => {
                 selectionEnd: 2,
             })
         ).toEqual({
-            formattedValue: '0.50',
+            value: '0.50',
             selectionStart: null,
             selectionEnd: null,
         });
@@ -339,7 +339,7 @@ describe('number', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '12',
+            value: '12',
             selectionStart: 2,
             selectionEnd: 2,
         });
@@ -357,7 +357,7 @@ describe('number', () => {
                 selectionEnd: 3,
             })
         ).toEqual({
-            formattedValue: '0',
+            value: '0',
             selectionStart: 1,
             selectionEnd: 1,
         });
@@ -376,7 +376,7 @@ describe('number', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '0.5',
+            value: '0.5',
             selectionStart: 3,
             selectionEnd: 3,
         });
@@ -395,7 +395,7 @@ describe('number', () => {
                 selectionEnd: 2,
             })
         ).toEqual({
-            formattedValue: '0.',
+            value: '0.',
             selectionStart: 2,
             selectionEnd: 2,
         });
@@ -414,7 +414,7 @@ describe('number', () => {
                 selectionEnd: 6,
             })
         ).toEqual({
-            formattedValue: '-12',
+            value: '-12',
             selectionStart: 3,
             selectionEnd: 3,
         });
@@ -432,7 +432,7 @@ describe('number', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '12,345',
+            value: '12,345',
             selectionStart: 6,
             selectionEnd: 6,
         });
@@ -451,7 +451,7 @@ describe('number', () => {
                 selectionEnd: 8,
             })
         ).toEqual({
-            formattedValue: '12,345.67',
+            value: '12,345.67',
             selectionStart: 9,
             selectionEnd: 9,
         });
@@ -470,7 +470,7 @@ describe('number', () => {
                 selectionEnd: 6,
             })
         ).toEqual({
-            formattedValue: '-12,345',
+            value: '-12,345',
             selectionStart: 7,
             selectionEnd: 7,
         });
@@ -488,7 +488,7 @@ describe('number', () => {
                 selectionEnd: 4,
             })
         ).toEqual({
-            formattedValue: '12,345',
+            value: '12,345',
             selectionStart: 2,
             selectionEnd: 5,
         });
@@ -507,7 +507,7 @@ describe('number', () => {
                 selectionEnd: 2,
             })
         ).toEqual({
-            formattedValue: '0',
+            value: '0',
             selectionStart: 1,
             selectionEnd: 1,
         });
@@ -525,7 +525,7 @@ describe('number', () => {
                 selectionEnd: 3,
             })
         ).toEqual({
-            formattedValue: '100',
+            value: '100',
             selectionStart: 3,
             selectionEnd: 3,
         });
@@ -544,7 +544,7 @@ describe('number', () => {
                 selectionEnd: 1,
             })
         ).toEqual({
-            formattedValue: '-',
+            value: '-',
             selectionStart: 1,
             selectionEnd: 1,
         });
@@ -563,7 +563,7 @@ describe('number', () => {
                 selectionEnd: 4,
             })
         ).toEqual({
-            formattedValue: '10',
+            value: '10',
             selectionStart: 2,
             selectionEnd: 2,
         });
@@ -583,7 +583,7 @@ describe('number', () => {
                 selectionEnd: 4,
             })
         ).toEqual({
-            formattedValue: '0',
+            value: '0',
             selectionStart: 1,
             selectionEnd: 1,
         });
@@ -602,7 +602,7 @@ describe('number', () => {
                 selectionEnd: 3,
             })
         ).toEqual({
-            formattedValue: '12.',
+            value: '12.',
             selectionStart: 3,
             selectionEnd: 3,
         });
@@ -622,7 +622,7 @@ describe('number', () => {
                 selectionEnd: 4,
             })
         ).toEqual({
-            formattedValue: '10',
+            value: '10',
             selectionStart: 2,
             selectionEnd: 2,
         });
@@ -642,7 +642,7 @@ describe('number', () => {
                 selectionEnd: 2,
             })
         ).toEqual({
-            formattedValue: '-.',
+            value: '-.',
             selectionStart: 2,
             selectionEnd: 2,
         });
@@ -661,7 +661,7 @@ describe('number', () => {
                 selectionEnd: 3,
             })
         ).toEqual({
-            formattedValue: '9.5',
+            value: '9.5',
             selectionStart: 3,
             selectionEnd: 3,
         });

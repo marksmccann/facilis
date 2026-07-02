@@ -7,7 +7,7 @@ const messages = {
     WARN01: 'Selector "{{ selector }}" matched {{ count }} elements. Binding the first match.',
 } as const;
 
-export const reporter = createReporter(
+const reporter = createReporter(
     process.env.NODE_ENV === 'production' ? ({} as typeof messages) : messages,
     {
         formatMessage(message, code) {
@@ -15,3 +15,5 @@ export const reporter = createReporter(
         },
     }
 );
+
+export default reporter;

@@ -14,7 +14,7 @@ describe('text', () => {
                 selectionEnd: 3,
             })
         ).toEqual({
-            formattedValue: 'abc',
+            value: 'abc',
             selectionStart: 3,
             selectionEnd: 3,
         });
@@ -32,7 +32,7 @@ describe('text', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: 'abc',
+            value: 'abc',
             selectionStart: 3,
             selectionEnd: 3,
         });
@@ -50,7 +50,7 @@ describe('text', () => {
                 selectionEnd: 4,
             })
         ).toEqual({
-            formattedValue: 'abc',
+            value: 'abc',
             selectionStart: null,
             selectionEnd: null,
         });

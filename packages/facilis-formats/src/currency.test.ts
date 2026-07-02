@@ -12,7 +12,7 @@ describe('currency', () => {
                 selectionEnd: 7,
             })
         ).toEqual({
-            formattedValue: '$12,345.6',
+            value: '$12,345.6',
             selectionStart: 9,
             selectionEnd: 9,
         });
@@ -28,7 +28,7 @@ describe('currency', () => {
                 selectionEnd: 7,
             })
         ).toEqual({
-            formattedValue: '$12,345.60',
+            value: '$12,345.60',
             selectionStart: null,
             selectionEnd: null,
         });
@@ -46,7 +46,7 @@ describe('currency', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '€12,345',
+            value: '€12,345',
             selectionStart: 7,
             selectionEnd: 7,
         });
@@ -66,7 +66,7 @@ describe('currency', () => {
                 selectionEnd: 7,
             })
         ).toEqual({
-            formattedValue: '€12.345,6',
+            value: '€12.345,6',
             selectionStart: 9,
             selectionEnd: 9,
         });
@@ -86,7 +86,7 @@ describe('currency', () => {
                 selectionEnd: 7,
             })
         ).toEqual({
-            formattedValue: '€12.345,60',
+            value: '€12.345,60',
             selectionStart: null,
             selectionEnd: null,
         });
@@ -104,7 +104,7 @@ describe('currency', () => {
                 selectionEnd: 7,
             })
         ).toEqual({
-            formattedValue: '$123,456',
+            value: '$123,456',
             selectionStart: 8,
             selectionEnd: 8,
         });
@@ -122,7 +122,7 @@ describe('currency', () => {
                 selectionEnd: 7,
             })
         ).toEqual({
-            formattedValue: '$12345.6',
+            value: '$12345.6',
             selectionStart: 8,
             selectionEnd: 8,
         });
@@ -141,7 +141,7 @@ describe('currency', () => {
                 selectionEnd: 7,
             })
         ).toEqual({
-            formattedValue: '123,456',
+            value: '123,456',
             selectionStart: 7,
             selectionEnd: 7,
         });
@@ -157,7 +157,7 @@ describe('currency', () => {
                 selectionEnd: 2,
             })
         ).toEqual({
-            formattedValue: '$0.50',
+            value: '$0.50',
             selectionStart: null,
             selectionEnd: null,
         });
@@ -173,7 +173,7 @@ describe('currency', () => {
                 selectionEnd: 5,
             })
         ).toEqual({
-            formattedValue: '$12',
+            value: '$12',
             selectionStart: 3,
             selectionEnd: 3,
         });
