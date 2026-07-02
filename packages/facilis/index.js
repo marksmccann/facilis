@@ -1,7 +1,10 @@
+export { buildText } from './src/index.ts';
 export { defineFormat } from './src/index.ts';
+export { filterCharacters } from './src/index.ts';
 export { formatBlurValueForNumber } from './src/index.ts';
 export { formatValueForPattern } from './src/index.ts';
 export { formatValueForNumber } from './src/index.ts';
+export { matchesText } from './src/index.ts';
 export { normalizeValueForPattern } from './src/index.ts';
 export { normalizeValueForNumber } from './src/index.ts';
 export { parsePatternOptions } from './src/index.ts';

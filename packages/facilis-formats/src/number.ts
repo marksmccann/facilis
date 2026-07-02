@@ -1,10 +1,10 @@
 import {
     defineFormat,
     formatBlurValueForNumber,
-    formatValueForNumber,
     normalizeValueForNumber,
-    resolveSelectionForNumber,
+    type FormatState,
     type FormatInstance,
+    type NormalizeState,
 } from 'facilis';
 
 /**
@@ -109,32 +109,65 @@ export function number(options?: NumberOptions): FormatInstance {
 
     return defineFormat({
         name: 'number',
-        normalizeValue(context) {
-            return normalizeValueForNumber(context, {
-                allowNegative,
-                decimalPlaces,
-                decimalSeparator,
-                max,
-                min,
-                trimLeadingZeros,
-            });
+        normalize(_character: string, state: NormalizeState) {
+            state.replace(
+                normalizeValueForNumber(
+                    {
+                        rawValue: state.rawValue.slice(0, state.index + 1),
+                    },
+                    {
+                        allowNegative,
+                        decimalPlaces,
+                        decimalSeparator,
+                        max,
+                        min,
+                        trimLeadingZeros,
+                    }
+                )
+            );
         },
-        formatValue(context) {
-            return formatValueForNumber(context, {
-                decimalPlaces,
-                decimalSeparator,
-                thousandsSeparator,
-            });
+        format(character: string, state: FormatState) {
+            const isNegative = state.normalized.startsWith('-');
+            const unsignedStartIndex = isNegative ? 1 : 0;
+            const decimalIndex = state.normalized.indexOf(decimalSeparator);
+            const integerEndIndex =
+                decimalIndex === -1 ? state.normalized.length : decimalIndex;
+
+            if (character === '-') {
+                state.append(character);
+                state.consume();
+                return;
+            }
+
+            if (character === decimalSeparator) {
+                state.append(character);
+                state.consume();
+                return;
+            }
+
+            const unsignedCharacterIndex = state.index - unsignedStartIndex;
+            const integerDigitCount = integerEndIndex - unsignedStartIndex;
+            const isIntegerDigit =
+                decimalIndex === -1 || state.index < decimalIndex;
+
+            state.append(character);
+
+            if (isIntegerDigit && thousandsSeparator !== '') {
+                const remainingIntegerDigits =
+                    integerDigitCount - unsignedCharacterIndex - 1;
+
+                if (
+                    remainingIntegerDigits > 0 &&
+                    remainingIntegerDigits % 3 === 0
+                ) {
+                    state.append(thousandsSeparator);
+                }
+            }
+
+            state.consume();
         },
-        resolveSelection(context) {
-            return resolveSelectionForNumber(context, {
-                allowDecimal: decimalPlaces > 0,
-                allowNegative,
-                decimalSeparator,
-            });
-        },
-        formatBlurValue(context) {
-            return formatBlurValueForNumber(context, {
+        finalize(state) {
+            return formatBlurValueForNumber(state, {
                 decimalSeparator,
                 insertLeadingZero,
                 padDecimalPlaces,

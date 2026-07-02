@@ -1,10 +1,10 @@
 import {
     defineFormat,
-    formatValueForPattern,
-    normalizeValueForPattern,
+    matchesText,
     parsePatternOptions,
-    resolveSelectionForPattern,
+    type FormatState,
     type FormatInstance,
+    type NormalizeState,
     type ParsePatternOptions,
     type PatternTokenDefinitions,
 } from 'facilis';
@@ -28,6 +28,7 @@ export type PatternOptions = {
      * The pattern string that defines literal characters and token slots.
      */
     pattern: string;
+
     /**
      * The token definitions keyed by the wildcard characters used in the pattern.
      */
@@ -70,17 +71,57 @@ export function pattern(input: PatternOptions): FormatInstance;
 export function pattern(input: PatternInput): FormatInstance {
     const patternOptions = normalizePatternOptions(input);
     const patternParts = parsePatternOptions(patternOptions);
+    const tokenParts = patternParts.filter((part) => part.kind === 'token');
+    const insertionsByNormalizedIndex: string[] = [];
+    const tokenPartsByNormalizedIndex: typeof tokenParts = [];
+    let normalizedIndex = 0;
+
+    for (const part of patternParts) {
+        if (part.kind === 'literal') {
+            insertionsByNormalizedIndex[normalizedIndex] =
+                (insertionsByNormalizedIndex[normalizedIndex] ?? '') +
+                part.character;
+            continue;
+        }
+
+        tokenPartsByNormalizedIndex[normalizedIndex] = part;
+        normalizedIndex += 1;
+    }
 
     return defineFormat({
         name: 'pattern',
-        normalizeValue(context) {
-            return normalizeValueForPattern(context, { patternParts });
+        normalize(character, state: NormalizeState) {
+            const tokenPart = tokenParts[state.normalized.length];
+
+            if (!tokenPart) {
+                return;
+            }
+
+            if (matchesText(character, tokenPart.definition.matches)) {
+                state.append(character);
+            }
         },
-        formatValue(context) {
-            return formatValueForPattern(context, { patternParts });
-        },
-        resolveSelection(context) {
-            return resolveSelectionForPattern(context, { patternParts });
+        format(character: string, state: FormatState) {
+            const tokenPart =
+                tokenPartsByNormalizedIndex[state.normalizedPosition];
+            const insertion =
+                insertionsByNormalizedIndex[state.normalizedPosition] ?? '';
+
+            if (insertion !== '') {
+                state.append(insertion);
+            }
+
+            if (!tokenPart) {
+                return;
+            }
+
+            state.append(character);
+            state.consume();
         },
     })();
 }
+
+// Part 1:
+// resolveNormalizedSelection(...)
+// countCharacters(value, predicate): number
+// countCharacters(values, predicate): number[]

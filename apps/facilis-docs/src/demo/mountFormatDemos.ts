@@ -103,7 +103,7 @@ export function mountPatternDemo() {
         pattern({
             pattern: 'AA-####',
             tokens: {
-                A: { matches: /[A-Z]/ },
+                A: { matches: /[a-z]/i },
                 '#': { matches: /\d/ },
             },
         })

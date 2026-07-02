@@ -1,5 +1,10 @@
-import { defineFormat, type FormatInstance } from 'facilis';
-import { resolveSelectionForText } from 'facilis';
+import {
+    defineFormat,
+    matchesText,
+    type FormatInstance,
+    type FormatState,
+    type NormalizeState,
+} from 'facilis';
 
 /**
  * The configuration options for a text format.
@@ -15,20 +20,6 @@ export type TextOptions = {
 };
 
 /**
- * Produces the normalized text value by retaining only characters that satisfy
- * the configured regular expression.
- */
-function normalizeTextValue(rawValue: string, matches: RegExp) {
-    const characters = rawValue.split('');
-    const filteredCharacters = characters.filter((character) => {
-        matches.lastIndex = 0;
-        return matches.test(character);
-    });
-
-    return filteredCharacters.join('');
-}
-
-/**
  * Creates a text format instance that preserves only the characters matched by
  * the provided regular expression.
  *
@@ -39,16 +30,14 @@ export function text(options: TextOptions): FormatInstance {
 
     return defineFormat({
         name: 'text',
-        normalizeValue({ rawValue }) {
-            return normalizeTextValue(rawValue, matches);
+        normalize(character: string, state: NormalizeState) {
+            if (matchesText(character, matches)) {
+                state.append(character);
+            }
         },
-        formatValue({ normalizedValue }) {
-            return normalizedValue;
-        },
-        resolveSelection(context) {
-            return resolveSelectionForText(context, {
-                characterMatches: matches,
-            });
+        format(character: string, state: FormatState) {
+            state.append(character);
+            state.consume();
         },
     })();
 }

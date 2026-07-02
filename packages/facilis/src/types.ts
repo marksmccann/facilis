@@ -1,9 +1,87 @@
 /**
- * Defines the behavior for a single reusable format.
+ * The read-only values available while normalizing one raw character.
  *
  * @since 0.0.1
  */
-export type FormatDefinition = {
+type NormalizeContext = {
+    /** The current raw character position being processed. */
+    index: number;
+    /** The full raw input value. */
+    rawValue: string;
+    /** The normalized value built so far. */
+    normalized: string;
+};
+
+/**
+ * The actions available while normalizing one raw character.
+ *
+ * @since 0.0.1
+ */
+type NormalizeActions = {
+    /** Appends text to the normalized value being built. */
+    append: (text: string) => void;
+    /** Replaces the normalized value built so far. */
+    replace: (text: string) => void;
+};
+
+/**
+ * The read-only values available while formatting one structure item.
+ *
+ * @since 0.0.1
+ */
+type FormatContext = {
+    /** The current formatting item position being processed. */
+    index: number;
+    /** The full normalized value being formatted. */
+    normalized: string;
+    /** The formatted value built so far. */
+    formatted: string;
+    /** The current normalized cursor position while formatting. */
+    normalizedPosition: number;
+};
+
+/**
+ * The actions available while formatting one structure item.
+ *
+ * @since 0.0.1
+ */
+type FormatActions = {
+    /** Appends visible text to the formatted value being built. */
+    append: (text: string) => void;
+    /** Advances the normalized cursor position by the provided amount. */
+    consume: (amount?: number) => void;
+};
+
+/**
+ * The full state available while normalizing one raw character.
+ *
+ * @since 0.0.1
+ */
+export type NormalizeState = NormalizeContext & NormalizeActions;
+
+/**
+ * The full state available while formatting one structure item.
+ *
+ * @since 0.0.1
+ */
+export type FormatState = FormatContext & FormatActions;
+
+/**
+ * The state available while finalizing a formatted value.
+ *
+ * @since 0.0.1
+ */
+export type FinalizeState = {
+    /** The formatted value produced during live input formatting. */
+    formattedValue: string;
+};
+
+/**
+ * Defines one format using the original context-in/context-out shape.
+ *
+ * @since 0.0.1
+ */
+export type LegacyFormatDefinition = {
     /** The unique name of the format. */
     name: string;
     /** Produces the normalized value from the raw input value. */
@@ -17,6 +95,65 @@ export type FormatDefinition = {
         context: FormatSelectionContext
     ) => FormatSelectionResult;
 };
+
+type StagedFormatBase = {
+    /** The unique name of the format. */
+    name: string;
+    /** Produces the normalized value while processing one raw character. */
+    normalize: (character: string, state: NormalizeState) => void;
+    /** Produces the formatted value that should be applied on blur. */
+    finalize?: (state: FinalizeState) => string;
+    /** Resolves the next selection range after live formatting. */
+    resolve?: (context: FormatSelectionContext) => FormatSelectionResult;
+};
+
+/**
+ * Defines one format using the staged normalize/format model over the
+ * normalized characters directly.
+ *
+ * @since 0.0.1
+ */
+export type CharacterStagedFormatDefinition = StagedFormatBase & {
+    /** Formatting runs over the normalized characters directly. */
+    formatItems?: undefined;
+    /** Contributes visible text while formatting one normalized character. */
+    format: (character: string, state: FormatState) => void;
+};
+
+/**
+ * Defines one format using the staged normalize/format model over explicit
+ * structure items.
+ *
+ * @since 0.0.1
+ */
+export type StructuredStagedFormatDefinition<FormatItem = unknown> =
+    StagedFormatBase & {
+    /**
+     * The ordered items that drive formatting. When omitted, formatting runs
+     * over the normalized characters directly.
+     */
+        formatItems: readonly FormatItem[];
+    /** Contributes visible text while formatting one structure item. */
+        format: (item: FormatItem, state: FormatState) => void;
+    };
+
+/**
+ * Defines one format using the staged normalize/format model.
+ *
+ * @since 0.0.1
+ */
+export type StagedFormatDefinition<FormatItem = unknown> =
+    | CharacterStagedFormatDefinition
+    | StructuredStagedFormatDefinition<FormatItem>;
+
+/**
+ * Defines the behavior for a single reusable format.
+ *
+ * @since 0.0.1
+ */
+export type FormatDefinition<FormatItem = unknown> =
+    | LegacyFormatDefinition
+    | StagedFormatDefinition<FormatItem>;
 
 /**
  * Describes the current input value and selection being processed.
@@ -127,4 +264,5 @@ export type FormatInstance = {
  */
 export type FormatFactory = () => FormatInstance;
 
+export type * from './filterCharacters';
 export type * from './resolveSelectionForText';
