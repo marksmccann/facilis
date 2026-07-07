@@ -186,33 +186,44 @@ function matchesPatternToken(
 }
 
 /**
- * Groups the parsed pattern literals into the strings that should appear
- * before each token slot, plus any trailing literals that should appear after
- * the final token slot.
+ * Resolves the next visible pattern prefix after one raw character is
+ * processed.
+ *
+ * When a literal run is next, any typed character advances through it. If that
+ * same character also matches the next token slot, the token is accepted too.
  *
  * @private
  */
-function resolvePatternLiterals(patternParts: PatternPart[]): {
-    literalsBeforeTokens: string[];
-    trailingLiterals: string;
-} {
-    const literalsBeforeTokens: string[] = [];
-    let pendingLiterals = '';
+function resolvePatternPrefix(
+    patternParts: PatternPart[],
+    currentValue: string,
+    character: string
+) {
+    let nextValue = currentValue;
+    let partIndex = currentValue.length;
+    const nextPart = patternParts[partIndex];
 
-    for (const part of patternParts) {
-        if (part.kind === 'literal') {
-            pendingLiterals += part.character;
-            continue;
-        }
-
-        literalsBeforeTokens.push(pendingLiterals);
-        pendingLiterals = '';
+    if (!nextPart) {
+        return currentValue;
     }
 
-    return {
-        literalsBeforeTokens,
-        trailingLiterals: pendingLiterals,
-    };
+    while (patternParts[partIndex]?.kind === 'literal') {
+        const literalPart = patternParts[partIndex] as PatternLiteralPart;
+        nextValue += literalPart.character;
+        partIndex += 1;
+    }
+
+    const tokenPart = patternParts[partIndex];
+
+    if (!tokenPart || tokenPart.kind !== 'token') {
+        return nextValue;
+    }
+
+    if (matchesPatternToken(tokenPart.definition, character)) {
+        nextValue += character;
+    }
+
+    return nextValue;
 }
 
 /**
@@ -225,32 +236,21 @@ export function pattern(input: PatternOptions): Format;
 export function pattern(input: PatternInput): Format {
     const patternOptions = normalizePatternOptions(input);
     const patternParts = parsePatternOptions(patternOptions);
-    const tokenParts = patternParts.filter(
-        (part): part is PatternTokenPart => part.kind === 'token'
-    );
-    const { literalsBeforeTokens, trailingLiterals } =
-        resolvePatternLiterals(patternParts);
 
     return defineFormat({
         name: 'pattern',
         normalize(character, state) {
-            const tokenPart = tokenParts[state.normalized.length];
+            const prefix = resolvePatternPrefix(
+                patternParts,
+                state.normalized,
+                character
+            );
 
-            if (!tokenPart) return;
-
-            if (matchesPatternToken(tokenPart.definition, character)) {
-                state.append(character);
-            }
+            state.replace(prefix);
         },
         format(character, state) {
-            state.append(literalsBeforeTokens[state.index] ?? '');
             state.append(character);
             state.advance();
-
-            // Append the trailing literals after the last tokens has been filled
-            if (state.index === tokenParts.length - 1) {
-                state.append(trailingLiterals);
-            }
         },
     });
 }

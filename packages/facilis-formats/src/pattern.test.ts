@@ -6,11 +6,19 @@ describe('pattern', () => {
         const format = pattern('###-##');
 
         expect(
-            format.onInput({
-                value: '12345',
-                selectionStart: 5,
-                selectionEnd: 5,
-            })
+            format.onInput(
+                null,
+                {
+                    value: '1234',
+                    selectionStart: 4,
+                    selectionEnd: 4,
+                },
+                {
+                    value: '12345',
+                    selectionStart: 5,
+                    selectionEnd: 5,
+                }
+            )
         ).toEqual({
             value: '123-45',
             selectionStart: 6,
@@ -22,11 +30,19 @@ describe('pattern', () => {
         const format = pattern('###-##');
 
         expect(
-            format.onInput({
-                value: '12a34',
-                selectionStart: 5,
-                selectionEnd: 5,
-            })
+            format.onInput(
+                null,
+                {
+                    value: '12a3',
+                    selectionStart: 4,
+                    selectionEnd: 4,
+                },
+                {
+                    value: '12a34',
+                    selectionStart: 5,
+                    selectionEnd: 5,
+                }
+            )
         ).toEqual({
             value: '123-4',
             selectionStart: 5,
@@ -44,11 +60,19 @@ describe('pattern', () => {
         });
 
         expect(
-            format.onInput({
-                value: '1a2Bc',
-                selectionStart: 5,
-                selectionEnd: 5,
-            }).value
+            format.onInput(
+                null,
+                {
+                    value: '1a2B',
+                    selectionStart: 4,
+                    selectionEnd: 4,
+                },
+                {
+                    value: '1a2Bc',
+                    selectionStart: 5,
+                    selectionEnd: 5,
+                }
+            ).value
         ).toBe('12-Bc');
     });
 
@@ -65,6 +89,54 @@ describe('pattern', () => {
             value: '123-4',
             selectionStart: null,
             selectionEnd: null,
+        });
+    });
+
+    it('inserts a literal run when any character is typed at its boundary', () => {
+        const format = pattern('##/##');
+
+        expect(
+            format.onInput(
+                null,
+                {
+                    value: '12',
+                    selectionStart: 2,
+                    selectionEnd: 2,
+                },
+                {
+                    value: '12x',
+                    selectionStart: 3,
+                    selectionEnd: 3,
+                }
+            )
+        ).toEqual({
+            value: '12/',
+            selectionStart: 3,
+            selectionEnd: 3,
+        });
+    });
+
+    it('inserts the next token too when the typed character matches it', () => {
+        const format = pattern('##/##');
+
+        expect(
+            format.onInput(
+                null,
+                {
+                    value: '12',
+                    selectionStart: 2,
+                    selectionEnd: 2,
+                },
+                {
+                    value: '123',
+                    selectionStart: 3,
+                    selectionEnd: 3,
+                }
+            )
+        ).toEqual({
+            value: '12/3',
+            selectionStart: 4,
+            selectionEnd: 4,
         });
     });
 });
