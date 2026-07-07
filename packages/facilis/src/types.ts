@@ -1,15 +1,23 @@
 /**
- * Describes one value and selection snapshot at a point in time.
+ * Describes one selection snapshot.
  *
  * @since 0.0.1
  */
-export type InputSnapshot = {
-    /** The current value being processed. */
-    value: string;
+export type Selection = {
     /** The start of the current selection, if one exists. */
     selectionStart: number | null;
     /** The end of the current selection, if one exists. */
     selectionEnd: number | null;
+};
+
+/**
+ * Describes one value and selection snapshot at a point in time.
+ *
+ * @since 0.0.1
+ */
+export type InputSnapshot = Selection & {
+    /** The current value being processed. */
+    value: string;
 };
 
 /**
@@ -92,6 +100,26 @@ export type BlurContext = {
 };
 
 /**
+ * The context available while resolving the final live-input selection.
+ *
+ * @since 0.0.1
+ */
+export type SelectContext = {
+    /** The current edit transition. */
+    edit: EditState;
+    /** The previous committed snapshot. */
+    previous: InputSnapshot;
+    /** The current browser snapshot. */
+    current: InputSnapshot;
+    /** The normalized value produced during input formatting. */
+    normalizedValue: string;
+    /** The formatted value produced during input formatting. */
+    formattedValue: string;
+    /** The default selection resolved by the core pipeline. */
+    resolvedSelection: Selection;
+};
+
+/**
  * Defines the behavior for a single reusable format.
  *
  * @since 0.0.1
@@ -105,6 +133,8 @@ export type FormatDefinition = {
     format: (character: string, state: FormatState) => void;
     /** Produces the formatted value that should be applied on blur. */
     blur?: (context: BlurContext) => string;
+    /** Resolves the final selection to apply after live input formatting. */
+    select?: (context: SelectContext) => Selection | undefined;
 };
 
 /**
@@ -119,7 +149,7 @@ export type Format = {
     onMount(data: InputSnapshot): InputSnapshot;
     /** Handles live input formatting. */
     onInput(
-        inputType: string | null,
+        type: string | null,
         previous: InputSnapshot,
         current: InputSnapshot
     ): InputSnapshot;

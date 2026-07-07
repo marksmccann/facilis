@@ -205,6 +205,99 @@ describe('defineFormat', () => {
         });
     });
 
+    it('lets select override the resolved live-input selection', () => {
+        const format = defineFormat({
+            name: 'select-override',
+            normalize(character, state) {
+                state.append(character);
+            },
+            format(character, state) {
+                state.append(`[${character}]`);
+                state.advance();
+            },
+            select(context) {
+                expect(context.previous).toEqual({
+                    value: 'ab',
+                    selectionStart: 2,
+                    selectionEnd: 2,
+                });
+                expect(context.current).toEqual({
+                    value: 'abc',
+                    selectionStart: 3,
+                    selectionEnd: 3,
+                });
+                expect(context.edit.kind).toBe('insert');
+                expect(context.normalizedValue).toBe('abc');
+                expect(context.formattedValue).toBe('[a][b][c]');
+                expect(context.resolvedSelection).toEqual({
+                    selectionStart: 9,
+                    selectionEnd: 9,
+                });
+
+                return {
+                    selectionStart: 1,
+                    selectionEnd: 1,
+                };
+            },
+        });
+
+        expect(
+            format.onInput(
+                'insertText',
+                {
+                    value: 'ab',
+                    selectionStart: 2,
+                    selectionEnd: 2,
+                },
+                {
+                    value: 'abc',
+                    selectionStart: 3,
+                    selectionEnd: 3,
+                }
+            )
+        ).toEqual({
+            value: '[a][b][c]',
+            selectionStart: 1,
+            selectionEnd: 1,
+        });
+    });
+
+    it('keeps the resolved live-input selection when select returns nothing', () => {
+        const format = defineFormat({
+            name: 'select-default',
+            normalize(character, state) {
+                state.append(character.toUpperCase());
+            },
+            format(character, state) {
+                state.append(`[${character}]`);
+                state.advance();
+            },
+            select() {
+                return undefined;
+            },
+        });
+
+        expect(
+            format.onInput(
+                'insertText',
+                {
+                    value: 'a1',
+                    selectionStart: 2,
+                    selectionEnd: 2,
+                },
+                {
+                    value: 'a1b',
+                    selectionStart: 3,
+                    selectionEnd: 3,
+                }
+            )
+        ).toEqual({
+            value: '[A][1][B]',
+            selectionStart: 9,
+            selectionEnd: 9,
+        });
+    });
+
     it('exposes the normalized edit transition while normalizing', () => {
         let seenEdit: string | null = null;
 
