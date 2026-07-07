@@ -139,4 +139,76 @@ describe('pattern', () => {
             selectionEnd: 4,
         });
     });
+
+    it('deletes a trailing literal run on backward delete at the end', () => {
+        const format = pattern('(###) ###-####');
+
+        expect(
+            format.onInput(
+                'deleteContentBackward',
+                {
+                    value: '(123) ',
+                    selectionStart: 6,
+                    selectionEnd: 6,
+                },
+                {
+                    value: '(123)',
+                    selectionStart: 5,
+                    selectionEnd: 5,
+                }
+            )
+        ).toEqual({
+            value: '(123',
+            selectionStart: 4,
+            selectionEnd: 4,
+        });
+    });
+
+    it('moves backward-delete selection before a middle literal run', () => {
+        const format = pattern('(###) ###-####');
+
+        expect(
+            format.onInput(
+                'deleteContentBackward',
+                {
+                    value: '(123) 456-7890',
+                    selectionStart: 6,
+                    selectionEnd: 6,
+                },
+                {
+                    value: '(123)456-7890',
+                    selectionStart: 5,
+                    selectionEnd: 5,
+                }
+            )
+        ).toEqual({
+            value: '(123) 456-7890',
+            selectionStart: 4,
+            selectionEnd: 4,
+        });
+    });
+
+    it('trims trailing literals left behind after deleting the last token', () => {
+        const format = pattern('(###) ###-####');
+
+        expect(
+            format.onInput(
+                'deleteContentBackward',
+                {
+                    value: '(555) 5',
+                    selectionStart: 7,
+                    selectionEnd: 7,
+                },
+                {
+                    value: '(555) ',
+                    selectionStart: 6,
+                    selectionEnd: 6,
+                }
+            )
+        ).toEqual({
+            value: '(555',
+            selectionStart: 4,
+            selectionEnd: 4,
+        });
+    });
 });

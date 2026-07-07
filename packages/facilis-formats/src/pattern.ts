@@ -227,6 +227,97 @@ function resolvePatternPrefix(
 }
 
 /**
+ * Resolves the start of the literal run immediately before one collapsed
+ * selection boundary, if one exists.
+ *
+ * @private
+ */
+function resolvePatternLiteralRunStart(
+    patternParts: PatternPart[],
+    selectionStart: number | null,
+    selectionEnd: number | null
+) {
+    if (
+        selectionStart === null ||
+        selectionEnd === null ||
+        selectionStart !== selectionEnd
+    ) {
+        return null;
+    }
+
+    let literalStart = selectionStart;
+
+    while (
+        literalStart > 0 &&
+        patternParts[literalStart - 1]?.kind === 'literal'
+    ) {
+        literalStart -= 1;
+    }
+
+    return literalStart === selectionStart ? null : literalStart;
+}
+
+/**
+ * Resolves the visible prefix that should remain when a backward delete targets
+ * a trailing literal run at the end of the current pattern value.
+ *
+ * @private
+ */
+function resolvePatternTrailingLiteralDeletionValue(
+    patternParts: PatternPart[],
+    previousValue: string,
+    selectionStart: number | null,
+    selectionEnd: number | null
+) {
+    if (
+        selectionStart === null ||
+        selectionEnd === null ||
+        selectionStart !== selectionEnd ||
+        selectionStart !== previousValue.length
+    ) {
+        return null;
+    }
+
+    const literalStart = resolvePatternLiteralRunStart(
+        patternParts,
+        selectionStart,
+        selectionEnd
+    );
+
+    return literalStart === null ? null : previousValue.slice(0, literalStart);
+}
+
+/**
+ * Resolves the visible prefix that should remain when a backward delete leaves
+ * an orphaned trailing literal run at the end of the current pattern value.
+ *
+ * @private
+ */
+function resolvePatternTrailingLiteralTrimValue(
+    patternParts: PatternPart[],
+    currentValue: string,
+    selectionStart: number | null,
+    selectionEnd: number | null
+) {
+    if (
+        selectionStart === null ||
+        selectionEnd === null ||
+        selectionStart !== selectionEnd ||
+        selectionStart !== currentValue.length
+    ) {
+        return null;
+    }
+
+    const literalStart = resolvePatternLiteralRunStart(
+        patternParts,
+        selectionStart,
+        selectionEnd
+    );
+
+    return literalStart === null ? null : currentValue.slice(0, literalStart);
+}
+
+/**
  * Creates a pattern format instance from a tokenized pattern string.
  *
  * @since 0.0.1
@@ -240,6 +331,34 @@ export function pattern(input: PatternInput): Format {
     return defineFormat({
         name: 'pattern',
         normalize(character, state) {
+            if (state.edit.kind === 'delete-backward') {
+                const trailingDeletionValue =
+                    resolvePatternTrailingLiteralDeletionValue(
+                        patternParts,
+                        state.edit.previous.value,
+                        state.edit.previous.selectionStart,
+                        state.edit.previous.selectionEnd
+                    );
+
+                if (trailingDeletionValue !== null) {
+                    state.set(trailingDeletionValue);
+                    return;
+                }
+
+                const trailingTrimValue =
+                    resolvePatternTrailingLiteralTrimValue(
+                        patternParts,
+                        state.edit.current.value,
+                        state.edit.current.selectionStart,
+                        state.edit.current.selectionEnd
+                    );
+
+                if (trailingTrimValue !== null) {
+                    state.set(trailingTrimValue);
+                    return;
+                }
+            }
+
             const prefix = resolvePatternPrefix(
                 patternParts,
                 state.normalized,
@@ -251,6 +370,38 @@ export function pattern(input: PatternInput): Format {
         format(character, state) {
             state.append(character);
             state.advance();
+        },
+        select(context) {
+            if (context.edit.kind !== 'delete-backward') {
+                return undefined;
+            }
+
+            const trailingDeletionValue =
+                resolvePatternTrailingLiteralDeletionValue(
+                    patternParts,
+                    context.previous.value,
+                    context.previous.selectionStart,
+                    context.previous.selectionEnd
+                );
+
+            if (trailingDeletionValue !== null) {
+                return undefined;
+            }
+
+            const literalStart = resolvePatternLiteralRunStart(
+                patternParts,
+                context.resolvedSelection.selectionStart,
+                context.resolvedSelection.selectionEnd
+            );
+
+            if (literalStart === null) {
+                return undefined;
+            }
+
+            return {
+                selectionStart: literalStart,
+                selectionEnd: literalStart,
+            };
         },
     });
 }
