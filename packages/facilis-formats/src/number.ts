@@ -151,7 +151,7 @@ export function number(options?: NumberOptions): Format {
                         allowNegative
                     );
 
-                    state.replace(trimmedValue);
+                    state.set(trimmedValue);
                 }
 
                 if (
@@ -168,7 +168,7 @@ export function number(options?: NumberOptions): Format {
                         max
                     );
 
-                    state.replace(clampedValue);
+                    state.set(clampedValue);
                 }
 
                 return;
@@ -190,7 +190,7 @@ export function number(options?: NumberOptions): Format {
                         allowNegative
                     );
 
-                    state.replace(trimmedValue);
+                    state.set(trimmedValue);
                 }
             }
         },

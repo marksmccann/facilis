@@ -64,12 +64,12 @@ describe('defineFormat', () => {
         });
     });
 
-    it('supports replacing the normalized value while normalizing', () => {
+    it('supports setting the normalized value while normalizing', () => {
         const format = defineFormat({
-            name: 'replace-normalized',
+            name: 'set-normalized',
             normalize(character, state) {
                 if (character === '#') {
-                    state.replace('!');
+                    state.set('!');
                     return;
                 }
 

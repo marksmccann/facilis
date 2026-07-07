@@ -71,12 +71,12 @@ describe('runNormalize', () => {
         expect(result.rawToNormalized).toEqual([0, 1, 2, 3]);
     });
 
-    it('supports replacing the normalized value in progress', () => {
+    it('supports setting the normalized value in progress', () => {
         const definition: FormatDefinition = {
-            name: 'replace',
+            name: 'set',
             normalize(character, state) {
                 if (character === '#') {
-                    state.replace('!');
+                    state.set('!');
                     return;
                 }
 

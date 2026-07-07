@@ -57,8 +57,8 @@ export type NormalizeState = {
     normalized: string;
     /** Appends text to the normalized value being built. */
     append: (text: string) => void;
-    /** Replaces the normalized value built so far. */
-    replace: (text: string) => void;
+    /** Sets the normalized value built so far to the provided text. */
+    set: (text: string) => void;
 };
 
 /**

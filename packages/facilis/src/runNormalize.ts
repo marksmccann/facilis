@@ -77,7 +77,7 @@ export default function runNormalize(
             append(text) {
                 normalized += text;
             },
-            replace(text) {
+            set(text) {
                 normalized = text;
             },
         });

@@ -87,7 +87,7 @@ export function currency(options?: CurrencyOptions): Format {
                     false
                 );
 
-                state.replace(trimmedValue);
+                state.set(trimmedValue);
 
                 return;
             }
@@ -107,7 +107,7 @@ export function currency(options?: CurrencyOptions): Format {
                     false
                 );
 
-                state.replace(trimmedValue);
+                state.set(trimmedValue);
             }
         },
         format(character, state) {

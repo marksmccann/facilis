@@ -246,7 +246,7 @@ export function pattern(input: PatternInput): Format {
                 character
             );
 
-            state.replace(prefix);
+            state.set(prefix);
         },
         format(character, state) {
             state.append(character);
