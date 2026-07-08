@@ -1,5 +1,6 @@
 import { bindFormat } from '../../../../packages/facilis-dom/src/index.ts';
 import {
+    creditCard,
     currency,
     number,
     pattern,
@@ -31,6 +32,11 @@ export function mountCurrencyDemo() {
     bind('[data-demo-currency-bare]', () =>
         currency({ includeCents: false, symbol: '' })
     );
+}
+
+export function mountCreditCardDemo() {
+    bind('[data-demo-credit-card-default]', () => creditCard());
+    bind('[data-demo-credit-card-amex]', () => creditCard());
 }
 
 export function mountNumberDemo() {

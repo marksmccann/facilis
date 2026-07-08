@@ -41,6 +41,7 @@ export default defineConfig({
                     label: 'API Reference',
                     items: [
                         { label: 'Formats Overview', slug: 'reference/formats' },
+                        { label: 'creditCard', slug: 'reference/formats/credit-card' },
                         { label: 'currency', slug: 'reference/formats/currency' },
                         { label: 'number', slug: 'reference/formats/number' },
                         { label: 'pattern', slug: 'reference/formats/pattern' },

@@ -1,0 +1,30 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/"
+    title="creditCard() Demo"
+>
+    <article class="demo-card">
+        <h2>Standard card numbers</h2>
+        <p>Most card numbers stay in four-digit groups while the format strips anything that is not a digit.</p>
+        <label class="demo-label" for="credit-card-default">Card number</label>
+        <input class="demo-input" id="credit-card-default" data-demo-credit-card-default type="text" placeholder="Try 4111111111111111" />
+        <p class="demo-note">Try <code>4111111111111111</code> to see the default grouping: <code>4111 1111 1111 1111</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>American Express switching</h2>
+        <p>When the digits begin with <code>34</code> or <code>37</code>, the format switches to the American Express layout automatically.</p>
+        <label class="demo-label" for="credit-card-amex">AmEx number</label>
+        <input class="demo-input" id="credit-card-amex" data-demo-credit-card-amex type="text" placeholder="Try 371449635398431" />
+        <p class="demo-note">Try <code>371449635398431</code> to see the AmEx grouping: <code>3714 496353 98431</code>.</p>
+    </article>
+
+    <script>
+        import { mountCreditCardDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountCreditCardDemo();
+    </script>
+</FormatDemoLayout>

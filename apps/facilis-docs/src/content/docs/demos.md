@@ -11,6 +11,7 @@ experiments can share the same deployment target.
 
 Dedicated format demos live at:
 
+- `/facilis/demos/formats/credit-card/`
 - `/facilis/demos/formats/currency/`
 - `/facilis/demos/formats/number/`
 - `/facilis/demos/formats/pattern/`
