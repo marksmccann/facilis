@@ -114,6 +114,70 @@ function resolveIgnoredSeparatorSelection(
 }
 
 /**
+ * Tests whether one collapsed insertion should be ignored because the card
+ * number is already full.
+ *
+ * @private
+ */
+function shouldIgnoreCreditCardInsertionWhenFull(
+    previousValue: string,
+    currentValue: string,
+    currentSelectionStart: number | null,
+    currentSelectionEnd: number | null
+) {
+    if (
+        currentSelectionStart === null ||
+        currentSelectionEnd === null
+    ) {
+        return false;
+    }
+
+    if (currentSelectionStart !== currentSelectionEnd) {
+        return false;
+    }
+
+    if (currentValue.length !== previousValue.length + 1) {
+        return false;
+    }
+
+    if (currentSelectionStart >= currentValue.length) {
+        return false;
+    }
+
+    const previousDigits = previousValue.replace(/\D/g, '');
+
+    return (
+        previousDigits.length >= resolveCreditCardDigitLimit(previousDigits)
+    );
+}
+
+/**
+ * Resolves the caret position that should be restored after one ignored
+ * insertion into a full card number.
+ *
+ * @private
+ */
+function resolveIgnoredCreditCardInsertionSelection(
+    previousValue: string,
+    currentValue: string,
+    currentSelectionStart: number | null,
+    currentSelectionEnd: number | null
+) {
+    if (
+        !shouldIgnoreCreditCardInsertionWhenFull(
+            previousValue,
+            currentValue,
+            currentSelectionStart,
+            currentSelectionEnd
+        )
+    ) {
+        return null;
+    }
+
+    return currentSelectionStart === null ? null : currentSelectionStart - 1;
+}
+
+/**
  * Creates a credit-card number format that automatically switches to the
  * American Express grouping when the entered digits begin with `34` or `37`.
  *
@@ -125,8 +189,24 @@ export function creditCard(): Format {
     return defineFormat({
         name: 'creditCard',
         normalize(character, state) {
+            const shouldIgnoreInsertion =
+                shouldIgnoreCreditCardInsertionWhenFull(
+                    state.edit.previous.value,
+                    state.edit.current.value,
+                    state.edit.current.selectionStart,
+                    state.edit.current.selectionEnd
+                );
+
             if (state.index === 0) {
                 shouldShowTrailingSeparator = false;
+
+                if (shouldIgnoreInsertion) {
+                    state.set(state.edit.previous.value.replace(/\D/g, ''));
+                }
+            }
+
+            if (shouldIgnoreInsertion) {
+                return;
             }
 
             if (!/\d/.test(character)) {
@@ -177,6 +257,21 @@ export function creditCard(): Format {
             }
         },
         select(context) {
+            const ignoredInsertionSelection =
+                resolveIgnoredCreditCardInsertionSelection(
+                    context.previous.value,
+                    context.current.value,
+                    context.current.selectionStart,
+                    context.current.selectionEnd
+                );
+
+            if (ignoredInsertionSelection !== null) {
+                return {
+                    selectionStart: ignoredInsertionSelection,
+                    selectionEnd: ignoredInsertionSelection,
+                };
+            }
+
             const nextSelection = resolveIgnoredSeparatorSelection(
                 context.previous.value,
                 context.current.value,

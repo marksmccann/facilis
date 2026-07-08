@@ -318,6 +318,68 @@ function resolvePatternTrailingLiteralTrimValue(
 }
 
 /**
+ * Tests whether one collapsed insertion should be ignored because the pattern
+ * is already full.
+ *
+ * @private
+ */
+function shouldIgnorePatternInsertionWhenFull(
+    patternParts: PatternPart[],
+    previousValue: string,
+    currentValue: string,
+    currentSelectionStart: number | null,
+    currentSelectionEnd: number | null
+) {
+    if (
+        currentSelectionStart === null ||
+        currentSelectionEnd === null
+    ) {
+        return false;
+    }
+
+    if (currentSelectionStart !== currentSelectionEnd) {
+        return false;
+    }
+
+    if (previousValue.length !== patternParts.length) {
+        return false;
+    }
+
+    return (
+        currentValue.length === previousValue.length + 1 &&
+        currentSelectionStart < currentValue.length
+    );
+}
+
+/**
+ * Resolves the caret position that should be restored after one ignored
+ * insertion into a full pattern value.
+ *
+ * @private
+ */
+function resolveIgnoredPatternInsertionSelection(
+    patternParts: PatternPart[],
+    previousValue: string,
+    currentValue: string,
+    currentSelectionStart: number | null,
+    currentSelectionEnd: number | null
+) {
+    if (
+        !shouldIgnorePatternInsertionWhenFull(
+            patternParts,
+            previousValue,
+            currentValue,
+            currentSelectionStart,
+            currentSelectionEnd
+        )
+    ) {
+        return null;
+    }
+
+    return currentSelectionStart === null ? null : currentSelectionStart - 1;
+}
+
+/**
  * Creates a pattern format instance from a tokenized pattern string.
  *
  * @since 0.0.1
@@ -331,6 +393,23 @@ export function pattern(input: PatternInput): Format {
     return defineFormat({
         name: 'pattern',
         normalize(character, state) {
+            const shouldIgnoreInsertion =
+                shouldIgnorePatternInsertionWhenFull(
+                    patternParts,
+                    state.edit.previous.value,
+                    state.edit.current.value,
+                    state.edit.current.selectionStart,
+                    state.edit.current.selectionEnd
+                );
+
+            if (shouldIgnoreInsertion) {
+                if (state.index === 0) {
+                    state.set(state.edit.previous.value);
+                }
+
+                return;
+            }
+
             if (state.edit.kind === 'delete-backward') {
                 const trailingDeletionValue =
                     resolvePatternTrailingLiteralDeletionValue(
@@ -372,6 +451,22 @@ export function pattern(input: PatternInput): Format {
             state.advance();
         },
         select(context) {
+            const ignoredInsertionSelection =
+                resolveIgnoredPatternInsertionSelection(
+                    patternParts,
+                    context.previous.value,
+                    context.current.value,
+                    context.current.selectionStart,
+                    context.current.selectionEnd
+                );
+
+            if (ignoredInsertionSelection !== null) {
+                return {
+                    selectionStart: ignoredInsertionSelection,
+                    selectionEnd: ignoredInsertionSelection,
+                };
+            }
+
             if (context.edit.kind !== 'delete-backward') {
                 return undefined;
             }

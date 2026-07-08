@@ -140,6 +140,54 @@ describe('pattern', () => {
         });
     });
 
+    it('rejects a middle token insertion when the pattern is already full', () => {
+        const format = pattern('##/##');
+
+        expect(
+            format.onInput(
+                'insertText',
+                {
+                    value: '12/34',
+                    selectionStart: 2,
+                    selectionEnd: 2,
+                },
+                {
+                    value: '129/34',
+                    selectionStart: 3,
+                    selectionEnd: 3,
+                }
+            )
+        ).toEqual({
+            value: '12/34',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
+    it('rejects a middle token insertion even when the previous selection was stale', () => {
+        const format = pattern('##/##');
+
+        expect(
+            format.onInput(
+                'insertText',
+                {
+                    value: '12/34',
+                    selectionStart: 5,
+                    selectionEnd: 5,
+                },
+                {
+                    value: '129/34',
+                    selectionStart: 3,
+                    selectionEnd: 3,
+                }
+            )
+        ).toEqual({
+            value: '12/34',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
     it('deletes a trailing literal run on backward delete at the end', () => {
         const format = pattern('(###) ###-####');
 

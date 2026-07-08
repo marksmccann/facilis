@@ -218,6 +218,54 @@ describe('creditCard', () => {
         });
     });
 
+    it('rejects a middle digit insertion when the card number is already full', () => {
+        const format = creditCard();
+
+        expect(
+            format.onInput(
+                'insertText',
+                {
+                    value: '4111 1111 1111 1111',
+                    selectionStart: 2,
+                    selectionEnd: 2,
+                },
+                {
+                    value: '41911 1111 1111 1111',
+                    selectionStart: 3,
+                    selectionEnd: 3,
+                }
+            )
+        ).toEqual({
+            value: '4111 1111 1111 1111',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
+    it('rejects a middle digit insertion even when the previous selection was stale', () => {
+        const format = creditCard();
+
+        expect(
+            format.onInput(
+                'insertText',
+                {
+                    value: '4111 1111 1111 1111',
+                    selectionStart: 19,
+                    selectionEnd: 19,
+                },
+                {
+                    value: '41911 1111 1111 1111',
+                    selectionStart: 3,
+                    selectionEnd: 3,
+                }
+            )
+        ).toEqual({
+            value: '4111 1111 1111 1111',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
+    });
+
     it('does not preserve a trailing separator after deleting the next digit', () => {
         const format = creditCard();
 
