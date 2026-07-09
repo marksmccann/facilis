@@ -8,11 +8,18 @@ export default function insertLeadingZeroOnBlur(
     decimalSeparator: string,
     allowNegative: boolean
 ) {
-    if (value.startsWith(decimalSeparator)) {
+    if (
+        value.startsWith(decimalSeparator) &&
+        /\d/.test(value.slice(decimalSeparator.length))
+    ) {
         return `0${value}`;
     }
 
-    if (allowNegative && value.startsWith(`-${decimalSeparator}`)) {
+    if (
+        allowNegative &&
+        value.startsWith(`-${decimalSeparator}`) &&
+        /\d/.test(value.slice(decimalSeparator.length + 1))
+    ) {
         return `-0${value.slice(1)}`;
     }
 

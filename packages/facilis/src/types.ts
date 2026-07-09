@@ -65,6 +65,8 @@ export type FormatDefinition = {
     normalize: (input: string) => string;
     /** Builds the default display value from a semantic value. */
     format?: (value: string) => string;
+    /** Adjusts the formatted display value when the field blurs. */
+    blur?: (formattedValue: string) => string;
     /** Intercepts specific editing intentions. */
     on?: FormatHooks;
 };

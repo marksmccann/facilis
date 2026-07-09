@@ -26,6 +26,13 @@ function formatValue(definition: FormatDefinition, value: string): string {
     return definition.format?.(value) ?? value;
 }
 
+function blurValue(
+    definition: FormatDefinition,
+    formattedValue: string
+): string {
+    return definition.blur?.(formattedValue) ?? formattedValue;
+}
+
 /** Creates a reusable format from a format definition. */
 export function defineFormat(definition: FormatDefinition): Format {
     return {
@@ -121,9 +128,10 @@ export function defineFormat(definition: FormatDefinition): Format {
         onBlur(input) {
             const normalizedValue = definition.normalize(input.value);
             const formattedValue = formatValue(definition, normalizedValue);
+            const blurredValue = blurValue(definition, formattedValue);
 
             return {
-                value: formattedValue,
+                value: blurredValue,
                 selectionStart: null,
                 selectionEnd: null,
             };

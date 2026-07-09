@@ -14,6 +14,14 @@ export default function padDecimalPlacesOnBlur(
         return value;
     }
 
+    if (value === '') {
+        return value;
+    }
+
+    if (!/\d/.test(value)) {
+        return value;
+    }
+
     if (!value.includes(decimalSeparator)) {
         return `${value}${decimalSeparator}${'0'.repeat(padDecimalPlaces)}`;
     }

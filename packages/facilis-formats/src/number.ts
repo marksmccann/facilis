@@ -1,14 +1,10 @@
 import { defineFormat, type Format } from 'facilis';
-import clampCompleteNumberValue from './internal/clampCompleteNumberValue';
-import countFractionDigits from './internal/countFractionDigits';
 import insertLeadingZeroOnBlur from './internal/insertLeadingZeroOnBlur';
 import isDecimalSeparator from './internal/isDecimalSeparator';
 import isDigit from './internal/isDigit';
 import isNegativeSign from './internal/isNegativeSign';
 import padDecimalPlacesOnBlur from './internal/padDecimalPlacesOnBlur';
-import shouldClampNumberValue from './internal/shouldClampNumberValue';
 import shouldInsertThousandsSeparator from './internal/shouldInsertThousandsSeparator';
-import trimLeadingZerosInValue from './internal/trimLeadingZerosInValue';
 
 /**
  * The configuration options for a number format.
@@ -52,45 +48,151 @@ export type NumberOptions = {
      * The default is `false`.
      */
     insertLeadingZero?: boolean;
-
-    /**
-     * Whether to trim unnecessary leading zeros from the integer portion,
-     * such as converting `00012` to `12`. The default is `false`.
-     */
-    trimLeadingZeros?: boolean;
-
-    /**
-     * The minimum numeric value allowed while typing. Values below this
-     * boundary clamp to the minimum as soon as they resolve to a complete
-     * number.
-     */
-    min?: number;
-
-    /**
-     * The maximum numeric value allowed while typing. Values above this
-     * boundary clamp to the maximum as soon as they resolve to a complete
-     * number.
-     */
-    max?: number;
 };
+
+type NormalizedNumberOptions = Required<NumberOptions>;
 
 /**
  * Applies the default number-format options when an option is omitted.
  *
  * @private
  */
-function normalizeNumberOptions(options: NumberOptions = {}) {
+function normalizeNumberOptions(
+    options: NumberOptions = {}
+): NormalizedNumberOptions {
     return {
         allowNegative: options.allowNegative ?? false,
         decimalPlaces: Math.max(0, options.decimalPlaces ?? 0),
         padDecimalPlaces: Math.max(0, options.padDecimalPlaces ?? 0),
         decimalSeparator: options.decimalSeparator ?? '.',
         insertLeadingZero: options.insertLeadingZero ?? false,
-        max: options.max,
-        min: options.min,
         thousandsSeparator: options.thousandsSeparator ?? '',
-        trimLeadingZeros: options.trimLeadingZeros ?? false,
     };
+}
+
+function canAppendFractionDigit(
+    value: string,
+    decimalSeparator: string,
+    decimalPlaces: number
+) {
+    const separatorIndex = value.indexOf(decimalSeparator);
+
+    if (separatorIndex === -1) return true;
+
+    const fractionStart = separatorIndex + decimalSeparator.length;
+    return value.slice(fractionStart).length < decimalPlaces;
+}
+
+function normalizeNumberValue(
+    input: string,
+    { allowNegative, decimalPlaces, decimalSeparator }: NormalizedNumberOptions
+) {
+    let value = '';
+    let hasDecimalSeparator = false;
+
+    for (const character of input) {
+        if (allowNegative && isNegativeSign(character) && value.length === 0) {
+            value += character;
+            continue;
+        }
+
+        if (isDigit(character)) {
+            if (
+                !canAppendFractionDigit(value, decimalSeparator, decimalPlaces)
+            ) {
+                continue;
+            }
+
+            value += character;
+            continue;
+        }
+
+        if (
+            decimalPlaces > 0 &&
+            isDecimalSeparator(character, decimalSeparator) &&
+            !hasDecimalSeparator
+        ) {
+            value += decimalSeparator;
+            hasDecimalSeparator = true;
+        }
+    }
+
+    return value;
+}
+
+function formatNumberValue(
+    value: string,
+    {
+        allowNegative,
+        decimalSeparator,
+        thousandsSeparator,
+    }: NormalizedNumberOptions
+) {
+    if (!thousandsSeparator) return value;
+
+    let formattedValue = '';
+
+    for (let index = 0; index < value.length; index += 1) {
+        const character = value[index];
+
+        if (
+            isDigit(character) &&
+            shouldInsertThousandsSeparator(
+                value,
+                index,
+                decimalSeparator,
+                allowNegative
+            )
+        ) {
+            formattedValue += thousandsSeparator;
+        }
+
+        formattedValue += character;
+    }
+
+    return formattedValue;
+}
+
+function getPreviousThousandsSeparatorStart(
+    displayValue: string,
+    position: number,
+    thousandsSeparator: string
+) {
+    if (!thousandsSeparator || position <= 0) {
+        return null;
+    }
+
+    const separatorStart = position - thousandsSeparator.length;
+
+    if (separatorStart < 0) {
+        return null;
+    }
+
+    if (displayValue.slice(separatorStart, position) !== thousandsSeparator) {
+        return null;
+    }
+
+    return separatorStart;
+}
+
+function getFirstDisplayBoundaryForValue(
+    displayValue: string,
+    valueBoundary: number,
+    options: NormalizedNumberOptions
+) {
+    for (let index = 0; index <= displayValue.length; index += 1) {
+        const displayBoundary = displayValue.slice(0, index);
+        const normalizedBoundary = normalizeNumberValue(
+            displayBoundary,
+            options
+        );
+
+        if (normalizedBoundary.length === valueBoundary) {
+            return index;
+        }
+    }
+
+    return displayValue.length;
 }
 
 /**
@@ -99,134 +201,77 @@ function normalizeNumberOptions(options: NumberOptions = {}) {
  * @since 0.0.1
  */
 export function number(options?: NumberOptions): Format {
-    const {
-        allowNegative,
-        decimalSeparator,
-        decimalPlaces,
-        insertLeadingZero,
-        max,
-        min,
-        padDecimalPlaces,
-        thousandsSeparator,
-        trimLeadingZeros,
-    } = normalizeNumberOptions(options);
+    const normalizedOptions = normalizeNumberOptions(options);
 
     return defineFormat({
-        name: 'number',
-        normalize(character, state) {
-            // Allow a minus sign only when negative values are enabled and
-            // the normalized value is still empty.
-            if (
-                allowNegative &&
-                isNegativeSign(character) &&
-                state.normalized.length === 0
-            ) {
-                state.append(character);
-
-                return;
-            }
-
-            if (isDigit(character)) {
-                const fractionDigitCount = countFractionDigits(
-                    state.normalized,
-                    decimalSeparator
-                );
-
-                // Once we are in the fractional portion, stop accepting digits
-                // after the configured decimal-place limit has been reached.
-                if (
-                    decimalPlaces > 0 &&
-                    state.normalized.includes(decimalSeparator) &&
-                    fractionDigitCount >= decimalPlaces
-                ) {
-                    return;
-                }
-
-                state.append(character);
-
-                if (trimLeadingZeros) {
-                    const trimmedValue = trimLeadingZerosInValue(
-                        state.normalized,
-                        decimalSeparator,
-                        allowNegative
-                    );
-
-                    state.set(trimmedValue);
-                }
-
-                if (
-                    shouldClampNumberValue(
-                        state.normalized,
-                        decimalPlaces,
-                        decimalSeparator
-                    )
-                ) {
-                    const clampedValue = clampCompleteNumberValue(
-                        state.normalized,
-                        decimalSeparator,
-                        min,
-                        max
-                    );
-
-                    state.set(clampedValue);
-                }
-
-                return;
-            }
-
-            // Allow a decimal separator only when decimals are enabled and
-            // the normalized value does not already contain one.
-            if (
-                decimalPlaces > 0 &&
-                isDecimalSeparator(character, decimalSeparator) &&
-                !state.normalized.includes(decimalSeparator)
-            ) {
-                state.append(character);
-
-                if (trimLeadingZeros) {
-                    const trimmedValue = trimLeadingZerosInValue(
-                        state.normalized,
-                        decimalSeparator,
-                        allowNegative
-                    );
-
-                    state.set(trimmedValue);
-                }
-            }
+        normalize(input) {
+            return normalizeNumberValue(input, normalizedOptions);
         },
-        format(character, state) {
-            if (
-                thousandsSeparator &&
-                isDigit(character) &&
-                shouldInsertThousandsSeparator(
-                    state.normalized,
-                    state.normalizedPosition,
-                    decimalSeparator,
-                    allowNegative
-                )
-            ) {
-                state.append(thousandsSeparator);
-            }
-
-            state.append(character);
-            state.advance();
+        format(value) {
+            return formatNumberValue(value, normalizedOptions);
         },
-        blur(context) {
-            let blurredValue = context.formattedValue;
-
-            if (insertLeadingZero) {
-                blurredValue = insertLeadingZeroOnBlur(
-                    blurredValue,
-                    decimalSeparator,
-                    allowNegative
-                );
-            }
+        blur(formattedValue) {
+            const value = normalizedOptions.insertLeadingZero
+                ? insertLeadingZeroOnBlur(
+                      formattedValue,
+                      normalizedOptions.decimalSeparator,
+                      normalizedOptions.allowNegative
+                  )
+                : formattedValue;
 
             return padDecimalPlacesOnBlur(
-                blurredValue,
-                decimalSeparator,
-                padDecimalPlaces
+                value,
+                normalizedOptions.decimalSeparator,
+                normalizedOptions.padDecimalPlaces
             );
+        },
+        on: {
+            deleteBackward(edit) {
+                const separatorStart = getPreviousThousandsSeparatorStart(
+                    edit.previousDisplay,
+                    edit.at,
+                    normalizedOptions.thousandsSeparator
+                );
+
+                if (
+                    separatorStart !== null &&
+                    edit.at < edit.previousDisplay.length
+                ) {
+                    return {
+                        value: edit.previousDisplay,
+                        selectionStart: separatorStart,
+                        selectionEnd: separatorStart,
+                    };
+                }
+
+                const deletedCharacter = edit.previousDisplay[edit.range.start];
+                const nextCharacter = edit.previousDisplay.slice(
+                    edit.at,
+                    edit.at + normalizedOptions.thousandsSeparator.length
+                );
+
+                if (
+                    normalizedOptions.thousandsSeparator &&
+                    isDigit(deletedCharacter) &&
+                    nextCharacter === normalizedOptions.thousandsSeparator
+                ) {
+                    const valueBoundary = normalizeNumberValue(
+                        edit.previousDisplay.slice(0, edit.range.start),
+                        normalizedOptions
+                    ).length;
+                    const selection = getFirstDisplayBoundaryForValue(
+                        edit.formattedNextDisplay,
+                        valueBoundary,
+                        normalizedOptions
+                    );
+
+                    return {
+                        value: edit.formattedNextDisplay,
+                        selectionStart: selection,
+                        selectionEnd: selection,
+                    };
+                }
+            },
         },
     });
 }
