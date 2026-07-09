@@ -13,6 +13,11 @@ export type TextOptions = {
     matches: RegExp;
 };
 
+function matchesCharacter(character: string, expression: RegExp): boolean {
+    expression.lastIndex = 0;
+    return expression.test(character);
+}
+
 /**
  * Creates a text format instance.
  *
@@ -20,15 +25,12 @@ export type TextOptions = {
  */
 export function text(options: TextOptions): Format {
     return defineFormat({
-        name: 'text',
-        normalize(character, state) {
-            if (options.matches.test(character)) {
-                state.append(character);
-            }
-        },
-        format(character, state) {
-            state.append(character);
-            state.advance();
+        normalize(input) {
+            return Array.from(input)
+                .filter((character) =>
+                    matchesCharacter(character, options.matches)
+                )
+                .join('');
         },
     });
 }

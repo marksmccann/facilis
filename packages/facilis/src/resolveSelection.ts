@@ -1,87 +1,82 @@
-import type { ResolveValueResult } from './resolveValue';
-import type {
-    FormatDefinition,
-    InputSnapshot,
-    Selection,
-    SelectContext,
-} from './types';
+import type { FormatDefinition, InputSnapshot, Selection } from './types';
 
-/**
- * Resolves one selection boundary through a boundary map while preserving
- * `null` selections and clamping out-of-range indexes to the last known
- * boundary.
- *
- * @private
- */
-function resolveSelectionBoundary(
-    boundaries: number[],
-    index: number | null
-): number | null {
+function resolveBoundary(boundaries: number[], index: number | null) {
     if (index === null) return null;
-    const lastIndex = Math.min(index, boundaries.length - 1);
-    return boundaries[lastIndex] ?? null;
+
+    const lastIndex = boundaries.length - 1;
+    const resolvedIndex = Math.max(0, Math.min(index, lastIndex));
+
+    return boundaries[resolvedIndex] ?? null;
 }
 
-/**
- * Resolves both selection boundaries through one boundary map while preserving
- * `null` selections and clamping out-of-range indexes to the last known
- * boundary.
- *
- * @private
- */
-function resolveSelectionBoundaries(
+function resolveBoundaries(
     selection: Selection,
     boundaries: number[]
 ): Selection {
-    const selectionStart = resolveSelectionBoundary(
-        boundaries,
-        selection.selectionStart
-    );
-    const selectionEnd = resolveSelectionBoundary(
-        boundaries,
-        selection.selectionEnd
-    );
-
     return {
-        selectionStart,
-        selectionEnd,
+        selectionStart: resolveBoundary(boundaries, selection.selectionStart),
+        selectionEnd: resolveBoundary(boundaries, selection.selectionEnd),
     };
 }
 
-/**
- * Resolves the final formatted selection, including the default boundary-map
- * resolution and any optional format-specific override.
- *
- * @private
- */
-export default function resolveSelection(
-    definition: FormatDefinition,
-    previous: InputSnapshot,
-    current: InputSnapshot,
-    value: ResolveValueResult
-): Selection {
-    const normalizedSelection = resolveSelectionBoundaries(
-        current,
-        value.rawToNormalized
-    );
-    const resolvedSelection = resolveSelectionBoundaries(
-        normalizedSelection,
-        value.normalizedToFormatted
-    );
-    const selectContext: SelectContext = {
-        edit: value.edit,
-        previous,
-        current,
-        normalizedValue: value.normalizedValue,
-        formattedValue: value.formattedValue,
-        resolvedSelection,
-    };
+function mapDisplayToValueBoundaries(
+    display: string,
+    normalize: FormatDefinition['normalize']
+) {
+    const boundaries: number[] = [];
 
-    if (definition.select) {
-        const selected = definition.select(selectContext);
-        if (selected) return selected;
+    for (let index = 0; index <= display.length; index += 1) {
+        boundaries.push(normalize(display.slice(0, index)).length);
     }
 
-    return resolvedSelection;
+    return boundaries;
 }
-``;
+
+function mapValueToDisplayBoundaries(
+    value: string,
+    display: string,
+    normalize: FormatDefinition['normalize']
+) {
+    const boundaries: number[] = [];
+    const displayToValue = mapDisplayToValueBoundaries(display, normalize);
+
+    for (let index = 0; index <= value.length; index += 1) {
+        boundaries.push(0);
+    }
+
+    for (const [displayBoundary, valueBoundary] of displayToValue.entries()) {
+        if (valueBoundary <= value.length) {
+            boundaries[valueBoundary] = displayBoundary;
+        }
+    }
+
+    return boundaries;
+}
+
+/** Resolves a display selection through the default value-format boundary maps. */
+export default function resolveSelection(
+    definition: FormatDefinition,
+    current: InputSnapshot,
+    normalizedValue: string,
+    formattedValue: string
+): Selection {
+    if (current.value === formattedValue) {
+        return {
+            selectionStart: current.selectionStart,
+            selectionEnd: current.selectionEnd,
+        };
+    }
+
+    const displayToValue = mapDisplayToValueBoundaries(
+        current.value,
+        definition.normalize
+    );
+    const valueToDisplay = mapValueToDisplayBoundaries(
+        normalizedValue,
+        formattedValue,
+        definition.normalize
+    );
+    const valueSelection = resolveBoundaries(current, displayToValue);
+
+    return resolveBoundaries(valueSelection, valueToDisplay);
+}

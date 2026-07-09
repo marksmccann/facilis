@@ -34,14 +34,28 @@ export function bindFormat(
         selectionEnd: input.selectionEnd,
     });
 
-    const handleInput = (event: InputEvent) => {
-        const inputType = event.inputType ?? null;
-
-        inputSnapshot = format.onInput(inputType, inputSnapshot, {
+    const syncInputSnapshot = () => {
+        inputSnapshot = {
             value: input.value,
             selectionStart: input.selectionStart,
             selectionEnd: input.selectionEnd,
-        });
+        };
+    };
+
+    const handleInput = (event: InputEvent) => {
+        const inputType = event.inputType ?? null;
+        const rawText = event.data ?? null;
+
+        inputSnapshot = format.onInput(
+            inputType,
+            inputSnapshot,
+            {
+                value: input.value,
+                selectionStart: input.selectionStart,
+                selectionEnd: input.selectionEnd,
+            },
+            rawText
+        );
 
         updateInput(input, inputSnapshot);
     };
@@ -58,10 +72,12 @@ export function bindFormat(
 
     updateInput(input, inputSnapshot);
 
+    document.addEventListener('selectionchange', syncInputSnapshot);
     input.addEventListener('input', handleInput);
     input.addEventListener('blur', handleBlur);
 
     return () => {
+        document.removeEventListener('selectionchange', syncInputSnapshot);
         input.removeEventListener('input', handleInput);
         input.removeEventListener('blur', handleBlur);
     };

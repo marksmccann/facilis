@@ -186,197 +186,173 @@ function matchesPatternToken(
 }
 
 /**
- * Resolves the next visible pattern prefix after one raw character is
- * processed.
- *
- * When a literal run is next, any typed character advances through it. If that
- * same character also matches the next token slot, the token is accepted too.
+ * Extracts the token characters from one display value.
  *
  * @private
  */
-function resolvePatternPrefix(
-    patternParts: PatternPart[],
-    currentValue: string,
-    character: string
-) {
-    let nextValue = currentValue;
-    let partIndex = currentValue.length;
-    const nextPart = patternParts[partIndex];
+function normalizeValueForPattern(patternParts: PatternPart[], input: string) {
+    let value = '';
+    let partIndex = 0;
 
-    if (!nextPart) {
-        return currentValue;
-    }
+    for (const character of input) {
+        while (patternParts[partIndex]?.kind === 'literal') {
+            partIndex += 1;
+        }
 
-    while (patternParts[partIndex]?.kind === 'literal') {
-        const literalPart = patternParts[partIndex] as PatternLiteralPart;
-        nextValue += literalPart.character;
+        const part = patternParts[partIndex];
+
+        if (!part || part.kind !== 'token') {
+            break;
+        }
+
+        if (!matchesPatternToken(part.definition, character)) {
+            continue;
+        }
+
+        value += character;
         partIndex += 1;
     }
 
-    const tokenPart = patternParts[partIndex];
-
-    if (!tokenPart || tokenPart.kind !== 'token') {
-        return nextValue;
-    }
-
-    if (matchesPatternToken(tokenPart.definition, character)) {
-        nextValue += character;
-    }
-
-    return nextValue;
+    return value;
 }
 
 /**
- * Resolves the start of the literal run immediately before one collapsed
- * selection boundary, if one exists.
+ * Builds the display value for one normalized pattern value.
  *
  * @private
  */
-function resolvePatternLiteralRunStart(
+function formatValueForPattern(patternParts: PatternPart[], value: string) {
+    let displayValue = '';
+    let valueIndex = 0;
+
+    for (const part of patternParts) {
+        if (part.kind === 'literal') {
+            if (valueIndex < value.length) {
+                displayValue += part.character;
+            }
+
+            continue;
+        }
+
+        const character = value[valueIndex];
+
+        if (!character) {
+            break;
+        }
+
+        displayValue += character;
+        valueIndex += 1;
+    }
+
+    return displayValue;
+}
+
+/**
+ * Resolves the literal run at one visible pattern position.
+ *
+ * @private
+ */
+function getPatternLiteralRun(patternParts: PatternPart[], position: number) {
+    let literalRun = '';
+
+    for (let index = position; index < patternParts.length; index += 1) {
+        const part = patternParts[index];
+
+        if (!part || part.kind !== 'literal') {
+            break;
+        }
+
+        literalRun += part.character;
+    }
+
+    return literalRun;
+}
+
+/**
+ * Tests whether typed text matches the next visible literal characters.
+ *
+ * @private
+ */
+function matchesNextPatternLiteral(
     patternParts: PatternPart[],
-    selectionStart: number | null,
-    selectionEnd: number | null
+    position: number,
+    text: string
 ) {
+    if (text === '') {
+        return false;
+    }
+
+    return getPatternLiteralRun(patternParts, position).startsWith(text);
+}
+
+/**
+ * Tests whether the current display is holding typed literals beyond the
+ * default formatted value.
+ *
+ * @private
+ */
+function hasPendingPatternLiteral(
+    patternParts: PatternPart[],
+    displayValue: string,
+    value: string
+) {
+    const formattedValue = formatValueForPattern(patternParts, value);
+
+    if (displayValue === formattedValue) {
+        return false;
+    }
+
+    if (!displayValue.startsWith(formattedValue)) {
+        return false;
+    }
+
+    return matchesNextPatternLiteral(
+        patternParts,
+        formattedValue.length,
+        displayValue.slice(formattedValue.length)
+    );
+}
+
+/**
+ * Resolves the start of the literal run immediately before the caret.
+ *
+ * @private
+ */
+function getPreviousPatternLiteralRunStart(
+    patternParts: PatternPart[],
+    displayValue: string,
+    position: number
+) {
+    if (position <= 0) {
+        return null;
+    }
+
+    let literalStart = position - 1;
+    const part = patternParts[literalStart];
+
     if (
-        selectionStart === null ||
-        selectionEnd === null ||
-        selectionStart !== selectionEnd
+        !part ||
+        part.kind !== 'literal' ||
+        part.character !== displayValue[literalStart]
     ) {
         return null;
     }
 
-    let literalStart = selectionStart;
+    while (literalStart > 0) {
+        const previousPart = patternParts[literalStart - 1];
 
-    while (
-        literalStart > 0 &&
-        patternParts[literalStart - 1]?.kind === 'literal'
-    ) {
+        if (
+            !previousPart ||
+            previousPart.kind !== 'literal' ||
+            previousPart.character !== displayValue[literalStart - 1]
+        ) {
+            break;
+        }
+
         literalStart -= 1;
     }
 
-    return literalStart === selectionStart ? null : literalStart;
-}
-
-/**
- * Resolves the visible prefix that should remain when a backward delete targets
- * a trailing literal run at the end of the current pattern value.
- *
- * @private
- */
-function resolvePatternTrailingLiteralDeletionValue(
-    patternParts: PatternPart[],
-    previousValue: string,
-    selectionStart: number | null,
-    selectionEnd: number | null
-) {
-    if (
-        selectionStart === null ||
-        selectionEnd === null ||
-        selectionStart !== selectionEnd ||
-        selectionStart !== previousValue.length
-    ) {
-        return null;
-    }
-
-    const literalStart = resolvePatternLiteralRunStart(
-        patternParts,
-        selectionStart,
-        selectionEnd
-    );
-
-    return literalStart === null ? null : previousValue.slice(0, literalStart);
-}
-
-/**
- * Resolves the visible prefix that should remain when a backward delete leaves
- * an orphaned trailing literal run at the end of the current pattern value.
- *
- * @private
- */
-function resolvePatternTrailingLiteralTrimValue(
-    patternParts: PatternPart[],
-    currentValue: string,
-    selectionStart: number | null,
-    selectionEnd: number | null
-) {
-    if (
-        selectionStart === null ||
-        selectionEnd === null ||
-        selectionStart !== selectionEnd ||
-        selectionStart !== currentValue.length
-    ) {
-        return null;
-    }
-
-    const literalStart = resolvePatternLiteralRunStart(
-        patternParts,
-        selectionStart,
-        selectionEnd
-    );
-
-    return literalStart === null ? null : currentValue.slice(0, literalStart);
-}
-
-/**
- * Tests whether one collapsed insertion should be ignored because the pattern
- * is already full.
- *
- * @private
- */
-function shouldIgnorePatternInsertionWhenFull(
-    patternParts: PatternPart[],
-    previousValue: string,
-    currentValue: string,
-    currentSelectionStart: number | null,
-    currentSelectionEnd: number | null
-) {
-    if (
-        currentSelectionStart === null ||
-        currentSelectionEnd === null
-    ) {
-        return false;
-    }
-
-    if (currentSelectionStart !== currentSelectionEnd) {
-        return false;
-    }
-
-    if (previousValue.length !== patternParts.length) {
-        return false;
-    }
-
-    return (
-        currentValue.length === previousValue.length + 1 &&
-        currentSelectionStart < currentValue.length
-    );
-}
-
-/**
- * Resolves the caret position that should be restored after one ignored
- * insertion into a full pattern value.
- *
- * @private
- */
-function resolveIgnoredPatternInsertionSelection(
-    patternParts: PatternPart[],
-    previousValue: string,
-    currentValue: string,
-    currentSelectionStart: number | null,
-    currentSelectionEnd: number | null
-) {
-    if (
-        !shouldIgnorePatternInsertionWhenFull(
-            patternParts,
-            previousValue,
-            currentValue,
-            currentSelectionStart,
-            currentSelectionEnd
-        )
-    ) {
-        return null;
-    }
-
-    return currentSelectionStart === null ? null : currentSelectionStart - 1;
+    return literalStart;
 }
 
 /**
@@ -391,112 +367,59 @@ export function pattern(input: PatternInput): Format {
     const patternParts = parsePatternOptions(patternOptions);
 
     return defineFormat({
-        name: 'pattern',
-        normalize(character, state) {
-            const shouldIgnoreInsertion =
-                shouldIgnorePatternInsertionWhenFull(
-                    patternParts,
-                    state.edit.previous.value,
-                    state.edit.current.value,
-                    state.edit.current.selectionStart,
-                    state.edit.current.selectionEnd
-                );
-
-            if (shouldIgnoreInsertion) {
-                if (state.index === 0) {
-                    state.set(state.edit.previous.value);
-                }
-
-                return;
-            }
-
-            if (state.edit.kind === 'delete-backward') {
-                const trailingDeletionValue =
-                    resolvePatternTrailingLiteralDeletionValue(
-                        patternParts,
-                        state.edit.previous.value,
-                        state.edit.previous.selectionStart,
-                        state.edit.previous.selectionEnd
-                    );
-
-                if (trailingDeletionValue !== null) {
-                    state.set(trailingDeletionValue);
+        normalize(input) {
+            return normalizeValueForPattern(patternParts, input);
+        },
+        format(value) {
+            return formatValueForPattern(patternParts, value);
+        },
+        on: {
+            append(edit) {
+                if (
+                    edit.text !== '' ||
+                    edit.attemptedValue !== edit.previousValue
+                ) {
                     return;
                 }
 
-                const trailingTrimValue =
-                    resolvePatternTrailingLiteralTrimValue(
+                if (
+                    matchesNextPatternLiteral(
                         patternParts,
-                        state.edit.current.value,
-                        state.edit.current.selectionStart,
-                        state.edit.current.selectionEnd
-                    );
-
-                if (trailingTrimValue !== null) {
-                    state.set(trailingTrimValue);
-                    return;
+                        edit.previousDisplay.length,
+                        edit.rawText
+                    )
+                ) {
+                    return edit.attemptedDisplay;
                 }
-            }
 
-            const prefix = resolvePatternPrefix(
-                patternParts,
-                state.normalized,
-                character
-            );
-
-            state.set(prefix);
-        },
-        format(character, state) {
-            state.append(character);
-            state.advance();
-        },
-        select(context) {
-            const ignoredInsertionSelection =
-                resolveIgnoredPatternInsertionSelection(
+                if (
+                    hasPendingPatternLiteral(
+                        patternParts,
+                        edit.previousDisplay,
+                        edit.previousValue
+                    )
+                ) {
+                    return edit.previousDisplay;
+                }
+            },
+            deleteBackward(edit) {
+                const literalStart = getPreviousPatternLiteralRunStart(
                     patternParts,
-                    context.previous.value,
-                    context.current.value,
-                    context.current.selectionStart,
-                    context.current.selectionEnd
+                    edit.previousDisplay,
+                    edit.at
                 );
 
-            if (ignoredInsertionSelection !== null) {
-                return {
-                    selectionStart: ignoredInsertionSelection,
-                    selectionEnd: ignoredInsertionSelection,
-                };
-            }
-
-            if (context.edit.kind !== 'delete-backward') {
-                return undefined;
-            }
-
-            const trailingDeletionValue =
-                resolvePatternTrailingLiteralDeletionValue(
-                    patternParts,
-                    context.previous.value,
-                    context.previous.selectionStart,
-                    context.previous.selectionEnd
-                );
-
-            if (trailingDeletionValue !== null) {
-                return undefined;
-            }
-
-            const literalStart = resolvePatternLiteralRunStart(
-                patternParts,
-                context.resolvedSelection.selectionStart,
-                context.resolvedSelection.selectionEnd
-            );
-
-            if (literalStart === null) {
-                return undefined;
-            }
-
-            return {
-                selectionStart: literalStart,
-                selectionEnd: literalStart,
-            };
+                if (
+                    literalStart !== null &&
+                    edit.at < edit.previousDisplay.length
+                ) {
+                    return {
+                        value: edit.previousDisplay,
+                        selectionStart: literalStart,
+                        selectionEnd: literalStart,
+                    };
+                }
+            },
         },
     });
 }
