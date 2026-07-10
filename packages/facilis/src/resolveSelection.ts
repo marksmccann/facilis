@@ -1,5 +1,17 @@
-import type { FormatDefinition, InputSnapshot, Selection } from './types';
+import type { FormatDefinition, Selection, TextState } from './types';
+import runFormat from './runFormat';
 
+/**
+ * Resolves one cursor boundary through a boundary lookup table.
+ *
+ * The incoming index represents a cursor position in the source text. The
+ * boundary table translates that index into the matching cursor position in
+ * the target text. Null selections remain null, and numeric indexes are
+ * clamped to the available lookup range so stale or out-of-range selections
+ * still resolve to a valid boundary when possible.
+ *
+ * @private
+ */
 function resolveBoundary(boundaries: number[], index: number | null) {
     if (index === null) return null;
 
@@ -9,74 +21,103 @@ function resolveBoundary(boundaries: number[], index: number | null) {
     return boundaries[resolvedIndex] ?? null;
 }
 
+/**
+ * Resolves both ends of a selection through the same boundary lookup table.
+ *
+ * @private
+ */
 function resolveBoundaries(
     selection: Selection,
     boundaries: number[]
 ): Selection {
-    return {
-        selectionStart: resolveBoundary(boundaries, selection.selectionStart),
-        selectionEnd: resolveBoundary(boundaries, selection.selectionEnd),
-    };
+    const start = selection.selectionStart;
+    const end = selection.selectionEnd;
+    const selectionStart = resolveBoundary(boundaries, start);
+    const selectionEnd = resolveBoundary(boundaries, end);
+
+    return { selectionStart, selectionEnd };
 }
 
-function mapDisplayToValueBoundaries(
-    display: string,
+/**
+ * Maps every possible cursor boundary in raw text to its corresponding
+ * normalized boundary.
+ *
+ * The returned array is indexed by raw boundary. Each entry is the length of
+ * the normalized text produced by the raw text up to that boundary. For
+ * example, raw text of `(555` with a digit-only normalizer produces
+ * `[0, 0, 1, 2, 3]`: the boundary after `(` still maps to normalized index
+ * `0`, while each digit advances the normalized index.
+ *
+ * @private
+ */
+function mapRawToNormalized(
+    raw: string,
     normalize: FormatDefinition['normalize']
 ) {
-    const boundaries: number[] = [];
+    return Array.from({ length: raw.length + 1 }, (_, index) => {
+        const rawSegment = raw.slice(0, index);
+        const normalizedBoundary = normalize(rawSegment).length;
 
-    for (let index = 0; index <= display.length; index += 1) {
-        boundaries.push(normalize(display.slice(0, index)).length);
-    }
-
-    return boundaries;
+        return normalizedBoundary;
+    });
 }
 
-function mapValueToDisplayBoundaries(
-    value: string,
-    display: string,
+/**
+ * Maps every possible cursor boundary in normalized text to its corresponding
+ * formatted boundary.
+ *
+ * The returned array is indexed by normalized boundary. Each entry is the
+ * formatted boundary that should represent that normalized boundary after
+ * formatting. For example, formatting `555` as `(555` with a digit-only
+ * normalizer produces `[1, 2, 3, 4]`: normalized boundary `0` lands after the
+ * leading `(`, and each digit boundary lands after its formatted digit.
+ *
+ * @private
+ */
+function mapNormalizedToFormatted(
+    normalized: string,
+    formatted: string,
     normalize: FormatDefinition['normalize']
 ) {
-    const boundaries: number[] = [];
-    const displayToValue = mapDisplayToValueBoundaries(display, normalize);
+    const total = normalized.length;
+    const rawToNormalized = mapRawToNormalized(formatted, normalize);
+    const boundaries = Array.from({ length: total + 1 }, () => 0);
 
-    for (let index = 0; index <= value.length; index += 1) {
-        boundaries.push(0);
-    }
+    Array.from(rawToNormalized.entries()).forEach((entry) => {
+        const [formattedBoundary, normalizedBoundary] = entry;
 
-    for (const [displayBoundary, valueBoundary] of displayToValue.entries()) {
-        if (valueBoundary <= value.length) {
-            boundaries[valueBoundary] = displayBoundary;
+        if (normalizedBoundary <= total) {
+            boundaries[normalizedBoundary] = formattedBoundary;
         }
-    }
+    });
 
     return boundaries;
 }
 
-/** Resolves a display selection through the default value-format boundary maps. */
+/**
+ * Resolves a raw selection through the default normalized and formatted
+ * boundary maps.
+ *
+ * @private
+ */
 export default function resolveSelection(
     definition: FormatDefinition,
-    current: InputSnapshot,
-    normalizedValue: string,
-    formattedValue: string
+    current: TextState
 ): Selection {
-    if (current.value === formattedValue) {
-        return {
-            selectionStart: current.selectionStart,
-            selectionEnd: current.selectionEnd,
-        };
+    const { normalize } = definition;
+    const { value: raw, selectionStart, selectionEnd } = current;
+    const normalized = normalize(raw);
+    const formatted = runFormat(definition, normalized);
+
+    // Attempt to derive the new selection when formatting changees the text.
+    if (raw !== formatted) {
+        const rawToNormalized = mapRawToNormalized(raw, normalize);
+        // prettier-ignore
+        const normalizedToFormatted = mapNormalizedToFormatted(normalized, formatted, normalize);
+        const normalizedSelection = resolveBoundaries(current, rawToNormalized);
+
+        return resolveBoundaries(normalizedSelection, normalizedToFormatted);
     }
 
-    const displayToValue = mapDisplayToValueBoundaries(
-        current.value,
-        definition.normalize
-    );
-    const valueToDisplay = mapValueToDisplayBoundaries(
-        normalizedValue,
-        formattedValue,
-        definition.normalize
-    );
-    const valueSelection = resolveBoundaries(current, displayToValue);
-
-    return resolveBoundaries(valueSelection, valueToDisplay);
+    return { selectionStart, selectionEnd };
 }

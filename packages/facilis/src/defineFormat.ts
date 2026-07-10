@@ -1,140 +1,87 @@
-import type { Format, FormatDefinition, FormatHookResult } from './types';
-import resolveAppendEdit, { resolveAppendSnapshot } from './resolveAppendEdit';
+import type { Format, FormatDefinition } from './types';
+import resolveAppendEdit from './resolveAppendEdit';
+import resolveAppendSnapshot from './resolveAppendSnapshot';
 import resolveDeleteBackwardEdit from './resolveDeleteBackwardEdit';
-import resolveInsertEdit, { resolveInsertSnapshot } from './resolveInsertEdit';
+import resolveEditResult from './resolveEditResult';
+import resolveInsertEdit from './resolveInsertEdit';
+import resolveInsertSnapshot from './resolveInsertSnapshot';
 import resolveSelection from './resolveSelection';
-
-function resolveHookResult(
-    result: FormatHookResult,
-    fallback: ReturnType<Format['onInput']>
-): ReturnType<Format['onInput']> | undefined {
-    if (result === undefined) return undefined;
-    if (result === null) return fallback;
-
-    if (typeof result === 'string') {
-        return {
-            value: result,
-            selectionStart: result.length,
-            selectionEnd: result.length,
-        };
-    }
-
-    return result;
-}
-
-function formatValue(definition: FormatDefinition, value: string): string {
-    return definition.format?.(value) ?? value;
-}
-
-function blurValue(
-    definition: FormatDefinition,
-    formattedValue: string
-): string {
-    return definition.blur?.(formattedValue) ?? formattedValue;
-}
+import runBlur from './runBlur';
+import runFormat from './runFormat';
 
 /** Creates a reusable format from a format definition. */
-export function defineFormat(definition: FormatDefinition): Format {
+export default function defineFormat(definition: FormatDefinition): Format {
     return {
-        onMount(input) {
-            const normalizedValue = definition.normalize(input.value);
-            const formattedValue = formatValue(definition, normalizedValue);
-            const selection = resolveSelection(
-                definition,
-                input,
-                normalizedValue,
-                formattedValue
-            );
+        onMount(current) {
+            const normalized = definition.normalize(current.value);
+            const formatted = runFormat(definition, normalized);
+            const selection = resolveSelection(definition, current);
 
-            return {
-                value: formattedValue,
-                ...selection,
-            };
+            return { value: formatted, ...selection };
         },
-        onInput(type, previous, current, rawText = null) {
+        onInput(details, previous, current) {
             const nextCurrent =
-                resolveAppendSnapshot(type, rawText, previous) ??
-                resolveInsertSnapshot(type, rawText, previous) ??
+                resolveAppendSnapshot(details, previous) ??
+                resolveInsertSnapshot(details, previous) ??
                 current;
-            const previousValue = definition.normalize(previous.value);
-            const normalizedValue = definition.normalize(nextCurrent.value);
-            const formattedNextDisplay = formatValue(
-                definition,
-                normalizedValue
-            );
+            const attemptedNormalized = definition.normalize(nextCurrent.value);
+            const formatted = runFormat(definition, attemptedNormalized);
             const appendEdit = resolveAppendEdit(
-                type,
-                definition,
+                details,
                 previous,
                 nextCurrent,
-                previousValue,
-                normalizedValue,
-                formattedNextDisplay
+                formatted
             );
             const appendResult = appendEdit
-                ? definition.on?.append?.(appendEdit)
+                ? definition.edit?.append?.(appendEdit)
                 : undefined;
-            const handledAppend = resolveHookResult(appendResult, previous);
+            const handledAppend = resolveEditResult(appendResult, previous);
 
             if (handledAppend) return handledAppend;
 
             const insertEdit = resolveInsertEdit(
-                type,
-                definition,
+                details,
                 previous,
                 nextCurrent,
-                previousValue,
-                normalizedValue,
-                formattedNextDisplay
+                formatted
             );
             const insertResult = insertEdit
-                ? definition.on?.insert?.(insertEdit)
+                ? definition.edit?.insert?.(insertEdit)
                 : undefined;
-            const handledInsert = resolveHookResult(insertResult, previous);
+            const handledInsert = resolveEditResult(insertResult, previous);
 
             if (handledInsert) return handledInsert;
 
             const deleteBackwardEdit = resolveDeleteBackwardEdit(
-                type,
+                details,
                 previous,
                 nextCurrent,
-                previousValue,
-                normalizedValue,
-                formattedNextDisplay
+                formatted
             );
             const deleteBackwardResult = deleteBackwardEdit
-                ? definition.on?.deleteBackward?.(deleteBackwardEdit)
+                ? definition.edit?.deleteBackward?.(deleteBackwardEdit)
                 : undefined;
-            const handledDeleteBackward = resolveHookResult(
+            const handledDeleteBackward = resolveEditResult(
                 deleteBackwardResult,
                 previous
             );
 
             if (handledDeleteBackward) return handledDeleteBackward;
 
-            const formattedValue = formattedNextDisplay;
-            const selection = resolveSelection(
-                definition,
-                nextCurrent,
-                normalizedValue,
-                formattedValue
-            );
+            const selection = resolveSelection(definition, nextCurrent);
 
             return {
-                value: formattedValue,
+                value: formatted,
                 ...selection,
             };
         },
         onBlur(input) {
-            const normalizedValue = definition.normalize(input.value);
-            const formattedValue = formatValue(definition, normalizedValue);
-            const blurredValue = blurValue(definition, formattedValue);
+            const normalized = definition.normalize(input.value);
+            const formatted = runFormat(definition, normalized);
+            const blurred = runBlur(definition, formatted);
+            const selection = { selectionStart: null, selectionEnd: null };
 
-            return {
-                value: blurredValue,
-                selectionStart: null,
-                selectionEnd: null,
-            };
+            return { value: blurred, ...selection };
         },
     };
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { defineFormat } from '../../facilis/src/defineFormat';
+import defineFormat from '../../facilis/src/defineFormat';
 import { pattern } from '../../facilis-formats/src/pattern';
 import { bindFormat } from './bindFormat';
 

@@ -1,1 +1,1 @@
-export { defineFormat } from './src/index.ts';
+export { default as defineFormat } from './src/defineFormat.ts';
