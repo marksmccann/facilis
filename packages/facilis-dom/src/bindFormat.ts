@@ -1,4 +1,4 @@
-import type { Format, InputSnapshot } from 'facilis';
+import type { Format, TextState } from 'facilis';
 import resolveInput from './resolveInput';
 
 /**
@@ -28,14 +28,14 @@ export function bindFormat(
     format: Format
 ): () => void {
     const input = resolveInput(target);
-    let inputSnapshot: InputSnapshot = format.onMount({
+    let textState: TextState = format.onMount({
         value: input.value,
         selectionStart: input.selectionStart,
         selectionEnd: input.selectionEnd,
     });
 
-    const syncInputSnapshot = () => {
-        inputSnapshot = {
+    const syncTextState = () => {
+        textState = {
             value: input.value,
             selectionStart: input.selectionStart,
             selectionEnd: input.selectionEnd,
@@ -43,41 +43,40 @@ export function bindFormat(
     };
 
     const handleInput = (event: InputEvent) => {
-        const inputType = event.inputType ?? null;
-        const rawText = event.data ?? null;
-
-        inputSnapshot = format.onInput(
-            inputType,
-            inputSnapshot,
+        textState = format.onInput(
+            {
+                inputType: event.inputType ?? null,
+                data: event.data ?? null,
+            },
+            textState,
             {
                 value: input.value,
                 selectionStart: input.selectionStart,
                 selectionEnd: input.selectionEnd,
-            },
-            rawText
+            }
         );
 
-        updateInput(input, inputSnapshot);
+        updateInput(input, textState);
     };
 
     const handleBlur = () => {
-        inputSnapshot = format.onBlur({
+        textState = format.onBlur({
             value: input.value,
             selectionStart: input.selectionStart,
             selectionEnd: input.selectionEnd,
         });
 
-        updateInput(input, inputSnapshot);
+        updateInput(input, textState);
     };
 
-    updateInput(input, inputSnapshot);
+    updateInput(input, textState);
 
-    document.addEventListener('selectionchange', syncInputSnapshot);
+    document.addEventListener('selectionchange', syncTextState);
     input.addEventListener('input', handleInput);
     input.addEventListener('blur', handleBlur);
 
     return () => {
-        document.removeEventListener('selectionchange', syncInputSnapshot);
+        document.removeEventListener('selectionchange', syncTextState);
         input.removeEventListener('input', handleInput);
         input.removeEventListener('blur', handleBlur);
     };

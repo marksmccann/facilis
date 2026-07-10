@@ -204,20 +204,20 @@ export function number(options?: NumberOptions): Format {
     const normalizedOptions = normalizeNumberOptions(options);
 
     return defineFormat({
-        normalize(input) {
-            return normalizeNumberValue(input, normalizedOptions);
+        normalize(raw) {
+            return normalizeNumberValue(raw, normalizedOptions);
         },
-        format(value) {
-            return formatNumberValue(value, normalizedOptions);
+        format(normalized) {
+            return formatNumberValue(normalized, normalizedOptions);
         },
-        blur(formattedValue) {
+        blur(formatted) {
             const value = normalizedOptions.insertLeadingZero
                 ? insertLeadingZeroOnBlur(
-                      formattedValue,
+                      formatted,
                       normalizedOptions.decimalSeparator,
                       normalizedOptions.allowNegative
                   )
-                : formattedValue;
+                : formatted;
 
             return padDecimalPlacesOnBlur(
                 value,
@@ -225,48 +225,47 @@ export function number(options?: NumberOptions): Format {
                 normalizedOptions.padDecimalPlaces
             );
         },
-        on: {
-            deleteBackward(edit) {
+        edit: {
+            deleteBackward(context) {
                 const separatorStart = getPreviousThousandsSeparatorStart(
-                    edit.previousDisplay,
-                    edit.at,
+                    context.previous,
+                    context.cursor,
                     normalizedOptions.thousandsSeparator
                 );
 
                 if (
                     separatorStart !== null &&
-                    edit.at < edit.previousDisplay.length
+                    context.cursor < context.previous.length
                 ) {
                     return {
-                        value: edit.previousDisplay,
+                        value: context.previous,
                         selectionStart: separatorStart,
                         selectionEnd: separatorStart,
                     };
                 }
 
-                const deletedCharacter = edit.previousDisplay[edit.range.start];
-                const nextCharacter = edit.previousDisplay.slice(
-                    edit.at,
-                    edit.at + normalizedOptions.thousandsSeparator.length
+                const nextCharacter = context.previous.slice(
+                    context.cursor,
+                    context.cursor + normalizedOptions.thousandsSeparator.length
                 );
 
                 if (
                     normalizedOptions.thousandsSeparator &&
-                    isDigit(deletedCharacter) &&
+                    isDigit(context.deleted) &&
                     nextCharacter === normalizedOptions.thousandsSeparator
                 ) {
                     const valueBoundary = normalizeNumberValue(
-                        edit.previousDisplay.slice(0, edit.range.start),
+                        context.previous.slice(0, context.start),
                         normalizedOptions
                     ).length;
                     const selection = getFirstDisplayBoundaryForValue(
-                        edit.formattedNextDisplay,
+                        context.formatted,
                         valueBoundary,
                         normalizedOptions
                     );
 
                     return {
-                        value: edit.formattedNextDisplay,
+                        value: context.formatted,
                         selectionStart: selection,
                         selectionEnd: selection,
                     };

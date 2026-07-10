@@ -367,54 +367,64 @@ export function pattern(input: PatternInput): Format {
     const patternParts = parsePatternOptions(patternOptions);
 
     return defineFormat({
-        normalize(input) {
-            return normalizeValueForPattern(patternParts, input);
+        normalize(raw) {
+            return normalizeValueForPattern(patternParts, raw);
         },
-        format(value) {
-            return formatValueForPattern(patternParts, value);
+        format(normalized) {
+            return formatValueForPattern(patternParts, normalized);
         },
-        on: {
-            append(edit) {
-                if (
-                    edit.text !== '' ||
-                    edit.attemptedValue !== edit.previousValue
-                ) {
+        edit: {
+            append(context) {
+                const appended = normalizeValueForPattern(
+                    patternParts,
+                    context.appended
+                );
+                const attempted = normalizeValueForPattern(
+                    patternParts,
+                    context.attempted
+                );
+                const previous = normalizeValueForPattern(
+                    patternParts,
+                    context.previous
+                );
+
+                if (appended !== '' || attempted !== previous) {
                     return;
                 }
 
                 if (
                     matchesNextPatternLiteral(
                         patternParts,
-                        edit.previousDisplay.length,
-                        edit.rawText
+                        context.previous.length,
+                        context.appended
                     )
                 ) {
-                    return edit.attemptedDisplay;
+                    return context.attempted;
                 }
 
                 if (
                     hasPendingPatternLiteral(
                         patternParts,
-                        edit.previousDisplay,
-                        edit.previousValue
+                        context.previous,
+                        previous
                     )
                 ) {
-                    return edit.previousDisplay;
+                    return context.previous;
                 }
             },
-            deleteBackward(edit) {
+            deleteBackward(context) {
                 const literalStart = getPreviousPatternLiteralRunStart(
                     patternParts,
-                    edit.previousDisplay,
-                    edit.at
+                    context.previous,
+                    context.cursor
                 );
 
                 if (
                     literalStart !== null &&
-                    edit.at < edit.previousDisplay.length
+                    context.cursor < context.previous.length
                 ) {
                     return {
-                        value: edit.previousDisplay,
+                        value: context.previous,
                         selectionStart: literalStart,
                         selectionEnd: literalStart,
                     };

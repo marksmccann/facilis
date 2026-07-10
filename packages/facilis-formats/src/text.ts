@@ -25,8 +25,8 @@ function matchesCharacter(character: string, expression: RegExp): boolean {
  */
 export function text(options: TextOptions): Format {
     return defineFormat({
-        normalize(input) {
-            return Array.from(input)
+        normalize(raw) {
+            return Array.from(raw)
                 .filter((character) =>
                     matchesCharacter(character, options.matches)
                 )

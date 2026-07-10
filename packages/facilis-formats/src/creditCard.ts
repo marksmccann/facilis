@@ -37,6 +37,12 @@ function formatGroups(value: string, groups: number[]) {
     return parts.join(' ');
 }
 
+function normalizeCreditCardValue(raw: string) {
+    const value = raw.replace(/\D/g, '');
+
+    return value.slice(0, resolveDigitLimit(value));
+}
+
 /**
  * Creates a credit-card number format.
  *
@@ -44,63 +50,57 @@ function formatGroups(value: string, groups: number[]) {
  */
 export function creditCard(): Format {
     return defineFormat({
-        normalize(input) {
-            const value = input.replace(/\D/g, '');
-
-            return value.slice(0, resolveDigitLimit(value));
+        normalize(raw) {
+            return normalizeCreditCardValue(raw);
         },
-        format(value) {
-            return isAmericanExpress(value)
-                ? formatGroups(value, [4, 6, 5])
-                : formatGroups(value, [4, 4, 4, 4]);
+        format(normalized) {
+            return isAmericanExpress(normalized)
+                ? formatGroups(normalized, [4, 6, 5])
+                : formatGroups(normalized, [4, 4, 4, 4]);
         },
-        on: {
-            append(edit) {
+        edit: {
+            append(context) {
+                const previous = normalizeCreditCardValue(context.previous);
+                const attempted = normalizeCreditCardValue(context.attempted);
+                const appended = normalizeCreditCardValue(context.appended);
                 const appendedTrailingSpace =
-                    edit.text === '' && edit.rawText.endsWith(' ');
+                    appended === '' && context.appended.endsWith(' ');
 
-                if (
-                    appendedTrailingSpace &&
-                    edit.previousDisplay.endsWith(' ')
-                ) {
-                    return edit.previousDisplay;
+                if (appendedTrailingSpace && context.previous.endsWith(' ')) {
+                    return context.previous;
                 }
 
                 if (
                     appendedTrailingSpace &&
-                    edit.attemptedValue === edit.previousValue &&
-                    edit.previousValue.length > 0 &&
-                    edit.previousValue.length <
-                        resolveDigitLimit(edit.previousValue) &&
-                    isSeparatorBoundary(
-                        edit.previousValue,
-                        edit.previousValue.length
-                    ) &&
-                    !edit.previousDisplay.endsWith(' ')
+                    attempted === previous &&
+                    previous.length > 0 &&
+                    previous.length < resolveDigitLimit(previous) &&
+                    isSeparatorBoundary(previous, previous.length) &&
+                    !context.previous.endsWith(' ')
                 ) {
-                    return edit.attemptedDisplay;
+                    return context.attempted;
                 }
             },
-            insert(edit) {
+            insert(context) {
+                const inserted = normalizeCreditCardValue(context.inserted);
+                const previous = normalizeCreditCardValue(context.previous);
+
                 if (
-                    edit.text !== '' &&
-                    edit.previousValue.length >=
-                        resolveDigitLimit(edit.previousValue)
+                    inserted !== '' &&
+                    previous.length >= resolveDigitLimit(previous)
                 ) {
                     return null;
                 }
             },
-            deleteBackward(edit) {
-                const deletedCharacter = edit.previousDisplay[edit.at - 1];
-
+            deleteBackward(context) {
                 if (
-                    deletedCharacter === ' ' &&
-                    edit.at < edit.previousDisplay.length
+                    context.deleted === ' ' &&
+                    context.cursor < context.previous.length
                 ) {
                     return {
-                        value: edit.previousDisplay,
-                        selectionStart: edit.at - 1,
-                        selectionEnd: edit.at - 1,
+                        value: context.previous,
+                        selectionStart: context.cursor - 1,
+                        selectionEnd: context.cursor - 1,
                     };
                 }
             },
