@@ -11,7 +11,14 @@ first-party exports from `facilis-formats`.
 ## Package
 
 ```ts
-import { creditCard, currency, number, pattern, text } from 'facilis-formats';
+import {
+    creditCard,
+    currency,
+    number,
+    pattern,
+    phoneNumber,
+    text,
+} from 'facilis-formats';
 ```
 
 Use `facilis-formats` when you want ready-made format definitions instead of
@@ -39,6 +46,11 @@ building a custom one directly with `defineFormat()`.
         title="pattern"
         description="A token-based pattern format with shorthand and explicit configuration forms."
         href="/facilis/reference/formats/pattern/"
+    />
+    <LinkCard
+        title="phoneNumber"
+        description="Phone-number formatting with the default 10-digit North American layout."
+        href="/facilis/reference/formats/phone-number/"
     />
     <LinkCard
         title="text"

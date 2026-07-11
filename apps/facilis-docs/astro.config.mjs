@@ -45,6 +45,10 @@ export default defineConfig({
                         { label: 'currency', slug: 'reference/formats/currency' },
                         { label: 'number', slug: 'reference/formats/number' },
                         { label: 'pattern', slug: 'reference/formats/pattern' },
+                        {
+                            label: 'phoneNumber',
+                            slug: 'reference/formats/phone-number',
+                        },
                         { label: 'text', slug: 'reference/formats/text' },
                     ],
                 },

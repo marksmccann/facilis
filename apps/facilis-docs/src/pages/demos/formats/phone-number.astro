@@ -1,0 +1,30 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/phone-number/"
+    title="phoneNumber() Demo"
+>
+    <article class="demo-card">
+        <h2>Default formatting</h2>
+        <p>Phone numbers use the familiar 10-digit North American layout while the format strips anything that is not a digit.</p>
+        <label class="demo-label" for="phone-number-default">Phone number</label>
+        <input class="demo-input" id="phone-number-default" data-demo-phone-number-default type="text" placeholder="Try 4145551212" />
+        <p class="demo-note">Try <code>4145551212</code> to see the default grouping: <code>(414) 555-1212</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Paste cleanup</h2>
+        <p>Existing punctuation, spaces, and other characters are ignored so pasted text resolves to the same phone-number shape.</p>
+        <label class="demo-label" for="phone-number-paste">Messy phone number</label>
+        <input class="demo-input" id="phone-number-paste" data-demo-phone-number-paste type="text" placeholder="Try 414.555.1212 ext. 9" />
+        <p class="demo-note">Try <code>414.555.1212 ext. 9</code>. The format keeps the first 10 digits and displays them as a phone number.</p>
+    </article>
+
+    <script>
+        import { mountPhoneNumberDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountPhoneNumberDemo();
+    </script>
+</FormatDemoLayout>

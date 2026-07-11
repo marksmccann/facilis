@@ -4,6 +4,7 @@ import {
     currency,
     number,
     pattern,
+    phoneNumber,
     text,
 } from '../../../../packages/facilis-formats/src/index.ts';
 
@@ -115,6 +116,11 @@ export function mountPatternDemo() {
         })
     );
     bind('[data-demo-pattern-wildcard]', () => pattern('**-##'));
+}
+
+export function mountPhoneNumberDemo() {
+    bind('[data-demo-phone-number-default]', () => phoneNumber());
+    bind('[data-demo-phone-number-paste]', () => phoneNumber());
 }
 
 export function mountTextDemo() {
