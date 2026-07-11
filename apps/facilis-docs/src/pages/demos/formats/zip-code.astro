@@ -1,0 +1,38 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/zip-code/"
+    title="zipCode() Demo"
+>
+    <article class="demo-card">
+        <h2>Default formatting</h2>
+        <p>ZIP codes use the default 5-digit layout while the format strips anything that is not a digit.</p>
+        <label class="demo-label" for="zip-code-default">ZIP code</label>
+        <input class="demo-input" id="zip-code-default" data-demo-zip-code-default type="text" placeholder="Try 12345" />
+        <p class="demo-note">Try <code>123456789</code>. The default format keeps the first 5 digits: <code>12345</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>ZIP+4 formatting</h2>
+        <p>The <code>includePlusFour</code> option supports the combined ZIP+4 layout with a hyphen after the first 5 digits.</p>
+        <label class="demo-label" for="zip-code-plus-four">ZIP+4 code</label>
+        <input class="demo-input" id="zip-code-plus-four" data-demo-zip-code-plus-four type="text" placeholder="Try 123456789" />
+        <p class="demo-note">Try <code>123456789</code> to see the ZIP+4 grouping: <code>12345-6789</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Paste cleanup</h2>
+        <p>Existing hyphens, spaces, and other characters are ignored so pasted text resolves to the same ZIP+4 shape.</p>
+        <label class="demo-label" for="zip-code-paste">Messy ZIP+4 code</label>
+        <input class="demo-input" id="zip-code-paste" data-demo-zip-code-paste type="text" placeholder="Try 12345 6789 ext. 0" />
+        <p class="demo-note">Try <code>12345 6789 ext. 0</code>. The format keeps the first 9 digits and displays them as a ZIP+4 code.</p>
+    </article>
+
+    <script>
+        import { mountZipCodeDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountZipCodeDemo();
+    </script>
+</FormatDemoLayout>

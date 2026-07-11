@@ -64,6 +64,10 @@ export default defineConfig({
                             slug: 'reference/formats/social-security-number',
                         },
                         { label: 'text', slug: 'reference/formats/text' },
+                        {
+                            label: 'zipCode',
+                            slug: 'reference/formats/zip-code',
+                        },
                     ],
                 },
             ],

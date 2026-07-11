@@ -19,6 +19,7 @@ Dedicated format demos live at:
 - `/facilis/demos/formats/phone-number/`
 - `/facilis/demos/formats/social-security-number/`
 - `/facilis/demos/formats/text/`
+- `/facilis/demos/formats/zip-code/`
 
 ## Current focus
 

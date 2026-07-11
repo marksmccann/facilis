@@ -8,6 +8,7 @@ import {
     phoneNumber,
     socialSecurityNumber,
     text,
+    zipCode,
 } from '../../../../packages/facilis-formats/src/index.ts';
 
 function bind(target: string, factory: () => ReturnType<typeof currency>) {
@@ -152,5 +153,15 @@ export function mountTextDemo() {
         text({
             matches: /[a-f0-9]/i,
         })
+    );
+}
+
+export function mountZipCodeDemo() {
+    bind('[data-demo-zip-code-default]', () => zipCode());
+    bind('[data-demo-zip-code-plus-four]', () =>
+        zipCode({ includePlusFour: true })
+    );
+    bind('[data-demo-zip-code-paste]', () =>
+        zipCode({ includePlusFour: true })
     );
 }

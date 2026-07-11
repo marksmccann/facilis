@@ -6,3 +6,4 @@ export * from './pattern';
 export * from './phoneNumber';
 export * from './socialSecurityNumber';
 export * from './text';
+export * from './zipCode';
