@@ -37,7 +37,7 @@ export function ein(): Format {
         },
         edit: {
             append(context) {
-                const { attempted, previous } = context;
+                const { attempted } = context;
 
                 if (!isAppendFormatting(context)) {
                     return;
@@ -48,7 +48,7 @@ export function ein(): Format {
                 }
 
                 if (isAppendDuplicateFormattingAt(context, '-', 2)) {
-                    return previous;
+                    return null;
                 }
             },
             insert(context) {

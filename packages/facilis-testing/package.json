@@ -1,27 +1,40 @@
 {
-  "name": "facilis-testing",
-  "version": "0.0.1",
-  "private": true,
-  "description": "Internal test helpers for Facilis packages.",
-  "type": "module",
-  "main": "./index.js",
-  "types": "./src/index.ts",
-  "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "default": "./index.js"
+    "name": "facilis-testing",
+    "version": "0.0.1",
+    "description": "Testing helpers for Facilis formats and adapters.",
+    "type": "module",
+    "main": "./index.js",
+    "types": "./src/index.ts",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "default": "./index.js"
+        }
+    },
+    "files": [
+        "index.js",
+        "src",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "node -e \"console.log('facilis-testing: no build step defined yet')\"",
+        "test": "node -e \"console.log('facilis-testing: no tests defined yet')\"",
+        "test:watch": "node -e \"console.log('facilis-testing: no watch tests defined yet')\""
+    },
+    "keywords": [
+        "facilis",
+        "testing",
+        "format",
+        "input",
+        "formatter"
+    ],
+    "license": "MIT",
+    "peerDependencies": {
+        "facilis": "0.0.1"
+    },
+    "devDependencies": {
+        "@types/node": "^26.0.1",
+        "facilis": "0.0.1"
     }
-  },
-  "files": [
-    "index.js",
-    "src",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "build": "node -e \"console.log('facilis-testing: no build step defined yet')\"",
-    "test": "node -e \"console.log('facilis-testing: no tests defined yet')\"",
-    "test:watch": "node -e \"console.log('facilis-testing: no watch tests defined yet')\""
-  },
-  "license": "MIT"
 }

@@ -1,5 +1,1 @@
-export {
-    applyBlur,
-    applyInput,
-    typeCharacters,
-} from './src/index.ts';
+export * from './src/index.ts';

@@ -409,7 +409,7 @@ export function pattern(input: PatternInput): Format {
                         previous
                     )
                 ) {
-                    return context.previous;
+                    return null;
                 }
             },
             deleteBackward(context) {

@@ -63,7 +63,7 @@ export function zipCode(options: ZipCodeOptions = {}): Format {
         },
         edit: {
             append(context) {
-                const { attempted, previous } = context;
+                const { attempted } = context;
 
                 if (!includePlusFour || !isAppendFormatting(context)) {
                     return;
@@ -74,7 +74,7 @@ export function zipCode(options: ZipCodeOptions = {}): Format {
                 }
 
                 if (isAppendDuplicateFormattingAt(context, '-', DIGIT_LIMIT)) {
-                    return previous;
+                    return null;
                 }
             },
             insert(context) {

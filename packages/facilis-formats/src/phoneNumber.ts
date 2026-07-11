@@ -40,7 +40,7 @@ export function phoneNumber(): Format {
         },
         edit: {
             append(context) {
-                const { attempted, previous } = context;
+                const { attempted } = context;
 
                 if (!isAppendFormatting(context)) {
                     return;
@@ -59,7 +59,7 @@ export function phoneNumber(): Format {
                     isAppendDuplicateFormattingAt(context, ') ', 4) ||
                     isAppendDuplicateFormattingAt(context, '-', 9)
                 ) {
-                    return previous;
+                    return null;
                 }
             },
             insert(context) {

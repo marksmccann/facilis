@@ -1,181 +1,98 @@
+import { setupInput, textState } from 'facilis-testing';
 import { describe, expect, it } from 'vitest';
 import { currency } from './currency';
 
 describe('currency', () => {
     it('prefixes the default symbol and groups the whole portion', () => {
-        const format = currency();
+        const input = setupInput(currency());
 
-        expect(
-            format.onInput({
-                value: '12345.6',
-                selectionStart: 7,
-                selectionEnd: 7,
-            })
-        ).toEqual({
-            value: '$12,345.6',
-            selectionStart: 9,
-            selectionEnd: 9,
-        });
+        expect(input.type('12345.6')).toEqual(textState('$12,345.6', 9));
     });
 
     it('pads cents to two digits on blur', () => {
-        const format = currency();
+        const input = setupInput(currency());
 
-        expect(
-            format.onBlur({
-                value: '12345.6',
-                selectionStart: 7,
-                selectionEnd: 7,
-            })
-        ).toEqual({
-            value: '$12,345.60',
-            selectionStart: null,
-            selectionEnd: null,
-        });
+        expect(input.blur('12345.6')).toEqual(
+            textState('$12,345.60', null)
+        );
     });
 
     it('supports a custom symbol', () => {
-        const format = currency({
-            symbol: '€',
-        });
-
-        expect(
-            format.onInput({
-                value: '12345',
-                selectionStart: 5,
-                selectionEnd: 5,
+        const input = setupInput(
+            currency({
+                symbol: '€',
             })
-        ).toEqual({
-            value: '€12,345',
-            selectionStart: 7,
-            selectionEnd: 7,
-        });
+        );
+
+        expect(input.type('12345')).toEqual(textState('€12,345', 7));
     });
 
     it('supports custom separators', () => {
-        const format = currency({
-            symbol: '€',
-            decimalSeparator: ',',
-            thousandsSeparator: '.',
-        });
-
-        expect(
-            format.onInput({
-                value: '12345,6',
-                selectionStart: 7,
-                selectionEnd: 7,
+        const input = setupInput(
+            currency({
+                symbol: '€',
+                decimalSeparator: ',',
+                thousandsSeparator: '.',
             })
-        ).toEqual({
-            value: '€12.345,6',
-            selectionStart: 9,
-            selectionEnd: 9,
-        });
+        );
+
+        expect(input.type('12345,6')).toEqual(textState('€12.345,6', 9));
     });
 
     it('pads custom-separator cents on blur', () => {
-        const format = currency({
-            symbol: '€',
-            decimalSeparator: ',',
-            thousandsSeparator: '.',
-        });
-
-        expect(
-            format.onBlur({
-                value: '12345,6',
-                selectionStart: 7,
-                selectionEnd: 7,
+        const input = setupInput(
+            currency({
+                symbol: '€',
+                decimalSeparator: ',',
+                thousandsSeparator: '.',
             })
-        ).toEqual({
-            value: '€12.345,60',
-            selectionStart: null,
-            selectionEnd: null,
-        });
+        );
+
+        expect(input.blur('12345,6')).toEqual(
+            textState('€12.345,60', null)
+        );
     });
 
     it('ignores decimal separators when cents are disabled', () => {
-        const format = currency({
-            includeCents: false,
-        });
-
-        expect(
-            format.onInput({
-                value: '12345.6',
-                selectionStart: 7,
-                selectionEnd: 7,
+        const input = setupInput(
+            currency({
+                includeCents: false,
             })
-        ).toEqual({
-            value: '$123,456',
-            selectionStart: 8,
-            selectionEnd: 8,
-        });
+        );
+
+        expect(input.type('12345.6')).toEqual(textState('$123,456', 8));
     });
 
     it('supports disabling thousands separators', () => {
-        const format = currency({
-            thousandsSeparator: '',
-        });
-
-        expect(
-            format.onInput({
-                value: '12345.6',
-                selectionStart: 7,
-                selectionEnd: 7,
+        const input = setupInput(
+            currency({
+                thousandsSeparator: '',
             })
-        ).toEqual({
-            value: '$12345.6',
-            selectionStart: 8,
-            selectionEnd: 8,
-        });
+        );
+
+        expect(input.type('12345.6')).toEqual(textState('$12345.6', 8));
     });
 
     it('supports omitting the symbol entirely', () => {
-        const format = currency({
-            symbol: '',
-            includeCents: false,
-        });
-
-        expect(
-            format.onInput({
-                value: '12345.6',
-                selectionStart: 7,
-                selectionEnd: 7,
+        const input = setupInput(
+            currency({
+                symbol: '',
+                includeCents: false,
             })
-        ).toEqual({
-            value: '123,456',
-            selectionStart: 7,
-            selectionEnd: 7,
-        });
+        );
+
+        expect(input.type('12345.6')).toEqual(textState('123,456', 7));
     });
 
     it('inserts a leading zero on blur for decimal-only values', () => {
-        const format = currency();
+        const input = setupInput(currency());
 
-        expect(
-            format.onBlur({
-                value: '.5',
-                selectionStart: 2,
-                selectionEnd: 2,
-            })
-        ).toEqual({
-            value: '$0.50',
-            selectionStart: null,
-            selectionEnd: null,
-        });
+        expect(input.blur('.5')).toEqual(textState('$0.50', null));
     });
 
     it('trims unnecessary leading zeros while typing', () => {
-        const format = currency();
+        const input = setupInput(currency());
 
-        expect(
-            format.onInput({
-                value: '00012',
-                selectionStart: 5,
-                selectionEnd: 5,
-            })
-        ).toEqual({
-            value: '$12',
-            selectionStart: 3,
-            selectionEnd: 3,
-        });
+        expect(input.type('00012')).toEqual(textState('$12', 3));
     });
 });

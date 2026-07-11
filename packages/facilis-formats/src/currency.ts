@@ -40,6 +40,8 @@ export type CurrencyOptions = {
 /**
  * Applies the default currency symbol and cents behavior when an option is
  * omitted.
+ *
+ * @private
  */
 function normalizeCurrencyOptions(options: CurrencyOptions = {}) {
     return {
@@ -51,94 +53,117 @@ function normalizeCurrencyOptions(options: CurrencyOptions = {}) {
 }
 
 /**
+ * Extracts the numeric currency value from one display value.
+ *
+ * @private
+ */
+function normalizeCurrencyValue(
+    raw: string,
+    {
+        decimalSeparator,
+        includeCents,
+    }: ReturnType<typeof normalizeCurrencyOptions>
+) {
+    let value = '';
+
+    for (const character of raw) {
+        if (isDigit(character)) {
+            const fractionDigitCount = countFractionDigits(
+                value,
+                decimalSeparator
+            );
+
+            if (
+                includeCents &&
+                value.includes(decimalSeparator) &&
+                fractionDigitCount >= 2
+            ) {
+                continue;
+            }
+
+            value += character;
+            value = trimLeadingZerosInValue(value, decimalSeparator, false);
+            continue;
+        }
+
+        if (
+            includeCents &&
+            isDecimalSeparator(character, decimalSeparator) &&
+            !value.includes(decimalSeparator)
+        ) {
+            value += decimalSeparator;
+            value = trimLeadingZerosInValue(value, decimalSeparator, false);
+        }
+    }
+
+    return value;
+}
+
+/**
+ * Formats one normalized currency value for display.
+ *
+ * @private
+ */
+function formatCurrencyValue(
+    value: string,
+    {
+        decimalSeparator,
+        symbol,
+        thousandsSeparator,
+    }: ReturnType<typeof normalizeCurrencyOptions>
+) {
+    if (value === '') {
+        return '';
+    }
+
+    let formattedValue = symbol;
+
+    for (let index = 0; index < value.length; index += 1) {
+        const character = value[index];
+
+        if (
+            thousandsSeparator &&
+            isDigit(character) &&
+            shouldInsertThousandsSeparator(
+                value,
+                index,
+                decimalSeparator,
+                false
+            )
+        ) {
+            formattedValue += thousandsSeparator;
+        }
+
+        formattedValue += character;
+    }
+
+    return formattedValue;
+}
+
+/**
  * Creates a formatter for currency values.
  *
  * @since 0.0.1
  */
 export function currency(options?: CurrencyOptions): Format {
-    const { decimalSeparator, includeCents, symbol, thousandsSeparator } =
-        normalizeCurrencyOptions(options);
-    const decimalPlaces = includeCents ? 2 : 0;
+    const normalizedOptions = normalizeCurrencyOptions(options);
+    const { decimalSeparator, includeCents, symbol } = normalizedOptions;
 
     return defineFormat({
-        name: 'currency',
-        normalize(character, state) {
-            if (isDigit(character)) {
-                const fractionDigitCount = countFractionDigits(
-                    state.normalized,
-                    decimalSeparator
-                );
-
-                // Once we are in the fractional portion, stop accepting digits
-                // after the configured decimal-place limit has been reached.
-                if (
-                    decimalPlaces > 0 &&
-                    state.normalized.includes(decimalSeparator) &&
-                    fractionDigitCount >= decimalPlaces
-                ) {
-                    return;
-                }
-
-                state.append(character);
-
-                const trimmedValue = trimLeadingZerosInValue(
-                    state.normalized,
-                    decimalSeparator,
-                    false
-                );
-
-                state.set(trimmedValue);
-
-                return;
-            }
-
-            // Allow a decimal separator only when decimals are enabled and
-            // the normalized value does not already contain one.
-            if (
-                decimalPlaces > 0 &&
-                isDecimalSeparator(character, decimalSeparator) &&
-                !state.normalized.includes(decimalSeparator)
-            ) {
-                state.append(character);
-
-                const trimmedValue = trimLeadingZerosInValue(
-                    state.normalized,
-                    decimalSeparator,
-                    false
-                );
-
-                state.set(trimmedValue);
-            }
+        normalize(raw) {
+            return normalizeCurrencyValue(raw, normalizedOptions);
         },
-        format(character, state) {
-            if (state.normalizedPosition === 0 && symbol) {
-                state.append(symbol);
-            }
-
-            if (
-                thousandsSeparator &&
-                isDigit(character) &&
-                shouldInsertThousandsSeparator(
-                    state.normalized,
-                    state.normalizedPosition,
-                    decimalSeparator,
-                    false
-                )
-            ) {
-                state.append(thousandsSeparator);
-            }
-
-            state.append(character);
-            state.advance();
+        format(normalized) {
+            return formatCurrencyValue(normalized, normalizedOptions);
         },
-        blur(context) {
+        blur(formatted) {
             if (!includeCents) {
-                return context.formattedValue;
+                return formatted;
             }
 
             const valueWithoutSymbol = symbol
-                ? context.formattedValue.slice(symbol.length)
-                : context.formattedValue;
+                ? formatted.slice(symbol.length)
+                : formatted;
             const withLeadingZero = insertLeadingZeroOnBlur(
                 valueWithoutSymbol,
                 decimalSeparator,

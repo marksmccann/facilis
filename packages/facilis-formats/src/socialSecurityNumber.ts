@@ -39,7 +39,7 @@ export function socialSecurityNumber(): Format {
         },
         edit: {
             append(context) {
-                const { attempted, previous } = context;
+                const { attempted } = context;
 
                 if (!isAppendFormatting(context)) {
                     return;
@@ -56,7 +56,7 @@ export function socialSecurityNumber(): Format {
                     isAppendDuplicateFormattingAt(context, '-', 3) ||
                     isAppendDuplicateFormattingAt(context, '-', 6)
                 ) {
-                    return previous;
+                    return null;
                 }
             },
             insert(context) {

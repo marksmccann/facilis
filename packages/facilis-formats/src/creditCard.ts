@@ -101,17 +101,27 @@ export function creditCard(): Format {
                     return null;
                 }
 
-                if (!isAppendExpectedFormattingAt(context, ' ', position)) {
-                    return;
-                }
-
                 if (isAppendAtMaxLength(context, maxDigits)) {
                     return;
                 }
 
-                if (isSeparatorBoundary(value)) {
+                if (normalized.appended !== '') {
+                    return;
+                }
+
+                if (!isSeparatorBoundary(value)) {
+                    return;
+                }
+
+                if (previous.endsWith(' ')) {
+                    return null;
+                }
+
+                if (isAppendExpectedFormattingAt(context, ' ', position)) {
                     return attempted;
                 }
+
+                return `${previous} `;
             },
             insert(context) {
                 const value = context.normalized.previous;
