@@ -4,26 +4,48 @@ const AmericanExpressPrefixes = new Set(['34', '37']);
 const DefaultDigitLimit = 16;
 const AmericanExpressDigitLimit = 15;
 
+/**
+ * Tests whether the normalized value starts with an American Express prefix.
+ *
+ * @private
+ */
 function isAmericanExpress(value: string) {
     return AmericanExpressPrefixes.has(value.slice(0, 2));
 }
 
+/**
+ * Resolves the maximum number of digits allowed for the active card layout.
+ *
+ * @private
+ */
 function resolveDigitLimit(value: string) {
     return isAmericanExpress(value)
         ? AmericanExpressDigitLimit
         : DefaultDigitLimit;
 }
 
+/**
+ * Tests whether one normalized digit position should be followed by a separator.
+ *
+ * @private
+ */
 function isSeparatorBoundary(value: string, position: number) {
     if (position === 0) return false;
 
-    if (isAmericanExpress(value)) {
+    if (!isAmericanExpress(value)) {
         return position === 4 || position === 10;
     }
 
     return position % 4 === 0;
 }
 
+/**
+ * Builds a space-separated display value by slicing the normalized digits into
+ * the requested group shape, such as `4-4-4-4` or `4-6-5`. For example,
+ * `formatGroups('378282246310005', [4, 6, 5])` returns `'3782 822463 10005'`.
+ *
+ * @private
+ */
 function formatGroups(value: string, groups: number[]) {
     const parts: string[] = [];
     let index = 0;
@@ -37,9 +59,14 @@ function formatGroups(value: string, groups: number[]) {
     return parts.join(' ');
 }
 
-function normalizeCreditCardValue(raw: string) {
+/**
+ * Extracts credit-card digits from a raw value and clamps them to the active
+ * card layout.
+ *
+ * @private
+ */
+function normalizeValue(raw: string) {
     const value = raw.replace(/\D/g, '');
-
     return value.slice(0, resolveDigitLimit(value));
 }
 
@@ -51,56 +78,70 @@ function normalizeCreditCardValue(raw: string) {
 export function creditCard(): Format {
     return defineFormat({
         normalize(raw) {
-            return normalizeCreditCardValue(raw);
+            return normalizeValue(raw);
         },
         format(normalized) {
-            return isAmericanExpress(normalized)
-                ? formatGroups(normalized, [4, 6, 5])
-                : formatGroups(normalized, [4, 4, 4, 4]);
+            let groups = [4, 4, 4, 4];
+            if (isAmericanExpress(normalized)) groups = [4, 6, 5];
+            return formatGroups(normalized, groups);
         },
         edit: {
             append(context) {
-                const previous = normalizeCreditCardValue(context.previous);
-                const attempted = normalizeCreditCardValue(context.attempted);
-                const appended = normalizeCreditCardValue(context.appended);
-                const appendedTrailingSpace =
-                    appended === '' && context.appended.endsWith(' ');
+                const { normalized, appended, previous, attempted } = context;
+                const semanticAppend = normalized.appended !== '';
+                const appendIsTrailingSpace = appended.endsWith(' ');
+                const alreadyHasTrailingSpace = previous.endsWith(' ');
 
-                if (appendedTrailingSpace && context.previous.endsWith(' ')) {
-                    return context.previous;
+                // Ignore appended trailing space if there already is one.
+                if (
+                    !semanticAppend &&
+                    appendIsTrailingSpace &&
+                    alreadyHasTrailingSpace
+                ) {
+                    return null;
                 }
 
+                const value = normalized.previous;
+                const unchangedValue = normalized.attempted === value;
+                const hasValue = value.length > 0;
+                const maxDigits = resolveDigitLimit(value);
+                const hasRoomForMoreDigits = value.length < maxDigits;
+                const atSeparator = isSeparatorBoundary(value, value.length);
+
+                // Insert the attempted trailing space if it qualifies.
                 if (
-                    appendedTrailingSpace &&
-                    attempted === previous &&
-                    previous.length > 0 &&
-                    previous.length < resolveDigitLimit(previous) &&
-                    isSeparatorBoundary(previous, previous.length) &&
-                    !context.previous.endsWith(' ')
+                    !semanticAppend &&
+                    appendIsTrailingSpace &&
+                    unchangedValue &&
+                    hasValue &&
+                    hasRoomForMoreDigits &&
+                    atSeparator &&
+                    !alreadyHasTrailingSpace
                 ) {
-                    return context.attempted;
+                    return attempted;
                 }
             },
             insert(context) {
-                const inserted = normalizeCreditCardValue(context.inserted);
-                const previous = normalizeCreditCardValue(context.previous);
+                const { normalized } = context;
+                const value = normalized.previous;
+                const maxDigits = resolveDigitLimit(value);
+                const semanticInsert = normalized.inserted !== '';
+                const noMoreRoomForDigits = value.length >= maxDigits;
 
-                if (
-                    inserted !== '' &&
-                    previous.length >= resolveDigitLimit(previous)
-                ) {
+                // Reject inserted digits when value is full.
+                if (semanticInsert && noMoreRoomForDigits) {
                     return null;
                 }
             },
             deleteBackward(context) {
-                if (
-                    context.deleted === ' ' &&
-                    context.cursor < context.previous.length
-                ) {
+                const { deleted, cursor, previous } = context;
+
+                // Move the cursor instead of a deleting separator.
+                if (deleted === ' ' && cursor < previous.length) {
                     return {
-                        value: context.previous,
-                        selectionStart: context.cursor - 1,
-                        selectionEnd: context.cursor - 1,
+                        value: previous,
+                        selectionStart: cursor - 1,
+                        selectionEnd: cursor - 1,
                     };
                 }
             },

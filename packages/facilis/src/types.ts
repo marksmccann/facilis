@@ -66,6 +66,11 @@ export type EditContext = {
     formatted: string;
 
     /**
+     * The normalized values that correspond to the display text in this edit.
+     */
+    normalized: NormalizedEditContext;
+
+    /**
      * The cursor position before the edit.
      */
     cursor: number;
@@ -79,6 +84,23 @@ export type EditContext = {
      * The end of the changed range in the previous text.
      */
     end: number;
+};
+
+/**
+ * Describes the normalized values shared by every edit hook.
+ *
+ * @since 0.1.0
+ */
+export type NormalizedEditContext = {
+    /**
+     * The semantic value before the edit.
+     */
+    previous: string;
+
+    /**
+     * The semantic value the field attempted to become.
+     */
+    attempted: string;
 };
 
 /**
@@ -96,6 +118,16 @@ export type AppendEditContext = EditContext & {
      * The raw text appended at the end.
      */
     appended: string;
+
+    /**
+     * The normalized values that correspond to this append edit.
+     */
+    normalized: NormalizedEditContext & {
+        /**
+         * The semantic value represented by the appended text.
+         */
+        appended: string;
+    };
 };
 
 /**
@@ -113,6 +145,16 @@ export type InsertEditContext = EditContext & {
      * The raw text inserted in the middle.
      */
     inserted: string;
+
+    /**
+     * The normalized values that correspond to this insert edit.
+     */
+    normalized: NormalizedEditContext & {
+        /**
+         * The semantic value represented by the inserted text.
+         */
+        inserted: string;
+    };
 };
 
 /**
@@ -130,6 +172,16 @@ export type DeleteBackwardEditContext = EditContext & {
      * The resolved text deleted from the previous text.
      */
     deleted: string;
+
+    /**
+     * The normalized values that correspond to this backward-delete edit.
+     */
+    normalized: NormalizedEditContext & {
+        /**
+         * The semantic value represented by the deleted text.
+         */
+        deleted: string;
+    };
 };
 
 /**
@@ -193,6 +245,38 @@ export type FormatDefinition = {
      * Intercepts specific editing intentions.
      */
     edit?: FormatEditHooks;
+};
+
+/**
+ * Describes the shared internal context passed to edit-hook runners.
+ *
+ * @private
+ */
+export type RunEditContext = {
+    /**
+     * The format definition that owns the edit hook being run.
+     */
+    definition: FormatDefinition;
+
+    /**
+     * The value and selection snapshot before the edit.
+     */
+    previous: TextState;
+
+    /**
+     * The value and selection snapshot after the raw edit attempt.
+     */
+    current: TextState;
+
+    /**
+     * The semantic value produced by normalizing the current text.
+     */
+    normalized: string;
+
+    /**
+     * The default formatted text produced from the normalized value.
+     */
+    formatted: string;
 };
 
 /**
