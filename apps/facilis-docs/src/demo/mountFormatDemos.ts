@@ -5,6 +5,7 @@ import {
     number,
     pattern,
     phoneNumber,
+    socialSecurityNumber,
     text,
 } from '../../../../packages/facilis-formats/src/index.ts';
 
@@ -22,9 +23,7 @@ export function mountCurrencyDemo() {
             thousandsSeparator: '.',
         })
     );
-    bind('[data-demo-currency-whole]', () =>
-        currency({ includeCents: false })
-    );
+    bind('[data-demo-currency-whole]', () => currency({ includeCents: false }));
     bind('[data-demo-currency-plain-groups]', () =>
         currency({
             thousandsSeparator: '',
@@ -121,6 +120,15 @@ export function mountPatternDemo() {
 export function mountPhoneNumberDemo() {
     bind('[data-demo-phone-number-default]', () => phoneNumber());
     bind('[data-demo-phone-number-paste]', () => phoneNumber());
+}
+
+export function mountSocialSecurityNumberDemo() {
+    bind('[data-demo-social-security-number-default]', () =>
+        socialSecurityNumber()
+    );
+    bind('[data-demo-social-security-number-paste]', () =>
+        socialSecurityNumber()
+    );
 }
 
 export function mountTextDemo() {

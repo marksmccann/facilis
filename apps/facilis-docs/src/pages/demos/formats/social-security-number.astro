@@ -1,0 +1,30 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/social-security-number/"
+    title="socialSecurityNumber() Demo"
+>
+    <article class="demo-card">
+        <h2>Default formatting</h2>
+        <p>Social Security numbers use the standard 9-digit layout while the format strips anything that is not a digit.</p>
+        <label class="demo-label" for="social-security-number-default">Social Security number</label>
+        <input class="demo-input" id="social-security-number-default" data-demo-social-security-number-default type="text" placeholder="Try 123456789" />
+        <p class="demo-note">Try <code>123456789</code> to see the default grouping: <code>123-45-6789</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Paste cleanup</h2>
+        <p>Existing hyphens, spaces, and other characters are ignored so pasted text resolves to the same SSN shape.</p>
+        <label class="demo-label" for="social-security-number-paste">Messy Social Security number</label>
+        <input class="demo-input" id="social-security-number-paste" data-demo-social-security-number-paste type="text" placeholder="Try 123 45 6789 ext. 0" />
+        <p class="demo-note">Try <code>123 45 6789 ext. 0</code>. The format keeps the first 9 digits and displays them as a Social Security number.</p>
+    </article>
+
+    <script>
+        import { mountSocialSecurityNumberDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountSocialSecurityNumberDemo();
+    </script>
+</FormatDemoLayout>
