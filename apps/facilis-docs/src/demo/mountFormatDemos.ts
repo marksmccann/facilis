@@ -2,6 +2,7 @@ import { bindFormat } from '../../../../packages/facilis-dom/src/index.ts';
 import {
     creditCard,
     currency,
+    ein,
     number,
     pattern,
     phoneNumber,
@@ -37,6 +38,11 @@ export function mountCurrencyDemo() {
 export function mountCreditCardDemo() {
     bind('[data-demo-credit-card-default]', () => creditCard());
     bind('[data-demo-credit-card-amex]', () => creditCard());
+}
+
+export function mountEinDemo() {
+    bind('[data-demo-ein-default]', () => ein());
+    bind('[data-demo-ein-paste]', () => ein());
 }
 
 export function mountNumberDemo() {

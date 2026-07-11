@@ -52,6 +52,7 @@ export default defineConfig({
                             label: 'currency',
                             slug: 'reference/formats/currency',
                         },
+                        { label: 'ein', slug: 'reference/formats/ein' },
                         { label: 'number', slug: 'reference/formats/number' },
                         { label: 'pattern', slug: 'reference/formats/pattern' },
                         {
