@@ -1,6 +1,6 @@
 import type { Format } from 'facilis';
-import { textState } from './textState.ts';
-import type { TestInput } from './types.ts';
+import { textState } from './textState';
+import type { TestInput } from './types';
 
 /**
  * Replaces one text range with new text.

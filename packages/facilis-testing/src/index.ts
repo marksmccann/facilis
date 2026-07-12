@@ -1,3 +1,3 @@
-export { setupInput } from './setupInput.ts';
-export { textState } from './textState.ts';
-export type * from './types.ts';
+export { setupInput } from './setupInput';
+export { textState } from './textState';
+export type * from './types';
