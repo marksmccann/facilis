@@ -26,13 +26,14 @@ import { bindFormat } from 'facilis-dom';
 import { pattern } from 'facilis-formats';
 
 bindFormat(input, pattern('(###) ###-####'));
+bindFormat(input, pattern('aa-####'));
 
 bindFormat(
     input,
     pattern({
-        pattern: 'AA-####',
+        pattern: 'LL-####',
         tokens: {
-            A: { matches: /[A-Z]/ },
+            L: { matches: /[A-Z]/ },
             '#': { matches: /\d/ },
         },
     })
@@ -42,6 +43,7 @@ bindFormat(
 The preset string form includes:
 
 - `#` for digits
+- `a` for ASCII letters
 - `*` for any character
 
 Use the object form whenever you need custom tokens.

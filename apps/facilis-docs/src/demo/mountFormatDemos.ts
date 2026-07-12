@@ -112,15 +112,7 @@ export function mountNumberDemo() {
 
 export function mountPatternDemo() {
     bind('[data-demo-pattern-phone]', () => pattern('(###) ###-####'));
-    bind('[data-demo-pattern-custom]', () =>
-        pattern({
-            pattern: 'AA-####',
-            tokens: {
-                A: { matches: /[A-Z]/i },
-                '#': { matches: /\d/ },
-            },
-        })
-    );
+    bind('[data-demo-pattern-alpha]', () => pattern('aa-####'));
     bind('[data-demo-pattern-wildcard]', () => pattern('**-##'));
 }
 

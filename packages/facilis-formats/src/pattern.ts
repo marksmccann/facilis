@@ -1,4 +1,12 @@
-import { defineFormat, type Format } from 'facilis';
+import {
+    defineFormat,
+    isAppendDuplicateFormattingAt,
+    isAppendExpectedFormattingAt,
+    isAppendFormatting,
+    isDeleteBackwardOverFormatting,
+    isInsertAtMaxLength,
+    type Format,
+} from 'facilis';
 import { reporter } from './reporter';
 
 /**
@@ -31,6 +39,7 @@ export type ParsePatternOptions = {
      * The pattern string that defines literal characters and token slots.
      */
     pattern: string;
+
     /**
      * The token definitions keyed by the wildcard characters used in the pattern.
      */
@@ -74,6 +83,7 @@ export type PatternPart = PatternTokenPart | PatternLiteralPart;
  */
 const DefaultPatternTokens = {
     '#': { matches: /\d/ },
+    a: { matches: /[A-Za-z]/ },
     '*': { matches: /./ },
 };
 
@@ -186,65 +196,12 @@ function matchesPatternToken(
 }
 
 /**
- * Extracts the token characters from one display value.
+ * Counts the token slots in one parsed pattern.
  *
  * @private
  */
-function normalizeValueForPattern(patternParts: PatternPart[], input: string) {
-    let value = '';
-    let partIndex = 0;
-
-    for (const character of input) {
-        while (patternParts[partIndex]?.kind === 'literal') {
-            partIndex += 1;
-        }
-
-        const part = patternParts[partIndex];
-
-        if (!part || part.kind !== 'token') {
-            break;
-        }
-
-        if (!matchesPatternToken(part.definition, character)) {
-            continue;
-        }
-
-        value += character;
-        partIndex += 1;
-    }
-
-    return value;
-}
-
-/**
- * Builds the display value for one normalized pattern value.
- *
- * @private
- */
-function formatValueForPattern(patternParts: PatternPart[], value: string) {
-    let displayValue = '';
-    let valueIndex = 0;
-
-    for (const part of patternParts) {
-        if (part.kind === 'literal') {
-            if (valueIndex < value.length) {
-                displayValue += part.character;
-            }
-
-            continue;
-        }
-
-        const character = value[valueIndex];
-
-        if (!character) {
-            break;
-        }
-
-        displayValue += character;
-        valueIndex += 1;
-    }
-
-    return displayValue;
+function countPatternTokens(patternParts: PatternPart[]) {
+    return patternParts.filter((part) => part.kind === 'token').length;
 }
 
 /**
@@ -266,51 +223,6 @@ function getPatternLiteralRun(patternParts: PatternPart[], position: number) {
     }
 
     return literalRun;
-}
-
-/**
- * Tests whether typed text matches the next visible literal characters.
- *
- * @private
- */
-function matchesNextPatternLiteral(
-    patternParts: PatternPart[],
-    position: number,
-    text: string
-) {
-    if (text === '') {
-        return false;
-    }
-
-    return getPatternLiteralRun(patternParts, position).startsWith(text);
-}
-
-/**
- * Tests whether the current display is holding typed literals beyond the
- * default formatted value.
- *
- * @private
- */
-function hasPendingPatternLiteral(
-    patternParts: PatternPart[],
-    displayValue: string,
-    value: string
-) {
-    const formattedValue = formatValueForPattern(patternParts, value);
-
-    if (displayValue === formattedValue) {
-        return false;
-    }
-
-    if (!displayValue.startsWith(formattedValue)) {
-        return false;
-    }
-
-    return matchesNextPatternLiteral(
-        patternParts,
-        formattedValue.length,
-        displayValue.slice(formattedValue.length)
-    );
 }
 
 /**
@@ -365,64 +277,118 @@ export function pattern(input: PatternOptions): Format;
 export function pattern(input: PatternInput): Format {
     const patternOptions = normalizePatternOptions(input);
     const patternParts = parsePatternOptions(patternOptions);
+    const maxLength = countPatternTokens(patternParts);
 
     return defineFormat({
         normalize(raw) {
-            return normalizeValueForPattern(patternParts, raw);
+            let value = '';
+            let partIndex = 0;
+
+            for (const character of raw) {
+                while (patternParts[partIndex]?.kind === 'literal') {
+                    partIndex += 1;
+                }
+
+                const part = patternParts[partIndex];
+
+                if (!part || part.kind !== 'token') {
+                    break;
+                }
+
+                if (!matchesPatternToken(part.definition, character)) {
+                    continue;
+                }
+
+                value += character;
+                partIndex += 1;
+            }
+
+            return value;
         },
         format(normalized) {
-            return formatValueForPattern(patternParts, normalized);
+            let displayValue = '';
+            let valueIndex = 0;
+
+            for (const part of patternParts) {
+                if (part.kind === 'literal') {
+                    if (valueIndex < normalized.length) {
+                        displayValue += part.character;
+                    }
+
+                    continue;
+                }
+
+                const character = normalized[valueIndex];
+
+                if (!character) {
+                    break;
+                }
+
+                displayValue += character;
+                valueIndex += 1;
+            }
+
+            return displayValue;
         },
         edit: {
             append(context) {
-                const appended = normalizeValueForPattern(
+                if (!isAppendFormatting(context)) {
+                    return;
+                }
+
+                const pendingLiteralRun = getPatternLiteralRun(
                     patternParts,
-                    context.appended
-                );
-                const attempted = normalizeValueForPattern(
-                    patternParts,
-                    context.attempted
-                );
-                const previous = normalizeValueForPattern(
-                    patternParts,
-                    context.previous
+                    context.formatted.length
                 );
 
-                if (appended !== '' || attempted !== previous) {
+                if (
+                    isAppendDuplicateFormattingAt(
+                        context,
+                        pendingLiteralRun,
+                        context.formatted.length
+                    )
+                ) {
+                    return null;
+                }
+
+                const literalRun = getPatternLiteralRun(
+                    patternParts,
+                    context.previous.length
+                );
+
+                if (literalRun === '') {
                     return;
                 }
 
                 if (
-                    matchesNextPatternLiteral(
-                        patternParts,
-                        context.previous.length,
-                        context.appended
+                    isAppendExpectedFormattingAt(
+                        context,
+                        literalRun,
+                        context.previous.length
                     )
                 ) {
                     return context.attempted;
                 }
 
-                if (
-                    hasPendingPatternLiteral(
-                        patternParts,
-                        context.previous,
-                        previous
-                    )
-                ) {
+                return `${context.previous}${literalRun}`;
+            },
+            insert(context) {
+                if (isInsertAtMaxLength(context, maxLength)) {
                     return null;
                 }
             },
             deleteBackward(context) {
+                if (!isDeleteBackwardOverFormatting(context)) {
+                    return;
+                }
+
                 const literalStart = getPreviousPatternLiteralRunStart(
                     patternParts,
                     context.previous,
                     context.cursor
                 );
 
-                if (
-                    literalStart !== null &&
-                    context.cursor < context.previous.length
-                ) {
+                if (literalStart !== null) {
                     return {
                         value: context.previous,
                         selectionStart: literalStart,

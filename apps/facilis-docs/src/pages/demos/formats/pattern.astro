@@ -8,18 +8,18 @@ import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
 >
     <article class="demo-card">
         <h2>Default formatting</h2>
-        <p>Pattern shorthand is the fastest way to express a phone layout with built-in digit tokens.</p>
+        <p>Pattern shorthand is the fastest way to express common layouts with built-in tokens.</p>
         <label class="demo-label" for="pattern-phone">Phone pattern</label>
         <input class="demo-input" id="pattern-phone" data-demo-pattern-phone type="text" placeholder="Try 4145551212" />
         <p class="demo-note">Try <code>4145551212</code> to see the pattern: <code>(###) ###-####</code>.</p>
     </article>
 
     <article class="demo-card">
-        <h2>Custom token definitions</h2>
-        <p>Provide explicit token rules when the built-in symbols are not enough. In this example, <code>A</code> accepts letters and <code>#</code> accepts digits.</p>
-        <label class="demo-label" for="pattern-custom">Letter and digit tokens</label>
-        <input class="demo-input" id="pattern-custom" data-demo-pattern-custom type="text" placeholder="Try AB1234 or ab12cd34" />
-        <p class="demo-note">This scenario uses the pattern: <code>AA-####</code>. The <code>A</code> slots accept letters, the <code>#</code> slots accept digits, and characters that do not satisfy the next token are skipped.</p>
+        <h2>Alpha token</h2>
+        <p>The built-in <code>a</code> token accepts letters, so shorthand patterns can mix letters and digits without custom token definitions.</p>
+        <label class="demo-label" for="pattern-alpha">Letter and digit tokens</label>
+        <input class="demo-input" id="pattern-alpha" data-demo-pattern-alpha type="text" placeholder="Try AB1234 or ab12cd34" />
+        <p class="demo-note">This scenario uses the pattern: <code>aa-####</code>. The <code>a</code> slots accept letters, the <code>#</code> slots accept digits, and characters that do not satisfy the next token are skipped.</p>
     </article>
 
     <article class="demo-card">

@@ -18,6 +18,10 @@ With `pattern('(###) ###-####')`:
 
 - `4145551212` becomes `(414) 555-1212`
 
+With `pattern('aa-####')`:
+
+- `AB12CD34` becomes `AB-1234`
+
 With `pattern({ pattern: '##/##/####' })`:
 
 - `01022026` becomes `01/02/2026`
@@ -26,9 +30,9 @@ With:
 
 ```ts
 pattern({
-    pattern: 'AA-####',
+    pattern: 'LL-####',
     tokens: {
-        A: { matches: /[A-Z]/i },
+        L: { matches: /[A-Z]/i },
         '#': { matches: /\d/ },
     },
 });
@@ -54,10 +58,12 @@ import { pattern } from 'facilis-formats';
 ```ts
 const phonePattern = pattern('(###) ###-####');
 
-const codePattern = pattern({
-    pattern: 'AA-####',
+const codePattern = pattern('aa-####');
+
+const customPattern = pattern({
+    pattern: 'LL-####',
     tokens: {
-        A: { matches: /[A-Z]/i },
+        L: { matches: /[A-Z]/i },
         '#': { matches: /\d/ },
     },
 });
@@ -70,14 +76,18 @@ When `input` is a string, `pattern()` uses built-in token definitions.
 Built-in tokens:
 
 - `#` matches a digit with `/\d/`
+- `a` matches an ASCII letter with `/[A-Za-z]/`
 - `*` matches any character with `/./`
 
 This is the fastest form when the built-in tokens are enough.
+Use the object form with custom `tokens` when you need one of these characters
+to remain a literal part of the pattern.
 
 Example:
 
 ```ts
 const phonePattern = pattern('(###) ###-####');
+const codePattern = pattern('aa-####');
 const datePattern = pattern('##/##/####');
 ```
 
@@ -110,15 +120,16 @@ Default: the same built-in token set used by shorthand syntax.
 When omitted, `pattern()` uses:
 
 - `#` for digits
+- `a` for ASCII letters
 - `*` for any character
 
 Example:
 
 ```ts
 const codePattern = pattern({
-    pattern: 'AA-####',
+    pattern: 'LL-####',
     tokens: {
-        A: { matches: /[A-Z]/i },
+        L: { matches: /[A-Z]/i },
         '#': { matches: /\d/ },
     },
 });
