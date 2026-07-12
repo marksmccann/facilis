@@ -1,6 +1,7 @@
 export * from './creditCard';
 export * from './currency';
 export * from './ein';
+export * from './expirationDate';
 export * from './number';
 export * from './pattern';
 export * from './phoneNumber';

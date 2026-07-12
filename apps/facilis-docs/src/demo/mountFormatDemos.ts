@@ -3,6 +3,7 @@ import {
     creditCard,
     currency,
     ein,
+    expirationDate,
     number,
     pattern,
     phoneNumber,
@@ -44,6 +45,11 @@ export function mountCreditCardDemo() {
 export function mountEinDemo() {
     bind('[data-demo-ein-default]', () => ein());
     bind('[data-demo-ein-paste]', () => ein());
+}
+
+export function mountExpirationDateDemo() {
+    bind('[data-demo-expiration-date-default]', () => expirationDate());
+    bind('[data-demo-expiration-date-paste]', () => expirationDate());
 }
 
 export function mountNumberDemo() {

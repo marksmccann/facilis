@@ -14,6 +14,7 @@ Dedicated format demos live at:
 - `/facilis/demos/formats/credit-card/`
 - `/facilis/demos/formats/currency/`
 - `/facilis/demos/formats/ein/`
+- `/facilis/demos/formats/expiration-date/`
 - `/facilis/demos/formats/number/`
 - `/facilis/demos/formats/pattern/`
 - `/facilis/demos/formats/phone-number/`

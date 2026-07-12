@@ -1,0 +1,30 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/expiration-date/"
+    title="expirationDate() Demo"
+>
+    <article class="demo-card">
+        <h2>Default formatting</h2>
+        <p>Expiration dates use the common 4-digit card layout while the format strips anything that is not a digit.</p>
+        <label class="demo-label" for="expiration-date-default">Expiration date</label>
+        <input class="demo-input" id="expiration-date-default" data-demo-expiration-date-default type="text" placeholder="Try 1234" />
+        <p class="demo-note">Try <code>1234</code> to see the default grouping: <code>12/34</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Paste cleanup</h2>
+        <p>Existing slashes, spaces, and other characters are ignored so pasted text resolves to the same expiration-date shape.</p>
+        <label class="demo-label" for="expiration-date-paste">Messy expiration date</label>
+        <input class="demo-input" id="expiration-date-paste" data-demo-expiration-date-paste type="text" placeholder="Try 12 / 34 ext. 5" />
+        <p class="demo-note">Try <code>12 / 34 ext. 5</code>. The format keeps the first 4 digits and displays them as an expiration date.</p>
+    </article>
+
+    <script>
+        import { mountExpirationDateDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountExpirationDateDemo();
+    </script>
+</FormatDemoLayout>
