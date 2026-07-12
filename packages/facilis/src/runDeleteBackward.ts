@@ -23,6 +23,7 @@ export default function runDeleteBackward(
             previous: previous.value,
             attempted: current.value,
             formatted,
+            normalize,
             cursor,
             start,
             end,

@@ -66,6 +66,12 @@ export type EditContext = {
     formatted: string;
 
     /**
+     * Extracts the semantic value from any display value using the active format
+     * definition.
+     */
+    normalize: FormatDefinition['normalize'];
+
+    /**
      * The normalized values that correspond to the display text in this edit.
      */
     normalized: NormalizedEditContext;

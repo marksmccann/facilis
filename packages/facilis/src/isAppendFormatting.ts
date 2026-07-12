@@ -9,9 +9,11 @@ import type { AppendEditContext } from './types';
 export default function isAppendFormatting(
     context: AppendEditContext
 ): boolean {
+    const { appended, normalized } = context;
+
     return (
-        context.appended !== '' &&
-        context.normalized.appended === '' &&
-        context.normalized.attempted === context.normalized.previous
+        appended !== '' &&
+        normalized.appended === '' &&
+        normalized.attempted === normalized.previous
     );
 }

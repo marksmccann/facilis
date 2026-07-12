@@ -1,11 +1,17 @@
-import { defineFormat, type Format } from 'facilis';
-import countFractionDigits from './internal/countFractionDigits';
-import insertLeadingZeroOnBlur from './internal/insertLeadingZeroOnBlur';
-import isDecimalSeparator from './internal/isDecimalSeparator';
-import isDigit from './internal/isDigit';
-import padDecimalPlacesOnBlur from './internal/padDecimalPlacesOnBlur';
-import shouldInsertThousandsSeparator from './internal/shouldInsertThousandsSeparator';
-import trimLeadingZerosInValue from './internal/trimLeadingZerosInValue';
+import {
+    defineFormat,
+    filterNumberCharacters,
+    insertNumberLeadingZero,
+    insertNumberThousandsSeparators,
+    isDeleteBackwardBeforeFormatting,
+    isDeleteBackwardOverFormatting,
+    limitNumberDecimalPlaces,
+    padNumberDecimalPlaces,
+    resolveSelectionAtDeletedBoundary,
+    resolveSelectionBeforeFormatting,
+    trimNumberLeadingZeros,
+    type Format,
+} from 'facilis';
 
 /**
  * The configuration options for a currency format.
@@ -53,129 +59,105 @@ function normalizeCurrencyOptions(options: CurrencyOptions = {}) {
 }
 
 /**
- * Extracts the numeric currency value from one display value.
- *
- * @private
- */
-function normalizeCurrencyValue(
-    raw: string,
-    {
-        decimalSeparator,
-        includeCents,
-    }: ReturnType<typeof normalizeCurrencyOptions>
-) {
-    let value = '';
-
-    for (const character of raw) {
-        if (isDigit(character)) {
-            const fractionDigitCount = countFractionDigits(
-                value,
-                decimalSeparator
-            );
-
-            if (
-                includeCents &&
-                value.includes(decimalSeparator) &&
-                fractionDigitCount >= 2
-            ) {
-                continue;
-            }
-
-            value += character;
-            value = trimLeadingZerosInValue(value, decimalSeparator, false);
-            continue;
-        }
-
-        if (
-            includeCents &&
-            isDecimalSeparator(character, decimalSeparator) &&
-            !value.includes(decimalSeparator)
-        ) {
-            value += decimalSeparator;
-            value = trimLeadingZerosInValue(value, decimalSeparator, false);
-        }
-    }
-
-    return value;
-}
-
-/**
- * Formats one normalized currency value for display.
- *
- * @private
- */
-function formatCurrencyValue(
-    value: string,
-    {
-        decimalSeparator,
-        symbol,
-        thousandsSeparator,
-    }: ReturnType<typeof normalizeCurrencyOptions>
-) {
-    if (value === '') {
-        return '';
-    }
-
-    let formattedValue = symbol;
-
-    for (let index = 0; index < value.length; index += 1) {
-        const character = value[index];
-
-        if (
-            thousandsSeparator &&
-            isDigit(character) &&
-            shouldInsertThousandsSeparator(
-                value,
-                index,
-                decimalSeparator,
-                false
-            )
-        ) {
-            formattedValue += thousandsSeparator;
-        }
-
-        formattedValue += character;
-    }
-
-    return formattedValue;
-}
-
-/**
  * Creates a formatter for currency values.
  *
  * @since 0.0.1
  */
 export function currency(options?: CurrencyOptions): Format {
     const normalizedOptions = normalizeCurrencyOptions(options);
-    const { decimalSeparator, includeCents, symbol } = normalizedOptions;
+    const { decimalSeparator, includeCents, symbol, thousandsSeparator } =
+        normalizedOptions;
 
     return defineFormat({
         normalize(raw) {
-            return normalizeCurrencyValue(raw, normalizedOptions);
+            let value = raw;
+
+            value = filterNumberCharacters(value, {
+                decimalPlaces: includeCents ? 2 : 0,
+                decimalSeparator,
+            });
+
+            value = limitNumberDecimalPlaces(value, {
+                decimalPlaces: includeCents ? 2 : 0,
+                decimalSeparator,
+            });
+
+            return trimNumberLeadingZeros(value, {
+                decimalSeparator,
+            });
         },
         format(normalized) {
-            return formatCurrencyValue(normalized, normalizedOptions);
+            if (normalized === '') return '';
+
+            const formattedValue = insertNumberThousandsSeparators(normalized, {
+                decimalSeparator,
+                thousandsSeparator,
+            });
+
+            return `${symbol}${formattedValue}`;
         },
         blur(formatted) {
-            if (!includeCents) {
-                return formatted;
-            }
+            let value = formatted;
 
-            const valueWithoutSymbol = symbol
-                ? formatted.slice(symbol.length)
-                : formatted;
-            const withLeadingZero = insertLeadingZeroOnBlur(
-                valueWithoutSymbol,
-                decimalSeparator,
-                false
-            );
-            const paddedValue = padDecimalPlacesOnBlur(
-                withLeadingZero,
-                decimalSeparator,
-                2
-            );
+            if (!includeCents) return formatted;
 
-            return `${symbol}${paddedValue}`;
+            if (symbol) value = value.slice(symbol.length);
+
+            value = insertNumberLeadingZero(value, { decimalSeparator });
+
+            value = padNumberDecimalPlaces(value, {
+                decimalPlaces: 2,
+                decimalSeparator,
+            });
+
+            return `${symbol}${value}`;
+        },
+        edit: {
+            deleteBackward(context) {
+                const { cursor, formatted, previous, start } = context;
+                const formatting = thousandsSeparator;
+
+                // prettier-ignore
+                const selectionBeforeSeparator = resolveSelectionBeforeFormatting({
+                    value: previous,
+                    position: cursor,
+                    formatting,
+                });
+
+                if (
+                    selectionBeforeSeparator &&
+                    isDeleteBackwardOverFormatting(context)
+                ) {
+                    return {
+                        value: previous,
+                        ...selectionBeforeSeparator,
+                    };
+                }
+
+                if (isDeleteBackwardOverFormatting(context)) {
+                    return {
+                        value: previous,
+                        selectionStart: cursor - 1,
+                        selectionEnd: cursor - 1,
+                    };
+                }
+
+                if (isDeleteBackwardBeforeFormatting(context, formatting)) {
+                    const selection = resolveSelectionAtDeletedBoundary({
+                        previous,
+                        formatted,
+                        start,
+                        normalize: context.normalize,
+                    });
+
+                    if (selection) {
+                        return {
+                            value: formatted,
+                            ...selection,
+                        };
+                    }
+                }
+            },
         },
     });
 }

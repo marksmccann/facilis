@@ -21,6 +21,7 @@ export default function runInsert(context: RunEditContext): FormatEditResult {
             previous: previous.value,
             attempted: current.value,
             formatted,
+            normalize,
             cursor,
             start: cursor,
             end: cursor,

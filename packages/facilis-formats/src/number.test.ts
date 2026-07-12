@@ -1,12 +1,27 @@
+import { setupInput, textState } from 'facilis-testing';
 import { describe, expect, it } from 'vitest';
 import { number } from './number';
+
+function input(
+    format: ReturnType<typeof number>,
+    current: Parameters<typeof format.onMount>[0]
+) {
+    return format.onInput(
+        {
+            inputType: 'insertText',
+            data: null,
+        },
+        textState('', 0),
+        current
+    );
+}
 
 describe('number', () => {
     it('keeps digits in the order they were entered', () => {
         const format = number();
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '12345',
                 selectionStart: 5,
                 selectionEnd: 5,
@@ -22,7 +37,7 @@ describe('number', () => {
         const format = number();
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '1a2-b3',
                 selectionStart: 6,
                 selectionEnd: 6,
@@ -56,7 +71,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '12.34',
                 selectionStart: 5,
                 selectionEnd: 5,
@@ -74,7 +89,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '1.2.3',
                 selectionStart: 5,
                 selectionEnd: 5,
@@ -93,7 +108,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '12,34',
                 selectionStart: 5,
                 selectionEnd: 5,
@@ -111,7 +126,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '12.345',
                 selectionStart: 6,
                 selectionEnd: 6,
@@ -129,7 +144,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '12345.67',
                 selectionStart: 8,
                 selectionEnd: 8,
@@ -147,7 +162,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '-123',
                 selectionStart: 4,
                 selectionEnd: 4,
@@ -163,7 +178,7 @@ describe('number', () => {
         const format = number();
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '-123',
                 selectionStart: 4,
                 selectionEnd: 4,
@@ -181,7 +196,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '1-2-3',
                 selectionStart: 5,
                 selectionEnd: 5,
@@ -333,7 +348,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '00012',
                 selectionStart: 5,
                 selectionEnd: 5,
@@ -351,7 +366,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '000',
                 selectionStart: 3,
                 selectionEnd: 3,
@@ -370,7 +385,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '000.5',
                 selectionStart: 5,
                 selectionEnd: 5,
@@ -389,7 +404,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '0.',
                 selectionStart: 2,
                 selectionEnd: 2,
@@ -408,7 +423,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '-00012',
                 selectionStart: 6,
                 selectionEnd: 6,
@@ -426,7 +441,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '12345',
                 selectionStart: 5,
                 selectionEnd: 5,
@@ -445,7 +460,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '12345.67',
                 selectionStart: 8,
                 selectionEnd: 8,
@@ -464,7 +479,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '-12345',
                 selectionStart: 6,
                 selectionEnd: 6,
@@ -482,14 +497,14 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '12345',
                 selectionStart: 2,
                 selectionEnd: 4,
             })
         ).toEqual({
             value: '12,345',
-            selectionStart: 2,
+            selectionStart: 3,
             selectionEnd: 5,
         });
     });
@@ -501,7 +516,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '-5',
                 selectionStart: 2,
                 selectionEnd: 2,
@@ -519,7 +534,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '150',
                 selectionStart: 3,
                 selectionEnd: 3,
@@ -538,7 +553,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '-',
                 selectionStart: 1,
                 selectionEnd: 1,
@@ -557,7 +572,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '12.5',
                 selectionStart: 4,
                 selectionEnd: 4,
@@ -577,7 +592,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '-1.5',
                 selectionStart: 4,
                 selectionEnd: 4,
@@ -596,7 +611,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '12.',
                 selectionStart: 3,
                 selectionEnd: 3,
@@ -616,7 +631,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '12,5',
                 selectionStart: 4,
                 selectionEnd: 4,
@@ -628,6 +643,26 @@ describe('number', () => {
         });
     });
 
+    it('preserves the decimal separator when clamping to a decimal bound', () => {
+        const format = number({
+            decimalPlaces: 2,
+            decimalSeparator: ',',
+            min: 0.5,
+        });
+
+        expect(
+            input(format, {
+                value: '0,4',
+                selectionStart: 3,
+                selectionEnd: 3,
+            })
+        ).toEqual({
+            value: '0,5',
+            selectionStart: 3,
+            selectionEnd: 3,
+        });
+    });
+
     it('does not clamp an incomplete negative decimal while typing', () => {
         const format = number({
             allowNegative: true,
@@ -636,7 +671,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '-.',
                 selectionStart: 2,
                 selectionEnd: 2,
@@ -655,7 +690,7 @@ describe('number', () => {
         });
 
         expect(
-            format.onInput({
+            input(format, {
                 value: '9.5',
                 selectionStart: 3,
                 selectionEnd: 3,
@@ -665,5 +700,21 @@ describe('number', () => {
             selectionStart: 3,
             selectionEnd: 3,
         });
+    });
+
+    it('moves before a thousands separator when deleting backward over it', () => {
+        const input = setupInput(number({ thousandsSeparator: ',' }));
+
+        expect(input.deleteBackward('12,345', 3)).toEqual(
+            textState('12,345', 2)
+        );
+    });
+
+    it('keeps the cursor before a thousands separator after deleting the previous digit', () => {
+        const input = setupInput(number({ thousandsSeparator: ',' }));
+
+        expect(input.deleteBackward('12,345', 2)).toEqual(
+            textState('1,345', 1)
+        );
     });
 });

@@ -1,10 +1,18 @@
-import { defineFormat, type Format } from 'facilis';
-import insertLeadingZeroOnBlur from './internal/insertLeadingZeroOnBlur';
-import isDecimalSeparator from './internal/isDecimalSeparator';
-import isDigit from './internal/isDigit';
-import isNegativeSign from './internal/isNegativeSign';
-import padDecimalPlacesOnBlur from './internal/padDecimalPlacesOnBlur';
-import shouldInsertThousandsSeparator from './internal/shouldInsertThousandsSeparator';
+import {
+    clampNumber,
+    defineFormat,
+    filterNumberCharacters,
+    insertNumberLeadingZero,
+    insertNumberThousandsSeparators,
+    isDeleteBackwardBeforeFormatting,
+    isDeleteBackwardOverFormatting,
+    limitNumberDecimalPlaces,
+    padNumberDecimalPlaces,
+    resolveSelectionAtDeletedBoundary,
+    resolveSelectionBeforeFormatting,
+    trimNumberLeadingZeros,
+    type Format,
+} from 'facilis';
 
 /**
  * The configuration options for a number format.
@@ -48,9 +56,31 @@ export type NumberOptions = {
      * The default is `false`.
      */
     insertLeadingZero?: boolean;
+
+    /**
+     * Whether to remove unnecessary leading zeros from the integer portion
+     * while typing. The default is `false`.
+     */
+    trimLeadingZeros?: boolean;
+
+    /**
+     * The minimum complete numeric value to allow while typing.
+     */
+    min?: number;
+
+    /**
+     * The maximum complete numeric value to allow while typing.
+     */
+    max?: number;
 };
 
-type NormalizedNumberOptions = Required<NumberOptions>;
+/**
+ * The complete number-format options after defaults have been applied.
+ *
+ * @private
+ */
+type NormalizedNumberOptions = Required<Omit<NumberOptions, 'max' | 'min'>> &
+    Pick<NumberOptions, 'max' | 'min'>;
 
 /**
  * Applies the default number-format options when an option is omitted.
@@ -66,133 +96,11 @@ function normalizeNumberOptions(
         padDecimalPlaces: Math.max(0, options.padDecimalPlaces ?? 0),
         decimalSeparator: options.decimalSeparator ?? '.',
         insertLeadingZero: options.insertLeadingZero ?? false,
+        max: options.max,
+        min: options.min,
         thousandsSeparator: options.thousandsSeparator ?? '',
+        trimLeadingZeros: options.trimLeadingZeros ?? false,
     };
-}
-
-function canAppendFractionDigit(
-    value: string,
-    decimalSeparator: string,
-    decimalPlaces: number
-) {
-    const separatorIndex = value.indexOf(decimalSeparator);
-
-    if (separatorIndex === -1) return true;
-
-    const fractionStart = separatorIndex + decimalSeparator.length;
-    return value.slice(fractionStart).length < decimalPlaces;
-}
-
-function normalizeNumberValue(
-    input: string,
-    { allowNegative, decimalPlaces, decimalSeparator }: NormalizedNumberOptions
-) {
-    let value = '';
-    let hasDecimalSeparator = false;
-
-    for (const character of input) {
-        if (allowNegative && isNegativeSign(character) && value.length === 0) {
-            value += character;
-            continue;
-        }
-
-        if (isDigit(character)) {
-            if (
-                !canAppendFractionDigit(value, decimalSeparator, decimalPlaces)
-            ) {
-                continue;
-            }
-
-            value += character;
-            continue;
-        }
-
-        if (
-            decimalPlaces > 0 &&
-            isDecimalSeparator(character, decimalSeparator) &&
-            !hasDecimalSeparator
-        ) {
-            value += decimalSeparator;
-            hasDecimalSeparator = true;
-        }
-    }
-
-    return value;
-}
-
-function formatNumberValue(
-    value: string,
-    {
-        allowNegative,
-        decimalSeparator,
-        thousandsSeparator,
-    }: NormalizedNumberOptions
-) {
-    if (!thousandsSeparator) return value;
-
-    let formattedValue = '';
-
-    for (let index = 0; index < value.length; index += 1) {
-        const character = value[index];
-
-        if (
-            isDigit(character) &&
-            shouldInsertThousandsSeparator(
-                value,
-                index,
-                decimalSeparator,
-                allowNegative
-            )
-        ) {
-            formattedValue += thousandsSeparator;
-        }
-
-        formattedValue += character;
-    }
-
-    return formattedValue;
-}
-
-function getPreviousThousandsSeparatorStart(
-    displayValue: string,
-    position: number,
-    thousandsSeparator: string
-) {
-    if (!thousandsSeparator || position <= 0) {
-        return null;
-    }
-
-    const separatorStart = position - thousandsSeparator.length;
-
-    if (separatorStart < 0) {
-        return null;
-    }
-
-    if (displayValue.slice(separatorStart, position) !== thousandsSeparator) {
-        return null;
-    }
-
-    return separatorStart;
-}
-
-function getFirstDisplayBoundaryForValue(
-    displayValue: string,
-    valueBoundary: number,
-    options: NormalizedNumberOptions
-) {
-    for (let index = 0; index <= displayValue.length; index += 1) {
-        const displayBoundary = displayValue.slice(0, index);
-        const normalizedBoundary = normalizeNumberValue(
-            displayBoundary,
-            options
-        );
-
-        if (normalizedBoundary.length === valueBoundary) {
-            return index;
-        }
-    }
-
-    return displayValue.length;
 }
 
 /**
@@ -202,73 +110,106 @@ function getFirstDisplayBoundaryForValue(
  */
 export function number(options?: NumberOptions): Format {
     const normalizedOptions = normalizeNumberOptions(options);
+    const {
+        thousandsSeparator,
+        decimalSeparator,
+        allowNegative,
+        decimalPlaces,
+        trimLeadingZeros,
+        padDecimalPlaces,
+        insertLeadingZero,
+        min,
+        max,
+    } = normalizedOptions;
 
     return defineFormat({
         normalize(raw) {
-            return normalizeNumberValue(raw, normalizedOptions);
+            let value = raw;
+
+            value = filterNumberCharacters(value, {
+                allowNegative,
+                decimalPlaces,
+                decimalSeparator,
+            });
+
+            value = limitNumberDecimalPlaces(value, {
+                decimalPlaces,
+                decimalSeparator,
+            });
+
+            if (trimLeadingZeros) {
+                value = trimNumberLeadingZeros(value, {
+                    allowNegative,
+                    decimalSeparator,
+                });
+            }
+
+            return clampNumber(value, {
+                decimalSeparator,
+                max: max,
+                min: min,
+            });
         },
         format(normalized) {
-            return formatNumberValue(normalized, normalizedOptions);
+            return insertNumberThousandsSeparators(normalized, {
+                allowNegative,
+                decimalSeparator,
+                thousandsSeparator,
+            });
         },
         blur(formatted) {
-            const value = normalizedOptions.insertLeadingZero
-                ? insertLeadingZeroOnBlur(
-                      formatted,
-                      normalizedOptions.decimalSeparator,
-                      normalizedOptions.allowNegative
-                  )
-                : formatted;
+            let value = formatted;
 
-            return padDecimalPlacesOnBlur(
-                value,
-                normalizedOptions.decimalSeparator,
-                normalizedOptions.padDecimalPlaces
-            );
+            if (insertLeadingZero) {
+                value = insertNumberLeadingZero(formatted, {
+                    allowNegative,
+                    decimalSeparator,
+                });
+            }
+
+            value = padNumberDecimalPlaces(value, {
+                decimalPlaces: padDecimalPlaces,
+                decimalSeparator,
+            });
+
+            return value;
         },
         edit: {
             deleteBackward(context) {
-                const separatorStart = getPreviousThousandsSeparatorStart(
-                    context.previous,
-                    context.cursor,
-                    normalizedOptions.thousandsSeparator
-                );
+                const { cursor, formatted, previous, start } = context;
+                const formatting = thousandsSeparator;
+
+                // prettier-ignore
+                const selectionBeforeFormatting = resolveSelectionBeforeFormatting({
+                    value: previous,
+                    position: cursor,
+                    formatting,
+                });
 
                 if (
-                    separatorStart !== null &&
-                    context.cursor < context.previous.length
+                    selectionBeforeFormatting &&
+                    isDeleteBackwardOverFormatting(context)
                 ) {
                     return {
-                        value: context.previous,
-                        selectionStart: separatorStart,
-                        selectionEnd: separatorStart,
+                        value: previous,
+                        ...selectionBeforeFormatting,
                     };
                 }
 
-                const nextCharacter = context.previous.slice(
-                    context.cursor,
-                    context.cursor + normalizedOptions.thousandsSeparator.length
-                );
+                if (isDeleteBackwardBeforeFormatting(context, formatting)) {
+                    const selection = resolveSelectionAtDeletedBoundary({
+                        previous,
+                        formatted,
+                        start,
+                        normalize: context.normalize,
+                    });
 
-                if (
-                    normalizedOptions.thousandsSeparator &&
-                    isDigit(context.deleted) &&
-                    nextCharacter === normalizedOptions.thousandsSeparator
-                ) {
-                    const valueBoundary = normalizeNumberValue(
-                        context.previous.slice(0, context.start),
-                        normalizedOptions
-                    ).length;
-                    const selection = getFirstDisplayBoundaryForValue(
-                        context.formatted,
-                        valueBoundary,
-                        normalizedOptions
-                    );
-
-                    return {
-                        value: context.formatted,
-                        selectionStart: selection,
-                        selectionEnd: selection,
-                    };
+                    if (selection) {
+                        return {
+                            value: formatted,
+                            ...selection,
+                        };
+                    }
                 }
             },
         },
