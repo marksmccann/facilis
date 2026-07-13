@@ -3,7 +3,7 @@
  *
  * @since 0.1.0
  */
-export type InsertNumberLeadingZeroOptions = {
+export type InsertLeadingZeroOptions = {
     /**
      * The decimal separator that marks the start of the fractional portion.
      */
@@ -20,9 +20,9 @@ export type InsertNumberLeadingZeroOptions = {
  *
  * @since 0.1.0
  */
-export default function insertNumberLeadingZero(
+export default function insertLeadingZero(
     value: string,
-    options: InsertNumberLeadingZeroOptions = {}
+    options: InsertLeadingZeroOptions = {}
 ) {
     const { allowNegative = false, decimalSeparator = '.' } = options;
 

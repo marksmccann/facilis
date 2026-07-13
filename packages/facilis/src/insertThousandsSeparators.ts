@@ -3,7 +3,7 @@
  *
  * @since 0.1.0
  */
-export type InsertNumberThousandsSeparatorsOptions = {
+export type InsertThousandsSeparatorsOptions = {
     /**
      * The decimal separator that marks the start of the fractional portion.
      */
@@ -25,9 +25,9 @@ export type InsertNumberThousandsSeparatorsOptions = {
  *
  * @since 0.1.0
  */
-export default function insertNumberThousandsSeparators(
+export default function insertThousandsSeparators(
     value: string,
-    options: InsertNumberThousandsSeparatorsOptions = {}
+    options: InsertThousandsSeparatorsOptions = {}
 ) {
     const {
         allowNegative = false,

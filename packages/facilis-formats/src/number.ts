@@ -2,15 +2,15 @@ import {
     clampNumber,
     defineFormat,
     filterNumberCharacters,
-    insertNumberLeadingZero,
-    insertNumberThousandsSeparators,
+    insertLeadingZero,
+    insertThousandsSeparators,
     isDeleteBackwardBeforeFormatting,
     isDeleteBackwardOverFormatting,
-    limitNumberDecimalPlaces,
-    padNumberDecimalPlaces,
+    limitDecimalPlaces,
+    padDecimalPlaces,
     resolveSelectionAtDeletedBoundary,
     resolveSelectionBeforeFormatting,
-    trimNumberLeadingZeros,
+    trimLeadingZeros,
     type Format,
 } from 'facilis';
 
@@ -115,9 +115,9 @@ export function number(options?: NumberOptions): Format {
         decimalSeparator,
         allowNegative,
         decimalPlaces,
-        trimLeadingZeros,
-        padDecimalPlaces,
-        insertLeadingZero,
+        trimLeadingZeros: shouldTrimLeadingZeros,
+        padDecimalPlaces: decimalPlacesToPad,
+        insertLeadingZero: shouldInsertLeadingZero,
         min,
         max,
     } = normalizedOptions;
@@ -132,13 +132,13 @@ export function number(options?: NumberOptions): Format {
                 decimalSeparator,
             });
 
-            value = limitNumberDecimalPlaces(value, {
+            value = limitDecimalPlaces(value, {
                 decimalPlaces,
                 decimalSeparator,
             });
 
-            if (trimLeadingZeros) {
-                value = trimNumberLeadingZeros(value, {
+            if (shouldTrimLeadingZeros) {
+                value = trimLeadingZeros(value, {
                     allowNegative,
                     decimalSeparator,
                 });
@@ -151,7 +151,7 @@ export function number(options?: NumberOptions): Format {
             });
         },
         format(normalized) {
-            return insertNumberThousandsSeparators(normalized, {
+            return insertThousandsSeparators(normalized, {
                 allowNegative,
                 decimalSeparator,
                 thousandsSeparator,
@@ -160,15 +160,15 @@ export function number(options?: NumberOptions): Format {
         blur(formatted) {
             let value = formatted;
 
-            if (insertLeadingZero) {
-                value = insertNumberLeadingZero(formatted, {
+            if (shouldInsertLeadingZero) {
+                value = insertLeadingZero(formatted, {
                     allowNegative,
                     decimalSeparator,
                 });
             }
 
-            value = padNumberDecimalPlaces(value, {
-                decimalPlaces: padDecimalPlaces,
+            value = padDecimalPlaces(value, {
+                decimalPlaces: decimalPlacesToPad,
                 decimalSeparator,
             });
 

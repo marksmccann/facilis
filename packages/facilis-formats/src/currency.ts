@@ -1,15 +1,15 @@
 import {
     defineFormat,
     filterNumberCharacters,
-    insertNumberLeadingZero,
-    insertNumberThousandsSeparators,
+    insertLeadingZero,
+    insertThousandsSeparators,
     isDeleteBackwardBeforeFormatting,
     isDeleteBackwardOverFormatting,
-    limitNumberDecimalPlaces,
-    padNumberDecimalPlaces,
+    limitDecimalPlaces,
+    padDecimalPlaces,
     resolveSelectionAtDeletedBoundary,
     resolveSelectionBeforeFormatting,
-    trimNumberLeadingZeros,
+    trimLeadingZeros,
     type Format,
 } from 'facilis';
 
@@ -77,19 +77,19 @@ export function currency(options?: CurrencyOptions): Format {
                 decimalSeparator,
             });
 
-            value = limitNumberDecimalPlaces(value, {
+            value = limitDecimalPlaces(value, {
                 decimalPlaces: includeCents ? 2 : 0,
                 decimalSeparator,
             });
 
-            return trimNumberLeadingZeros(value, {
+            return trimLeadingZeros(value, {
                 decimalSeparator,
             });
         },
         format(normalized) {
             if (normalized === '') return '';
 
-            const formattedValue = insertNumberThousandsSeparators(normalized, {
+            const formattedValue = insertThousandsSeparators(normalized, {
                 decimalSeparator,
                 thousandsSeparator,
             });
@@ -103,9 +103,9 @@ export function currency(options?: CurrencyOptions): Format {
 
             if (symbol) value = value.slice(symbol.length);
 
-            value = insertNumberLeadingZero(value, { decimalSeparator });
+            value = insertLeadingZero(value, { decimalSeparator });
 
-            value = padNumberDecimalPlaces(value, {
+            value = padDecimalPlaces(value, {
                 decimalPlaces: 2,
                 decimalSeparator,
             });

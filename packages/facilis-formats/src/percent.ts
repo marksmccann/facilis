@@ -2,12 +2,12 @@ import {
     clampNumber,
     defineFormat,
     filterNumberCharacters,
-    insertNumberLeadingZero,
+    insertLeadingZero,
     isDeleteBackwardBeforeFormatting,
-    limitNumberDecimalPlaces,
-    padNumberDecimalPlaces,
+    limitDecimalPlaces,
+    padDecimalPlaces,
     resolveSelectionAtDeletedBoundary,
-    trimNumberLeadingZeros,
+    trimLeadingZeros,
     type Format,
 } from 'facilis';
 
@@ -120,7 +120,7 @@ export function percent(options?: PercentOptions): Format {
         includeSymbol,
         max,
         min,
-        padDecimalPlaces,
+        padDecimalPlaces: decimalPlacesToPad,
     } = normalizedOptions;
     const symbol = includeSymbol ? PERCENT_SYMBOL : '';
 
@@ -134,12 +134,12 @@ export function percent(options?: PercentOptions): Format {
                 decimalSeparator,
             });
 
-            value = limitNumberDecimalPlaces(value, {
+            value = limitDecimalPlaces(value, {
                 decimalPlaces,
                 decimalSeparator,
             });
 
-            value = trimNumberLeadingZeros(value, {
+            value = trimLeadingZeros(value, {
                 allowNegative,
                 decimalSeparator,
             });
@@ -169,13 +169,13 @@ export function percent(options?: PercentOptions): Format {
                 value = value.slice(0, -symbol.length);
             }
 
-            value = insertNumberLeadingZero(value, {
+            value = insertLeadingZero(value, {
                 allowNegative,
                 decimalSeparator,
             });
 
-            value = padNumberDecimalPlaces(value, {
-                decimalPlaces: padDecimalPlaces,
+            value = padDecimalPlaces(value, {
+                decimalPlaces: decimalPlacesToPad,
                 decimalSeparator,
             });
 

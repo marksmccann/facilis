@@ -3,7 +3,7 @@
  *
  * @since 0.1.0
  */
-export type TrimNumberLeadingZerosOptions = {
+export type TrimLeadingZerosOptions = {
     /**
      * The decimal separator that marks the start of the fractional portion.
      */
@@ -21,9 +21,9 @@ export type TrimNumberLeadingZerosOptions = {
  *
  * @since 0.1.0
  */
-export default function trimNumberLeadingZeros(
+export default function trimLeadingZeros(
     value: string,
-    options: TrimNumberLeadingZerosOptions = {}
+    options: TrimLeadingZerosOptions = {}
 ) {
     const { allowNegative = false, decimalSeparator = '.' } = options;
     const sign = allowNegative && value.startsWith('-') ? '-' : '';

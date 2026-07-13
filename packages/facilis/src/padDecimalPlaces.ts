@@ -3,7 +3,7 @@
  *
  * @since 0.1.0
  */
-export type PadNumberDecimalPlacesOptions = {
+export type PadDecimalPlacesOptions = {
     /**
      * The decimal separator that marks the start of the fractional portion.
      */
@@ -21,9 +21,9 @@ export type PadNumberDecimalPlacesOptions = {
  *
  * @since 0.1.0
  */
-export default function padNumberDecimalPlaces(
+export default function padDecimalPlaces(
     value: string,
-    options: PadNumberDecimalPlacesOptions = {}
+    options: PadDecimalPlacesOptions = {}
 ) {
     const { decimalPlaces = 0, decimalSeparator = '.' } = options;
     const places = Math.max(0, decimalPlaces);

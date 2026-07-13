@@ -3,7 +3,7 @@
  *
  * @since 0.1.0
  */
-export type LimitNumberDecimalPlacesOptions = {
+export type LimitDecimalPlacesOptions = {
     /**
      * The decimal separator that marks the start of the fractional portion.
      */
@@ -20,9 +20,9 @@ export type LimitNumberDecimalPlacesOptions = {
  *
  * @since 0.1.0
  */
-export default function limitNumberDecimalPlaces(
+export default function limitDecimalPlaces(
     value: string,
-    options: LimitNumberDecimalPlacesOptions = {}
+    options: LimitDecimalPlacesOptions = {}
 ) {
     const { decimalPlaces = 0, decimalSeparator = '.' } = options;
     const separatorIndex = value.indexOf(decimalSeparator);
