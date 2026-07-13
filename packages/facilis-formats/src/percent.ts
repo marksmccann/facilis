@@ -11,7 +11,7 @@ import {
     type Format,
 } from 'facilis';
 
-const PercentSymbol = '%';
+const PERCENT_SYMBOL = '%';
 
 /**
  * The configuration options for a percent format.
@@ -122,7 +122,7 @@ export function percent(options?: PercentOptions): Format {
         min,
         padDecimalPlaces,
     } = normalizedOptions;
-    const symbol = includeSymbol ? PercentSymbol : '';
+    const symbol = includeSymbol ? PERCENT_SYMBOL : '';
 
     return defineFormat({
         normalize(raw) {
@@ -160,7 +160,7 @@ export function percent(options?: PercentOptions): Format {
                 return formattedValue;
             }
 
-            return `${formattedValue}${PercentSymbol}`;
+            return `${formattedValue}${PERCENT_SYMBOL}`;
         },
         blur(formatted) {
             let value = formatted;
@@ -186,7 +186,7 @@ export function percent(options?: PercentOptions): Format {
                 return value;
             }
 
-            return `${value}${PercentSymbol}`;
+            return `${value}${PERCENT_SYMBOL}`;
         },
         edit: {
             append(context) {

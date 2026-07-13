@@ -15,7 +15,7 @@ import { reporter } from './reporter';
  *
  * @since 0.1.0
  */
-const DatePatterns = [
+const DATE_PATTERNS = [
     'MM/DD/YY',
     'MM/DD/YYYY',
     'DD/MM/YY',
@@ -33,21 +33,21 @@ const DatePatterns = [
  *
  * @since 0.1.0
  */
-const DateSeparators = ['/', '-', '.'] as const;
+const DATE_SEPARATORS = ['/', '-', '.'] as const;
 
 /**
  * A canonical date pattern.
  *
  * @since 0.1.0
  */
-export type DatePattern = (typeof DatePatterns)[number];
+export type DatePattern = (typeof DATE_PATTERNS)[number];
 
 /**
  * A rendered date separator.
  *
  * @since 0.1.0
  */
-export type DateSeparator = (typeof DateSeparators)[number];
+export type DateSeparator = (typeof DATE_SEPARATORS)[number];
 
 /**
  * The configuration options for a date format.
@@ -97,11 +97,11 @@ function normalizeDateOptions(options: DateOptions): NormalizedDateOptions {
 
     const separator = options.separator ?? '/';
 
-    if (!DatePatterns.includes(options.pattern)) {
+    if (!DATE_PATTERNS.includes(options.pattern)) {
         reporter.fail('ERR07');
     }
 
-    if (!DateSeparators.includes(separator)) {
+    if (!DATE_SEPARATORS.includes(separator)) {
         reporter.fail('ERR08');
     }
 

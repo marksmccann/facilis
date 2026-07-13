@@ -15,28 +15,28 @@ import { reporter } from './reporter';
  *
  * @since 0.1.0
  */
-const TimePatterns = ['HH:mm', 'HH:mm:ss', 'hh:mm', 'hh:mm:ss'] as const;
+const TIME_PATTERNS = ['HH:mm', 'HH:mm:ss', 'hh:mm', 'hh:mm:ss'] as const;
 
 /**
  * The separators supported when rendering formatted time values.
  *
  * @since 0.1.0
  */
-const TimeSeparators = [':', '.'] as const;
+const TIME_SEPARATORS = [':', '.'] as const;
 
 /**
  * A canonical time pattern.
  *
  * @since 0.1.0
  */
-export type TimePattern = (typeof TimePatterns)[number];
+export type TimePattern = (typeof TIME_PATTERNS)[number];
 
 /**
  * A rendered time separator.
  *
  * @since 0.1.0
  */
-export type TimeSeparator = (typeof TimeSeparators)[number];
+export type TimeSeparator = (typeof TIME_SEPARATORS)[number];
 
 /**
  * The configuration options for a time format.
@@ -86,11 +86,11 @@ function normalizeTimeOptions(options: TimeOptions): NormalizedTimeOptions {
 
     const separator = options.separator ?? ':';
 
-    if (!TimePatterns.includes(options.pattern)) {
+    if (!TIME_PATTERNS.includes(options.pattern)) {
         reporter.fail('ERR10');
     }
 
-    if (!TimeSeparators.includes(separator)) {
+    if (!TIME_SEPARATORS.includes(separator)) {
         reporter.fail('ERR11');
     }
 

@@ -81,7 +81,7 @@ export type PatternPart = PatternTokenPart | PatternLiteralPart;
  *
  * @private
  */
-const DefaultPatternTokens = {
+const DEFAULT_PATTERN_TOKENS = {
     '#': { matches: /\d/ },
     a: { matches: /[A-Za-z]/ },
     '*': { matches: /./ },
@@ -121,13 +121,13 @@ function normalizePatternOptions(input: PatternInput): ParsePatternOptions {
     if (typeof input === 'string') {
         return {
             pattern: input,
-            tokens: DefaultPatternTokens,
+            tokens: DEFAULT_PATTERN_TOKENS,
         };
     }
 
     return {
         pattern: input.pattern,
-        tokens: input.tokens ?? DefaultPatternTokens,
+        tokens: input.tokens ?? DEFAULT_PATTERN_TOKENS,
     };
 }
 
