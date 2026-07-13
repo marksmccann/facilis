@@ -70,6 +70,12 @@ export type DateOptions = {
      * values while typing. The default is `false`.
      */
     insertLeadingZero?: boolean;
+
+    /**
+     * Whether to reject impossible month and day values while typing. The
+     * default is `false`.
+     */
+    strictMonthAndDay?: boolean;
 };
 
 /**
@@ -103,6 +109,7 @@ function normalizeDateOptions(options: DateOptions): NormalizedDateOptions {
         insertLeadingZero: options.insertLeadingZero ?? false,
         pattern: options.pattern,
         separator,
+        strictMonthAndDay: options.strictMonthAndDay ?? false,
     };
 }
 
@@ -119,12 +126,32 @@ function shouldInsertLeadingZero(segment: string, value: string) {
 }
 
 /**
+ * Determines whether one month or day segment can still resolve to a possible
+ * standalone segment value.
+ *
+ * @private
+ */
+function isPossibleMonthOrDay(segment: string, value: string) {
+    if (segment === 'MM') {
+        if (value.length === 1) return /^[0-1]$/.test(value);
+        return /^(0[1-9]|1[0-2])$/.test(value);
+    }
+
+    if (segment === 'DD') {
+        if (value.length === 1) return /^[0-3]$/.test(value);
+        return /^(0[1-9]|[1-2]\d|3[0-1])$/.test(value);
+    }
+
+    return true;
+}
+
+/**
  * Creates a date format for numeric date input.
  *
  * @since 0.1.0
  */
 export function date(options: DateOptions): Format {
-    const { insertLeadingZero, pattern, separator } =
+    const { insertLeadingZero, pattern, separator, strictMonthAndDay } =
         normalizeDateOptions(options);
     const segments = pattern.split('/');
     const segmentLengths = segments.map((segment) => segment.length);
@@ -160,7 +187,16 @@ export function date(options: DateOptions): Format {
                         break;
                     }
 
-                    segmentValue += digit;
+                    const nextSegmentValue = `${segmentValue}${digit}`;
+
+                    if (
+                        strictMonthAndDay &&
+                        !isPossibleMonthOrDay(segment, nextSegmentValue)
+                    ) {
+                        break;
+                    }
+
+                    segmentValue = nextSegmentValue;
                     digitIndex += 1;
                 }
 

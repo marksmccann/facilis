@@ -24,6 +24,11 @@ With `date({ pattern: 'MM/DD/YYYY', insertLeadingZero: true })`:
 - `2` becomes `02`
 - `24` becomes `02/04`
 
+With `date({ pattern: 'MM/DD/YYYY', strictMonthAndDay: true })`:
+
+- `13` becomes `1`
+- `1239` becomes `12/3`
+
 ## Signature
 
 ```ts
@@ -102,6 +107,25 @@ With raw input `24`, this formats as `02/04`. Months `2` through `9` and days
 `4` through `9` can be padded because those digits cannot validly begin a
 two-digit month or day.
 
+### strictMonthAndDay
+
+```ts
+type StrictMonthAndDay = boolean;
+```
+
+The `strictMonthAndDay` option rejects impossible standalone month and day
+segment values while typing. The default is `false`.
+
+```ts
+const strictDateFormat = date({
+    pattern: 'MM/DD/YYYY',
+    strictMonthAndDay: true,
+});
+```
+
+With raw input `13`, this stays at `1` because `13` is not a possible month.
+With raw input `1239`, this stays at `12/3` because `39` is not a possible day.
+
 ## Behavior
 
 - Keeps only digit characters in the normalized date.
@@ -109,4 +133,5 @@ two-digit month or day.
 - Ignores extra digits beyond the configured pattern length.
 - Lets expected punctuation move naturally through configured separators.
 - Can insert leading zeros for safe single-digit month and day values.
-- Does not validate real calendar dates or month/day ranges.
+- Can reject impossible standalone month and day segment values.
+- Does not validate full calendar dates like month-specific day counts.

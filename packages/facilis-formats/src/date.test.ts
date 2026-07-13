@@ -110,6 +110,61 @@ describe('date', () => {
         expect(input.type('24')).toEqual(textState('02-04', 5));
     });
 
+    it('preserves impossible month values by default', () => {
+        const input = setupInput(
+            date({
+                pattern: 'MM/DD/YYYY',
+            })
+        );
+
+        expect(input.type('13')).toEqual(textState('13', 2));
+    });
+
+    it('rejects an impossible month when month and day values are strict', () => {
+        const input = setupInput(
+            date({
+                pattern: 'MM/DD/YYYY',
+                strictMonthAndDay: true,
+            })
+        );
+
+        expect(input.type('13')).toEqual(textState('1', 1));
+    });
+
+    it('rejects an impossible day when month and day values are strict', () => {
+        const input = setupInput(
+            date({
+                pattern: 'MM/DD/YYYY',
+                strictMonthAndDay: true,
+            })
+        );
+
+        expect(input.type('1239')).toEqual(textState('12/3', 4));
+    });
+
+    it('rejects an impossible leading day when month and day values are strict', () => {
+        const input = setupInput(
+            date({
+                pattern: 'DD/MM/YYYY',
+                strictMonthAndDay: true,
+            })
+        );
+
+        expect(input.type('4')).toEqual(textState('', 0));
+    });
+
+    it('allows leading-zero insertion before applying strict month and day values', () => {
+        const input = setupInput(
+            date({
+                insertLeadingZero: true,
+                pattern: 'MM/DD/YYYY',
+                strictMonthAndDay: true,
+            })
+        );
+
+        expect(input.type('24')).toEqual(textState('02/04', 5));
+    });
+
     it('keeps the date to the configured pattern length', () => {
         const input = setupInput(
             date({

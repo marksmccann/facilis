@@ -85,6 +85,28 @@ import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
     </article>
 
     <article class="demo-card">
+        <h2>Strict month and day</h2>
+        <p>
+            Impossible standalone month and day values can be rejected while the
+            date is typed.
+        </p>
+        <label class="demo-label" for="date-strict-month-and-day">
+            Strict date
+        </label>
+        <input
+            class="demo-input"
+            id="date-strict-month-and-day"
+            data-demo-date-strict-month-and-day
+            type="text"
+            placeholder="Try 13 or 1239"
+        />
+        <p class="demo-note">
+            Try <code>13</code> or <code>1239</code>. This demo rejects
+            impossible month and day segments.
+        </p>
+    </article>
+
+    <article class="demo-card">
         <h2>Paste cleanup</h2>
         <p>
             Existing separators, spaces, and other characters are ignored so
