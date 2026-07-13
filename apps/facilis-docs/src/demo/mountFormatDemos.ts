@@ -2,6 +2,7 @@ import { bindFormat } from '../../../../packages/facilis-dom/src/index.ts';
 import {
     creditCard,
     currency,
+    date,
     ein,
     expirationDate,
     number,
@@ -40,6 +41,15 @@ export function mountCurrencyDemo() {
 export function mountCreditCardDemo() {
     bind('[data-demo-credit-card-default]', () => creditCard());
     bind('[data-demo-credit-card-amex]', () => creditCard());
+}
+
+export function mountDateDemo() {
+    bind('[data-demo-date-default]', () => date({ pattern: 'MM/DD/YYYY' }));
+    bind('[data-demo-date-dashed]', () =>
+        date({ pattern: 'MM/DD/YYYY', separator: '-' })
+    );
+    bind('[data-demo-date-year-month]', () => date({ pattern: 'YYYY/MM' }));
+    bind('[data-demo-date-paste]', () => date({ pattern: 'MM/DD/YYYY' }));
 }
 
 export function mountEinDemo() {

@@ -52,6 +52,7 @@ export default defineConfig({
                             label: 'currency',
                             slug: 'reference/formats/currency',
                         },
+                        { label: 'date', slug: 'reference/formats/date' },
                         { label: 'ein', slug: 'reference/formats/ein' },
                         {
                             label: 'expirationDate',

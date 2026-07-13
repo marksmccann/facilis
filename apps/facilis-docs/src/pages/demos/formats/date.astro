@@ -1,0 +1,92 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/date/"
+    title="date() Demo"
+>
+    <article class="demo-card">
+        <h2>Month day year</h2>
+        <p>
+            Dates use an explicit numeric pattern while the format strips
+            anything that is not a digit.
+        </p>
+        <label class="demo-label" for="date-default">Date</label>
+        <input
+            class="demo-input"
+            id="date-default"
+            data-demo-date-default
+            type="text"
+            placeholder="Try 01022026"
+        />
+        <p class="demo-note">
+            Try <code>01022026</code> to see <code>MM/DD/YYYY</code> grouping:
+            <code>01/02/2026</code>.
+        </p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Custom separator</h2>
+        <p>
+            The pattern stays canonical while the rendered separator can change.
+        </p>
+        <label class="demo-label" for="date-dashed">Dashed date</label>
+        <input
+            class="demo-input"
+            id="date-dashed"
+            data-demo-date-dashed
+            type="text"
+            placeholder="Try 01022026"
+        />
+        <p class="demo-note">
+            Try <code>01022026</code>. This demo renders the date as
+            <code>01-02-2026</code>.
+        </p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Year month</h2>
+        <p>
+            Patterns can omit parts when a shorter numeric date is the expected
+            field shape.
+        </p>
+        <label class="demo-label" for="date-year-month">Year and month</label>
+        <input
+            class="demo-input"
+            id="date-year-month"
+            data-demo-date-year-month
+            type="text"
+            placeholder="Try 202601"
+        />
+        <p class="demo-note">
+            Try <code>202601</code> to see <code>YYYY/MM</code> formatting.
+        </p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Paste cleanup</h2>
+        <p>
+            Existing separators, spaces, and other characters are ignored so
+            pasted text resolves to the configured date shape.
+        </p>
+        <label class="demo-label" for="date-paste">Messy date</label>
+        <input
+            class="demo-input"
+            id="date-paste"
+            data-demo-date-paste
+            type="text"
+            placeholder="Try 01 / 02 / 2026 ext. 9"
+        />
+        <p class="demo-note">
+            Try <code>01 / 02 / 2026 ext. 9</code>. The format keeps the first 8
+            digits and displays them as a date.
+        </p>
+    </article>
+
+    <script>
+        import { mountDateDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountDateDemo();
+    </script>
+</FormatDemoLayout>
