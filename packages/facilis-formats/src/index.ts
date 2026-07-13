@@ -5,6 +5,7 @@ export * from './ein';
 export * from './expirationDate';
 export * from './number';
 export * from './pattern';
+export * from './percent';
 export * from './phoneNumber';
 export * from './socialSecurityNumber';
 export * from './text';

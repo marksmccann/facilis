@@ -16,6 +16,20 @@ bindFormat(input, currency({ symbol: '€' }));
 bindFormat(input, currency({ symbol: '', includeCents: false }));
 ```
 
+## `percent`
+
+Create a percent formatter with optional decimal places, range limits, and an
+optional percent symbol.
+
+```ts
+import { bindFormat } from 'facilis-dom';
+import { percent } from 'facilis-formats';
+
+bindFormat(input, percent());
+bindFormat(input, percent({ decimalPlaces: 2, padDecimalPlaces: 2 }));
+bindFormat(input, percent({ includeSymbol: false }));
+```
+
 ## `pattern`
 
 Create a format from either a pattern string with preset tokens or an explicit

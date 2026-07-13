@@ -1,0 +1,70 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/percent/"
+    title="percent() Demo"
+>
+    <article class="demo-card">
+        <h2>Default formatting</h2>
+        <p>The default percent format keeps an integer value, trims unnecessary leading zeros, and appends the percent symbol.</p>
+        <label class="demo-label" for="percent-default">Type a percent</label>
+        <input class="demo-input" id="percent-default" data-demo-percent-default type="text" placeholder="Try 00012" />
+        <p class="demo-note">Try <code>00012</code> to see the default percent formatting.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>No percent symbol</h2>
+        <p>Omit the trailing symbol when the surrounding UI already supplies the unit.</p>
+        <label class="demo-label" for="percent-bare">Bare percent value</label>
+        <input class="demo-input" id="percent-bare" data-demo-percent-bare type="text" placeholder="Try 12" />
+        <p class="demo-note">This scenario uses <code>includeSymbol: false</code>, so <code>12</code> stays <code>12</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Decimal places</h2>
+        <p>Preserve a fractional percent value while trimming extra decimal digits.</p>
+        <label class="demo-label" for="percent-decimal">Decimal percent</label>
+        <input class="demo-input" id="percent-decimal" data-demo-percent-decimal type="text" placeholder="Try 12.345" />
+        <p class="demo-note">This scenario uses <code>decimalPlaces: 2</code>, so <code>12.345</code> becomes <code>12.34%</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Blur padding</h2>
+        <p>Pad the fractional portion on blur when the resting value should settle to a fixed decimal length.</p>
+        <label class="demo-label" for="percent-padded">Padded percent</label>
+        <input class="demo-input" id="percent-padded" data-demo-percent-padded type="text" placeholder="Try 12.5 and blur" />
+        <p class="demo-note">This scenario uses <code>decimalPlaces: 2</code> and <code>padDecimalPlaces: 2</code>, so <code>12.5</code> becomes <code>12.50%</code> on blur.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Decimal separator</h2>
+        <p>Swap the decimal separator when the surrounding UI expects comma decimals.</p>
+        <label class="demo-label" for="percent-decimal-separator">Localized percent</label>
+        <input class="demo-input" id="percent-decimal-separator" data-demo-percent-decimal-separator type="text" placeholder="Try 12345,6" />
+        <p class="demo-note">This scenario uses the decimal separator: <code>,</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Negative values</h2>
+        <p>Preserve a leading minus sign when the format should support signed percent input.</p>
+        <label class="demo-label" for="percent-negative">Signed percent</label>
+        <input class="demo-input" id="percent-negative" data-demo-percent-negative type="text" placeholder="Try -12.5" />
+        <p class="demo-note">This scenario enables negative values and preserves up to two decimal places.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Maximum clamp</h2>
+        <p>Clamp the value to a maximum as soon as typing resolves to a complete number above the allowed range.</p>
+        <label class="demo-label" for="percent-max">Maximum 100</label>
+        <input class="demo-input" id="percent-max" data-demo-percent-max type="text" placeholder="Try 150" />
+        <p class="demo-note">This scenario uses <code>max: 100</code>, so values like <code>150</code> become <code>100%</code> while typing.</p>
+    </article>
+
+    <script>
+        import { mountPercentDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountPercentDemo();
+    </script>
+</FormatDemoLayout>

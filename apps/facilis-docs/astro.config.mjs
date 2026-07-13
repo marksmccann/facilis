@@ -60,6 +60,7 @@ export default defineConfig({
                         },
                         { label: 'number', slug: 'reference/formats/number' },
                         { label: 'pattern', slug: 'reference/formats/pattern' },
+                        { label: 'percent', slug: 'reference/formats/percent' },
                         {
                             label: 'phoneNumber',
                             slug: 'reference/formats/phone-number',

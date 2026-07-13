@@ -18,6 +18,7 @@ Dedicated format demos live at:
 - `/facilis/demos/formats/expiration-date/`
 - `/facilis/demos/formats/number/`
 - `/facilis/demos/formats/pattern/`
+- `/facilis/demos/formats/percent/`
 - `/facilis/demos/formats/phone-number/`
 - `/facilis/demos/formats/social-security-number/`
 - `/facilis/demos/formats/text/`

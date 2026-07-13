@@ -7,6 +7,7 @@ import {
     expirationDate,
     number,
     pattern,
+    percent,
     phoneNumber,
     socialSecurityNumber,
     text,
@@ -136,6 +137,39 @@ export function mountPatternDemo() {
     bind('[data-demo-pattern-phone]', () => pattern('(###) ###-####'));
     bind('[data-demo-pattern-alpha]', () => pattern('aa-####'));
     bind('[data-demo-pattern-wildcard]', () => pattern('**-##'));
+}
+
+export function mountPercentDemo() {
+    bind('[data-demo-percent-default]', () => percent());
+    bind('[data-demo-percent-bare]', () => percent({ includeSymbol: false }));
+    bind('[data-demo-percent-decimal]', () =>
+        percent({
+            decimalPlaces: 2,
+        })
+    );
+    bind('[data-demo-percent-padded]', () =>
+        percent({
+            decimalPlaces: 2,
+            padDecimalPlaces: 2,
+        })
+    );
+    bind('[data-demo-percent-decimal-separator]', () =>
+        percent({
+            decimalPlaces: 2,
+            decimalSeparator: ',',
+        })
+    );
+    bind('[data-demo-percent-negative]', () =>
+        percent({
+            allowNegative: true,
+            decimalPlaces: 2,
+        })
+    );
+    bind('[data-demo-percent-max]', () =>
+        percent({
+            max: 100,
+        })
+    );
 }
 
 export function mountPhoneNumberDemo() {
