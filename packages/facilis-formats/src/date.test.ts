@@ -44,6 +44,72 @@ describe('date', () => {
         expect(input.type('01022026')).toEqual(textState('01-02-2026', 10));
     });
 
+    it('does not insert leading zeros by default', () => {
+        const input = setupInput(
+            date({
+                pattern: 'MM/DD/YYYY',
+            })
+        );
+
+        expect(input.type('23')).toEqual(textState('23', 2));
+    });
+
+    it('inserts a leading zero for a safe single-digit month', () => {
+        const input = setupInput(
+            date({
+                insertLeadingZero: true,
+                pattern: 'MM/DD/YYYY',
+            })
+        );
+
+        expect(input.type('2')).toEqual(textState('02', 2));
+    });
+
+    it('preserves the next digit for the following segment when padding a month', () => {
+        const input = setupInput(
+            date({
+                insertLeadingZero: true,
+                pattern: 'MM/DD/YYYY',
+            })
+        );
+
+        expect(input.type('23')).toEqual(textState('02/3', 4));
+    });
+
+    it('inserts a leading zero for a safe single-digit day', () => {
+        const input = setupInput(
+            date({
+                insertLeadingZero: true,
+                pattern: 'MM/DD/YYYY',
+            })
+        );
+
+        expect(input.type('124')).toEqual(textState('12/04', 5));
+    });
+
+    it('inserts a leading zero for a safe leading day segment', () => {
+        const input = setupInput(
+            date({
+                insertLeadingZero: true,
+                pattern: 'DD/MM/YYYY',
+            })
+        );
+
+        expect(input.type('4')).toEqual(textState('04', 2));
+    });
+
+    it('uses the configured separator when leading zeros are inserted', () => {
+        const input = setupInput(
+            date({
+                insertLeadingZero: true,
+                pattern: 'MM/DD/YYYY',
+                separator: '-',
+            })
+        );
+
+        expect(input.type('24')).toEqual(textState('02-04', 5));
+    });
+
     it('keeps the date to the configured pattern length', () => {
         const input = setupInput(
             date({

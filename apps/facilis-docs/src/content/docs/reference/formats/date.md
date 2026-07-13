@@ -19,6 +19,11 @@ With `date({ pattern: 'YYYY/MM', separator: '-' })`:
 
 - `202601` becomes `2026-01`
 
+With `date({ pattern: 'MM/DD/YYYY', insertLeadingZero: true })`:
+
+- `2` becomes `02`
+- `24` becomes `02/04`
+
 ## Signature
 
 ```ts
@@ -77,10 +82,31 @@ const dashedDateFormat = date({
 
 With raw input `01022026`, this formats as `01-02-2026`.
 
+### insertLeadingZero
+
+```ts
+type InsertLeadingZero = boolean;
+```
+
+The `insertLeadingZero` option pads safe single-digit month and day values while
+typing. The default is `false`.
+
+```ts
+const forgivingDateFormat = date({
+    pattern: 'MM/DD/YYYY',
+    insertLeadingZero: true,
+});
+```
+
+With raw input `24`, this formats as `02/04`. Months `2` through `9` and days
+`4` through `9` can be padded because those digits cannot validly begin a
+two-digit month or day.
+
 ## Behavior
 
 - Keeps only digit characters in the normalized date.
 - Formats digits according to the configured pattern.
 - Ignores extra digits beyond the configured pattern length.
 - Lets expected punctuation move naturally through configured separators.
+- Can insert leading zeros for safe single-digit month and day values.
 - Does not validate real calendar dates or month/day ranges.

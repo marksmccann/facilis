@@ -49,6 +49,9 @@ export function mountDateDemo() {
         date({ pattern: 'MM/DD/YYYY', separator: '-' })
     );
     bind('[data-demo-date-year-month]', () => date({ pattern: 'YYYY/MM' }));
+    bind('[data-demo-date-leading-zero]', () =>
+        date({ insertLeadingZero: true, pattern: 'MM/DD/YYYY' })
+    );
     bind('[data-demo-date-paste]', () => date({ pattern: 'MM/DD/YYYY' }));
 }
 

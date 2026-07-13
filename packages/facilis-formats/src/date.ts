@@ -64,6 +64,12 @@ export type DateOptions = {
      * The separator to render between date parts. The default is `/`.
      */
     separator?: DateSeparator;
+
+    /**
+     * Whether to insert a leading zero for safe single-digit month and day
+     * values while typing. The default is `false`.
+     */
+    insertLeadingZero?: boolean;
 };
 
 /**
@@ -94,9 +100,22 @@ function normalizeDateOptions(options: DateOptions): NormalizedDateOptions {
     }
 
     return {
+        insertLeadingZero: options.insertLeadingZero ?? false,
         pattern: options.pattern,
         separator,
     };
+}
+
+/**
+ * Determines whether one single-digit segment can be padded without blocking a
+ * valid continuation path.
+ *
+ * @private
+ */
+function shouldInsertLeadingZero(segment: string, value: string) {
+    if (segment === 'MM') return /^[2-9]$/.test(value);
+    if (segment === 'DD') return /^[4-9]$/.test(value);
+    return false;
 }
 
 /**
@@ -105,7 +124,8 @@ function normalizeDateOptions(options: DateOptions): NormalizedDateOptions {
  * @since 0.1.0
  */
 export function date(options: DateOptions): Format {
-    const { pattern, separator } = normalizeDateOptions(options);
+    const { insertLeadingZero, pattern, separator } =
+        normalizeDateOptions(options);
     const segments = pattern.split('/');
     const segmentLengths = segments.map((segment) => segment.length);
     const maxDigits = segmentLengths.reduce(
@@ -115,7 +135,43 @@ export function date(options: DateOptions): Format {
 
     return defineFormat({
         normalize(raw) {
-            return raw.replace(/\D/g, '').slice(0, maxDigits);
+            const digits = raw.replace(/\D/g, '');
+            let normalized = '';
+            let digitIndex = 0;
+
+            for (const [segmentIndex, segment] of segments.entries()) {
+                const hasFollowingSegment = segmentIndex < segments.length - 1;
+                let segmentValue = '';
+
+                while (
+                    digitIndex < digits.length &&
+                    segmentValue.length < segment.length
+                ) {
+                    const digit = digits[digitIndex];
+
+                    if (
+                        hasFollowingSegment &&
+                        insertLeadingZero &&
+                        segmentValue === '' &&
+                        shouldInsertLeadingZero(segment, digit)
+                    ) {
+                        segmentValue = `0${digit}`;
+                        digitIndex += 1;
+                        break;
+                    }
+
+                    segmentValue += digit;
+                    digitIndex += 1;
+                }
+
+                normalized += segmentValue;
+
+                if (segmentValue.length < segment.length) {
+                    break;
+                }
+            }
+
+            return normalized.slice(0, maxDigits);
         },
         format(normalized) {
             const parts: string[] = [];

@@ -65,6 +65,26 @@ import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
     </article>
 
     <article class="demo-card">
+        <h2>Leading zero</h2>
+        <p>
+            Safe single-digit months and days can be padded as the date is
+            typed.
+        </p>
+        <label class="demo-label" for="date-leading-zero">Padded date</label>
+        <input
+            class="demo-input"
+            id="date-leading-zero"
+            data-demo-date-leading-zero
+            type="text"
+            placeholder="Try 24"
+        />
+        <p class="demo-note">
+            Try <code>24</code>. This demo formats it as
+            <code>02/04</code>.
+        </p>
+    </article>
+
+    <article class="demo-card">
         <h2>Paste cleanup</h2>
         <p>
             Existing separators, spaces, and other characters are ignored so
