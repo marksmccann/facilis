@@ -1,0 +1,176 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/time/"
+    title="time() Demo"
+>
+    <article class="demo-card">
+        <h2>24-hour time</h2>
+        <p>
+            Times use an explicit numeric pattern while the format strips
+            anything that is not a digit.
+        </p>
+        <label class="demo-label" for="time-default">Time</label>
+        <input
+            class="demo-input"
+            id="time-default"
+            data-demo-time-default
+            type="text"
+            placeholder="Try 1430"
+        />
+        <p class="demo-note">
+            Try <code>1430</code> to see <code>HH:mm</code> grouping:
+            <code>14:30</code>.
+        </p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Seconds</h2>
+        <p>
+            Patterns can include seconds when the expected field shape needs a
+            third time part.
+        </p>
+        <label class="demo-label" for="time-seconds">Time with seconds</label>
+        <input
+            class="demo-input"
+            id="time-seconds"
+            data-demo-time-seconds
+            type="text"
+            placeholder="Try 143005"
+        />
+        <p class="demo-note">
+            Try <code>143005</code> to see <code>HH:mm:ss</code> formatting.
+        </p>
+    </article>
+
+    <article class="demo-card">
+        <h2>12-hour time</h2>
+        <p>
+            The <code>hh</code> hour token gives the format a 12-hour numeric
+            layout.
+        </p>
+        <label class="demo-label" for="time-twelve-hour">12-hour time</label>
+        <input
+            class="demo-input"
+            id="time-twelve-hour"
+            data-demo-time-twelve-hour
+            type="text"
+            placeholder="Try 0930"
+        />
+        <p class="demo-note">
+            Try <code>0930</code> to see <code>hh:mm</code> formatting.
+        </p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Custom separator</h2>
+        <p>
+            The pattern stays canonical while the rendered separator can change.
+        </p>
+        <label class="demo-label" for="time-dotted">Dotted time</label>
+        <input
+            class="demo-input"
+            id="time-dotted"
+            data-demo-time-dotted
+            type="text"
+            placeholder="Try 1430"
+        />
+        <p class="demo-note">
+            Try <code>1430</code>. This demo renders the time as
+            <code>14.30</code>.
+        </p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Leading zero</h2>
+        <p>
+            Safe single-digit hours, minutes, and seconds can be padded as the
+            time is typed.
+        </p>
+        <label class="demo-label" for="time-leading-zero">Padded time</label>
+        <input
+            class="demo-input"
+            id="time-leading-zero"
+            data-demo-time-leading-zero
+            type="text"
+            placeholder="Try 930 or 126"
+        />
+        <p class="demo-note">
+            Try <code>930</code> or <code>126</code>. This demo formats them as
+            <code>09:30</code> and <code>12:06</code>.
+        </p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Strict 24-hour parts</h2>
+        <p>
+            The <code>HH</code> pattern can reject hours outside
+            <code>00</code> through <code>23</code> and minutes outside
+            <code>00</code> through <code>59</code>.
+        </p>
+        <label class="demo-label" for="time-strict-twenty-four">
+            Strict 24-hour time
+        </label>
+        <input
+            class="demo-input"
+            id="time-strict-twenty-four"
+            data-demo-time-strict-twenty-four
+            type="text"
+            placeholder="Try 29 or 126"
+        />
+        <p class="demo-note">
+            Try appending <code>9</code> after <code>2</code> or
+            <code>6</code> after <code>12</code>.
+        </p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Strict 12-hour parts</h2>
+        <p>
+            The <code>hh</code> pattern can reject hours outside
+            <code>01</code> through <code>12</code>.
+        </p>
+        <label class="demo-label" for="time-strict-twelve">
+            Strict 12-hour time
+        </label>
+        <input
+            class="demo-input"
+            id="time-strict-twelve"
+            data-demo-time-strict-twelve
+            type="text"
+            placeholder="Try 13 or 00"
+        />
+        <p class="demo-note">
+            Try appending <code>3</code> after <code>1</code> or
+            <code>0</code> after <code>0</code>.
+        </p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Paste cleanup</h2>
+        <p>
+            Existing separators, spaces, and other characters are ignored so
+            pasted text resolves to the configured time shape.
+        </p>
+        <label class="demo-label" for="time-paste">Messy time</label>
+        <input
+            class="demo-input"
+            id="time-paste"
+            data-demo-time-paste
+            type="text"
+            placeholder="Try 14 : 30 : 05 ext. 9"
+        />
+        <p class="demo-note">
+            Try <code>14 : 30 : 05 ext. 9</code>. The format keeps the first 6
+            digits and displays them as a time.
+        </p>
+    </article>
+
+    <script>
+        import { mountTimeDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountTimeDemo();
+    </script>
+</FormatDemoLayout>

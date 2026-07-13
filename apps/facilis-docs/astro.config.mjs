@@ -70,6 +70,7 @@ export default defineConfig({
                             slug: 'reference/formats/social-security-number',
                         },
                         { label: 'text', slug: 'reference/formats/text' },
+                        { label: 'time', slug: 'reference/formats/time' },
                         {
                             label: 'zipCode',
                             slug: 'reference/formats/zip-code',

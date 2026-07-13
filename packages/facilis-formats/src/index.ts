@@ -9,4 +9,5 @@ export * from './percent';
 export * from './phoneNumber';
 export * from './socialSecurityNumber';
 export * from './text';
+export * from './time';
 export * from './zipCode';

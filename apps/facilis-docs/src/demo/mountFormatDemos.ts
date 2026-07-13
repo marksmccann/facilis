@@ -11,6 +11,7 @@ import {
     phoneNumber,
     socialSecurityNumber,
     text,
+    time,
     zipCode,
 } from '../../../../packages/facilis-formats/src/index.ts';
 
@@ -202,6 +203,25 @@ export function mountTextDemo() {
             matches: /[a-f0-9]/i,
         })
     );
+}
+
+export function mountTimeDemo() {
+    bind('[data-demo-time-default]', () => time({ pattern: 'HH:mm' }));
+    bind('[data-demo-time-seconds]', () => time({ pattern: 'HH:mm:ss' }));
+    bind('[data-demo-time-twelve-hour]', () => time({ pattern: 'hh:mm' }));
+    bind('[data-demo-time-dotted]', () =>
+        time({ pattern: 'HH:mm', separator: '.' })
+    );
+    bind('[data-demo-time-leading-zero]', () =>
+        time({ insertLeadingZero: true, pattern: 'HH:mm' })
+    );
+    bind('[data-demo-time-strict-twenty-four]', () =>
+        time({ pattern: 'HH:mm', strictTimeParts: true })
+    );
+    bind('[data-demo-time-strict-twelve]', () =>
+        time({ pattern: 'hh:mm', strictTimeParts: true })
+    );
+    bind('[data-demo-time-paste]', () => time({ pattern: 'HH:mm:ss' }));
 }
 
 export function mountZipCodeDemo() {
