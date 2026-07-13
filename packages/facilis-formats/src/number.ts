@@ -7,7 +7,9 @@ import {
     isDeleteBackwardBeforeFormatting,
     isDeleteBackwardOverFormatting,
     limitDecimalPlaces,
+    normalizeNegativeSign,
     padDecimalPlaces,
+    removeExtraDecimalSeparators,
     resolveSelectionAtDeletedBoundary,
     resolveSelectionBeforeFormatting,
     trimLeadingZeros,
@@ -127,9 +129,15 @@ export function number(options?: NumberOptions): Format {
             let value = raw;
 
             value = filterNumberCharacters(value, {
-                allowNegative,
-                decimalPlaces,
                 decimalSeparator,
+            });
+
+            value = removeExtraDecimalSeparators(value, {
+                decimalSeparator,
+            });
+
+            value = normalizeNegativeSign(value, {
+                allowNegative,
             });
 
             value = limitDecimalPlaces(value, {

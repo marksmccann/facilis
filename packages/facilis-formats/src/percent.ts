@@ -5,7 +5,9 @@ import {
     insertLeadingZero,
     isDeleteBackwardBeforeFormatting,
     limitDecimalPlaces,
+    normalizeNegativeSign,
     padDecimalPlaces,
+    removeExtraDecimalSeparators,
     resolveSelectionAtDeletedBoundary,
     trimLeadingZeros,
     type Format,
@@ -129,9 +131,15 @@ export function percent(options?: PercentOptions): Format {
             let value = raw;
 
             value = filterNumberCharacters(value, {
-                allowNegative,
-                decimalPlaces,
                 decimalSeparator,
+            });
+
+            value = removeExtraDecimalSeparators(value, {
+                decimalSeparator,
+            });
+
+            value = normalizeNegativeSign(value, {
+                allowNegative,
             });
 
             value = limitDecimalPlaces(value, {

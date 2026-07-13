@@ -6,7 +6,9 @@ import {
     isDeleteBackwardBeforeFormatting,
     isDeleteBackwardOverFormatting,
     limitDecimalPlaces,
+    normalizeNegativeSign,
     padDecimalPlaces,
+    removeExtraDecimalSeparators,
     resolveSelectionAtDeletedBoundary,
     resolveSelectionBeforeFormatting,
     trimLeadingZeros,
@@ -73,9 +75,14 @@ export function currency(options?: CurrencyOptions): Format {
             let value = raw;
 
             value = filterNumberCharacters(value, {
-                decimalPlaces: includeCents ? 2 : 0,
                 decimalSeparator,
             });
+
+            value = removeExtraDecimalSeparators(value, {
+                decimalSeparator,
+            });
+
+            value = normalizeNegativeSign(value);
 
             value = limitDecimalPlaces(value, {
                 decimalPlaces: includeCents ? 2 : 0,
