@@ -6,7 +6,7 @@ import type { TextState } from 'facilis';
  * @param value The text value for the state.
  * @param selectionStart The start of the text selection.
  * @param selectionEnd The end of the text selection.
- * @since 0.0.1
+ * @since 0.1.0
  */
 export function textState(
     value: string,

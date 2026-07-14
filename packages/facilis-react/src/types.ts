@@ -4,7 +4,7 @@ import type { FocusEventHandler, InputEventHandler, RefObject } from 'react';
 /**
  * Creates one Facilis format instance for the React adapter.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type FormatFactory<FormatOptions extends object = object> = (
     options: FormatOptions
@@ -13,7 +13,7 @@ export type FormatFactory<FormatOptions extends object = object> = (
 /**
  * Describes the React-specific options reserved by `useFormat`.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type UseFormatHookOptions = {
     /**
@@ -41,7 +41,7 @@ export type UseFormatHookOptions = {
  * Combines format factory options with the React-specific options reserved by
  * `useFormat`.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type UseFormatOptions<FormatOptions extends object = object> =
     FormatOptions & UseFormatHookOptions;
@@ -49,7 +49,7 @@ export type UseFormatOptions<FormatOptions extends object = object> =
 /**
  * Describes the props returned by `useFormat` for a React-managed input.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type UseFormatInputProps = {
     /**
@@ -76,7 +76,7 @@ export type UseFormatInputProps = {
 /**
  * Describes the object returned by `useFormat`.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type UseFormatResult = {
     /**

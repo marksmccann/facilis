@@ -21,7 +21,7 @@ import {
 /**
  * The configuration options for a currency format.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type CurrencyOptions = {
     /**
@@ -66,7 +66,7 @@ function normalizeCurrencyOptions(options: CurrencyOptions = {}) {
 /**
  * Creates a formatter for currency values.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export function currency(options?: CurrencyOptions): Format {
     const normalizedOptions = normalizeCurrencyOptions(options);

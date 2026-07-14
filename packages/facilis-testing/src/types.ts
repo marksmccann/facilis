@@ -3,7 +3,7 @@ import type { TextState } from 'facilis';
 /**
  * Describes a stateless test input for one Facilis format.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type TestInput = {
     /**
@@ -12,7 +12,7 @@ export type TestInput = {
      * @param value The text value to mount with the format.
      * @param selectionStart The start of the mounted selection. Defaults to the end of the value.
      * @param selectionEnd The end of the mounted selection. Defaults to `selectionStart`.
-     * @since 0.0.1
+     * @since 0.1.0
      */
     mount(
         value: string,
@@ -26,7 +26,7 @@ export type TestInput = {
      * @param value The text value to blur with the format.
      * @param selectionStart The start of the blurred selection. Defaults to the end of the value.
      * @param selectionEnd The end of the blurred selection. Defaults to `selectionStart`.
-     * @since 0.0.1
+     * @since 0.1.0
      */
     blur(
         value: string,
@@ -39,7 +39,7 @@ export type TestInput = {
      *
      * @param previous The text value before the append.
      * @param text The text to append.
-     * @since 0.0.1
+     * @since 0.1.0
      */
     append(previous: string, text: string): TextState;
 
@@ -50,7 +50,7 @@ export type TestInput = {
      * @param text The text to insert.
      * @param selectionStart The start of the replacement range.
      * @param selectionEnd The end of the replacement range. Defaults to `selectionStart`.
-     * @since 0.0.1
+     * @since 0.1.0
      */
     insert(
         previous: string,
@@ -64,7 +64,7 @@ export type TestInput = {
      *
      * @param previous The text value before the backward delete.
      * @param cursor The cursor position to delete backward from. Defaults to the end of the value.
-     * @since 0.0.1
+     * @since 0.1.0
      */
     deleteBackward(previous: string, cursor?: number): TextState;
 
@@ -73,7 +73,7 @@ export type TestInput = {
      * text state.
      *
      * @param text The text sequence to type.
-     * @since 0.0.1
+     * @since 0.1.0
      */
     type(text: string): TextState;
 };

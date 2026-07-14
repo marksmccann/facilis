@@ -34,7 +34,7 @@ function readTextState(input: HTMLInputElement): TextState {
  * Binds a format instance to an input element or selector and applies
  * formatting on `input` and `blur`.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export function bindFormat(
     target: Element | string,

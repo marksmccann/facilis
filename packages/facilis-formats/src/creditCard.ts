@@ -64,7 +64,7 @@ function isSeparatorBoundary(value: string) {
 /**
  * Creates a credit-card number format.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export function creditCard(): Format {
     return defineFormat({

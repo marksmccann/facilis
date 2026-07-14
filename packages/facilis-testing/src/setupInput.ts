@@ -24,7 +24,7 @@ function replaceText(
  * Creates a stateless test input for one Facilis format.
  *
  * @param format The Facilis format to drive through input-like interactions.
- * @since 0.0.1
+ * @since 0.1.0
  */
 export function setupInput(format: Format): TestInput {
     const input: TestInput = {

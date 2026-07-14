@@ -16,7 +16,7 @@ const PERCENT_SYMBOL = '%';
 /**
  * The configuration options for a percent format.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type PercentOptions = {
     /**
@@ -109,7 +109,7 @@ function isIncompletePercentValue(
 /**
  * Creates a formatter for percent values.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export function percent(options?: PercentOptions): Format {
     const normalizedOptions = normalizePercentOptions(options);

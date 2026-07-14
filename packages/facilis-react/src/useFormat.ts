@@ -55,7 +55,7 @@ function readInputDetails(event: Event): InputDetails {
  * it, and keeps the input value synchronized through Facilis' `onMount`,
  * `onInput`, and `onBlur` runtime hooks.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export function useFormat<FormatOptions extends object = object>(
     createFormat: FormatFactory<FormatOptions>,

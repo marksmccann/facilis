@@ -11,7 +11,7 @@ import { reporter } from './reporter';
 /**
  * Defines the matching rule for a single token symbol in a pattern format.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type PatternTokenDefinition = {
     /**
@@ -24,14 +24,14 @@ export type PatternTokenDefinition = {
  * Maps each token symbol used in a pattern string to the rule that determines
  * which raw characters can fill that token slot.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type PatternTokenDefinitions = Record<string, PatternTokenDefinition>;
 
 /**
  * The explicit configuration object for one parsed pattern definition.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type ParsePatternOptions = {
     /**
@@ -70,7 +70,7 @@ type PatternLiteralPart = {
  * Describes one ordered part of a parsed pattern, either a token character or
  * a literal character from the original pattern string.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type PatternPart = PatternTokenPart | PatternLiteralPart;
 
@@ -89,7 +89,7 @@ const DEFAULT_PATTERN_TOKENS = {
 /**
  * The explicit configuration object for a pattern format.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type PatternOptions = {
     /**
@@ -106,7 +106,7 @@ export type PatternOptions = {
  * The accepted input shape for creating a pattern format, either the shorthand
  * pattern string form or the explicit object form.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export type PatternInput = string | PatternOptions;
 
@@ -269,7 +269,7 @@ function getPreviousPatternLiteralRunStart(
 /**
  * Creates a pattern format instance from a tokenized pattern string.
  *
- * @since 0.0.1
+ * @since 0.1.0
  */
 export function pattern(input: string): Format;
 export function pattern(input: PatternOptions): Format;
