@@ -5,6 +5,8 @@ import {
     isAppendFormatting,
     isDeleteBackwardOverFormatting,
     isInsertAtMaxLength,
+    insertBeforeCharacter,
+    insertSeparators,
     type Format,
 } from 'facilis';
 import { reporter } from './reporter';
@@ -114,18 +116,6 @@ function normalizeDateOptions(options: DateOptions): NormalizedDateOptions {
 }
 
 /**
- * Determines whether one single-digit segment can be padded without blocking a
- * valid continuation path.
- *
- * @private
- */
-function shouldInsertLeadingZero(segment: string, value: string) {
-    if (segment === 'MM') return /^[2-9]$/.test(value);
-    if (segment === 'DD') return /^[4-9]$/.test(value);
-    return false;
-}
-
-/**
  * Determines whether one month or day segment can still resolve to a possible
  * standalone segment value.
  *
@@ -146,6 +136,46 @@ function isPossibleMonthOrDay(segment: string, value: string) {
 }
 
 /**
+ * Resolves the normalized positions represented by the canonical separator.
+ *
+ * @private
+ */
+function resolveSeparatorPositions(pattern: DatePattern) {
+    const positions: number[] = [];
+
+    pattern.split('').forEach((character, index) => {
+        if (character !== '/') return;
+        positions.push(index);
+    });
+
+    return positions;
+}
+
+/**
+ * Resolves the leading-zero insertion rules for month and day segments.
+ *
+ * @private
+ */
+function resolveLeadingZeroRules(segments: string[]) {
+    const rules: { position: number; matches: RegExp; insert: string }[] = [];
+    let position = 0;
+
+    segments.slice(0, -1).forEach((segment) => {
+        if (segment === 'MM') {
+            rules.push({ position, matches: /^[2-9]$/, insert: '0' });
+        }
+
+        if (segment === 'DD') {
+            rules.push({ position, matches: /^[4-9]$/, insert: '0' });
+        }
+
+        position += segment.length;
+    });
+
+    return rules;
+}
+
+/**
  * Creates a date format for numeric date input.
  *
  * @since 0.1.0
@@ -155,6 +185,8 @@ export function date(options: DateOptions): Format {
         normalizeDateOptions(options);
     const segments = pattern.split('/');
     const segmentLengths = segments.map((segment) => segment.length);
+    const separatorPositions = resolveSeparatorPositions(pattern);
+    const leadingZeroRules = resolveLeadingZeroRules(segments);
     const maxDigits = segmentLengths.reduce(
         (total, length) => total + length,
         0
@@ -162,12 +194,15 @@ export function date(options: DateOptions): Format {
 
     return defineFormat({
         normalize(raw) {
-            const digits = raw.replace(/\D/g, '');
+            let digits = raw.replace(/\D/g, '');
             let normalized = '';
             let digitIndex = 0;
 
-            for (const [segmentIndex, segment] of segments.entries()) {
-                const hasFollowingSegment = segmentIndex < segments.length - 1;
+            if (insertLeadingZero) {
+                digits = insertBeforeCharacter(digits, leadingZeroRules);
+            }
+
+            for (const segment of segments) {
                 let segmentValue = '';
 
                 while (
@@ -175,17 +210,6 @@ export function date(options: DateOptions): Format {
                     segmentValue.length < segment.length
                 ) {
                     const digit = digits[digitIndex];
-
-                    if (
-                        hasFollowingSegment &&
-                        insertLeadingZero &&
-                        segmentValue === '' &&
-                        shouldInsertLeadingZero(segment, digit)
-                    ) {
-                        segmentValue = `0${digit}`;
-                        digitIndex += 1;
-                        break;
-                    }
 
                     const nextSegmentValue = `${segmentValue}${digit}`;
 
@@ -210,20 +234,10 @@ export function date(options: DateOptions): Format {
             return normalized.slice(0, maxDigits);
         },
         format(normalized) {
-            const parts: string[] = [];
-            let index = 0;
-
-            for (const length of segmentLengths) {
-                const part = normalized.slice(index, index + length);
-
-                if (part) {
-                    parts.push(part);
-                }
-
-                index += length;
-            }
-
-            return parts.join(separator);
+            return insertSeparators(normalized, {
+                positions: separatorPositions,
+                separator,
+            });
         },
         edit: {
             append(context) {

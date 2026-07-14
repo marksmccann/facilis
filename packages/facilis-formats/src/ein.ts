@@ -5,6 +5,7 @@ import {
     isAppendFormatting,
     isDeleteBackwardOverFormatting,
     isInsertAtMaxLength,
+    insertSeparators,
     type Format,
 } from 'facilis';
 
@@ -26,14 +27,10 @@ export function ein(): Format {
             return raw.replace(/\D/g, '').slice(0, DIGIT_LIMIT);
         },
         format(normalized) {
-            const prefix = normalized.slice(0, 2);
-            const identifier = normalized.slice(2);
-            let formatted = '';
-
-            if (prefix) formatted += prefix;
-            if (identifier) formatted += `-${identifier}`;
-
-            return formatted;
+            return insertSeparators(normalized, {
+                positions: [2],
+                separator: '-',
+            });
         },
         edit: {
             append(context) {

@@ -5,6 +5,7 @@ import {
     isAppendFormatting,
     isDeleteBackwardOverFormatting,
     isInsertAtMaxLength,
+    insertSeparators,
     type Format,
 } from 'facilis';
 
@@ -26,14 +27,10 @@ export function expirationDate(): Format {
             return raw.replace(/\D/g, '').slice(0, DIGIT_LIMIT);
         },
         format(normalized) {
-            const month = normalized.slice(0, 2);
-            const year = normalized.slice(2);
-            let formatted = '';
-
-            if (month) formatted += month;
-            if (year) formatted += `/${year}`;
-
-            return formatted;
+            return insertSeparators(normalized, {
+                positions: [2],
+                separator: '/',
+            });
         },
         edit: {
             append(context) {

@@ -5,6 +5,8 @@ import {
     isAppendFormatting,
     isDeleteBackwardOverFormatting,
     isInsertAtMaxLength,
+    insertBeforeCharacter,
+    insertSeparators,
     type Format,
 } from 'facilis';
 import { reporter } from './reporter';
@@ -103,19 +105,6 @@ function normalizeTimeOptions(options: TimeOptions): NormalizedTimeOptions {
 }
 
 /**
- * Determines whether one single-digit segment can be padded without blocking a
- * valid continuation path.
- *
- * @private
- */
-function shouldInsertLeadingZero(segment: string, value: string) {
-    if (segment === 'HH') return /^[3-9]$/.test(value);
-    if (segment === 'hh') return /^[2-9]$/.test(value);
-    if (segment === 'mm' || segment === 'ss') return /^[6-9]$/.test(value);
-    return false;
-}
-
-/**
  * Determines whether one time segment can still resolve to a possible
  * standalone segment value.
  *
@@ -141,6 +130,50 @@ function isPossibleTimePart(segment: string, value: string) {
 }
 
 /**
+ * Resolves the normalized positions represented by the canonical separator.
+ *
+ * @private
+ */
+function resolveSeparatorPositions(pattern: TimePattern) {
+    const positions: number[] = [];
+
+    pattern.split('').forEach((character, index) => {
+        if (character !== ':') return;
+        positions.push(index);
+    });
+
+    return positions;
+}
+
+/**
+ * Resolves the leading-zero insertion rules for time segments.
+ *
+ * @private
+ */
+function resolveLeadingZeroRules(segments: string[]) {
+    const rules: { position: number; matches: RegExp; insert: string }[] = [];
+    let position = 0;
+
+    segments.forEach((segment) => {
+        if (segment === 'HH') {
+            rules.push({ position, matches: /^[3-9]$/, insert: '0' });
+        }
+
+        if (segment === 'hh') {
+            rules.push({ position, matches: /^[2-9]$/, insert: '0' });
+        }
+
+        if (segment === 'mm' || segment === 'ss') {
+            rules.push({ position, matches: /^[6-9]$/, insert: '0' });
+        }
+
+        position += segment.length;
+    });
+
+    return rules;
+}
+
+/**
  * Creates a time format for numeric time input.
  *
  * @since 0.1.0
@@ -150,6 +183,8 @@ export function time(options: TimeOptions): Format {
         normalizeTimeOptions(options);
     const segments = pattern.split(':');
     const segmentLengths = segments.map((segment) => segment.length);
+    const separatorPositions = resolveSeparatorPositions(pattern);
+    const leadingZeroRules = resolveLeadingZeroRules(segments);
     const maxDigits = segmentLengths.reduce(
         (total, length) => total + length,
         0
@@ -157,9 +192,13 @@ export function time(options: TimeOptions): Format {
 
     return defineFormat({
         normalize(raw) {
-            const digits = raw.replace(/\D/g, '');
+            let digits = raw.replace(/\D/g, '');
             let normalized = '';
             let digitIndex = 0;
+
+            if (insertLeadingZero) {
+                digits = insertBeforeCharacter(digits, leadingZeroRules);
+            }
 
             for (const segment of segments) {
                 let segmentValue = '';
@@ -169,16 +208,6 @@ export function time(options: TimeOptions): Format {
                     segmentValue.length < segment.length
                 ) {
                     const digit = digits[digitIndex];
-
-                    if (
-                        insertLeadingZero &&
-                        segmentValue === '' &&
-                        shouldInsertLeadingZero(segment, digit)
-                    ) {
-                        segmentValue = `0${digit}`;
-                        digitIndex += 1;
-                        break;
-                    }
 
                     const nextSegmentValue = `${segmentValue}${digit}`;
 
@@ -203,20 +232,10 @@ export function time(options: TimeOptions): Format {
             return normalized.slice(0, maxDigits);
         },
         format(normalized) {
-            const parts: string[] = [];
-            let index = 0;
-
-            for (const length of segmentLengths) {
-                const part = normalized.slice(index, index + length);
-
-                if (part) {
-                    parts.push(part);
-                }
-
-                index += length;
-            }
-
-            return parts.join(separator);
+            return insertSeparators(normalized, {
+                positions: separatorPositions,
+                separator,
+            });
         },
         edit: {
             append(context) {

@@ -5,6 +5,7 @@ import {
     isAppendFormatting,
     isDeleteBackwardOverFormatting,
     isInsertAtMaxLength,
+    insertSeparators,
     type Format,
 } from 'facilis';
 
@@ -52,14 +53,10 @@ export function zipCode(options: ZipCodeOptions = {}): Format {
                 return normalized;
             }
 
-            const zip = normalized.slice(0, DIGIT_LIMIT);
-            const plusFour = normalized.slice(DIGIT_LIMIT);
-            let formatted = '';
-
-            if (zip) formatted += zip;
-            if (plusFour) formatted += `-${plusFour}`;
-
-            return formatted;
+            return insertSeparators(normalized, {
+                positions: [DIGIT_LIMIT],
+                separator: '-',
+            });
         },
         edit: {
             append(context) {

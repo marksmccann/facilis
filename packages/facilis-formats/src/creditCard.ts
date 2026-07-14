@@ -5,6 +5,7 @@ import {
     isAppendExpectedFormattingAt,
     isDeleteBackwardOverFormatting,
     isInsertAtMaxLength,
+    insertSeparators,
     type Format,
 } from 'facilis';
 
@@ -73,22 +74,10 @@ export function creditCard(): Format {
             return value.slice(0, resolveDigitLimit(value));
         },
         format(normalized) {
-            let parts = [
-                normalized.slice(0, 4),
-                normalized.slice(4, 8),
-                normalized.slice(8, 12),
-                normalized.slice(12),
-            ];
-
-            if (isAmex(normalized)) {
-                parts = [
-                    normalized.slice(0, 4),
-                    normalized.slice(4, 10),
-                    normalized.slice(10),
-                ];
-            }
-
-            return parts.filter(Boolean).join(' ');
+            return insertSeparators(normalized, {
+                positions: isAmex(normalized) ? [4, 11] : [4, 9, 14],
+                separator: ' ',
+            });
         },
         edit: {
             append(context) {
@@ -97,24 +86,19 @@ export function creditCard(): Format {
                 const maxDigits = resolveDigitLimit(value);
                 const position = previous.length;
 
-                if (isAppendDuplicateFormatting(context)) {
+                if (
+                    isAppendDuplicateFormatting(context) ||
+                    previous.endsWith(' ')
+                ) {
                     return null;
                 }
 
-                if (isAppendAtMaxLength(context, maxDigits)) {
+                if (
+                    isAppendAtMaxLength(context, maxDigits) ||
+                    normalized.appended !== '' ||
+                    !isSeparatorBoundary(value)
+                ) {
                     return;
-                }
-
-                if (normalized.appended !== '') {
-                    return;
-                }
-
-                if (!isSeparatorBoundary(value)) {
-                    return;
-                }
-
-                if (previous.endsWith(' ')) {
-                    return null;
                 }
 
                 if (isAppendExpectedFormattingAt(context, ' ', position)) {

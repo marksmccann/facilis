@@ -5,6 +5,7 @@ import {
     isAppendFormatting,
     isDeleteBackwardOverFormatting,
     isInsertAtMaxLength,
+    insertSeparators,
     type Format,
 } from 'facilis';
 
@@ -27,16 +28,20 @@ export function phoneNumber(): Format {
             return raw.replace(/\D/g, '').slice(0, DIGIT_LIMIT);
         },
         format(normalized) {
-            const areaCode = normalized.slice(0, 3);
-            const prefix = normalized.slice(3, 6);
-            const lineNumber = normalized.slice(6);
-            let formatted = '';
+            let formatted = insertSeparators(normalized, {
+                positions: [0],
+                separator: '(',
+            });
 
-            if (areaCode) formatted += `(${areaCode}`;
-            if (prefix) formatted += `) ${prefix}`;
-            if (lineNumber) formatted += `-${lineNumber}`;
+            formatted = insertSeparators(formatted, {
+                positions: [4],
+                separator: ') ',
+            });
 
-            return formatted;
+            return insertSeparators(formatted, {
+                positions: [9],
+                separator: '-',
+            });
         },
         edit: {
             append(context) {

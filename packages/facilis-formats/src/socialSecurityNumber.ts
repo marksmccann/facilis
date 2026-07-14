@@ -5,6 +5,7 @@ import {
     isAppendFormatting,
     isDeleteBackwardOverFormatting,
     isInsertAtMaxLength,
+    insertSeparators,
     type Format,
 } from 'facilis';
 
@@ -26,16 +27,10 @@ export function socialSecurityNumber(): Format {
             return raw.replace(/\D/g, '').slice(0, DIGIT_LIMIT);
         },
         format(normalized) {
-            const area = normalized.slice(0, 3);
-            const group = normalized.slice(3, 5);
-            const serial = normalized.slice(5);
-            let formatted = '';
-
-            if (area) formatted += area;
-            if (group) formatted += `-${group}`;
-            if (serial) formatted += `-${serial}`;
-
-            return formatted;
+            return insertSeparators(normalized, {
+                positions: [3, 6],
+                separator: '-',
+            });
         },
         edit: {
             append(context) {
