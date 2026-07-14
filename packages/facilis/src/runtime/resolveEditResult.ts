@@ -1,4 +1,4 @@
-import type { FormatEditResult, TextState } from './types';
+import type { FormatEditResult, TextState } from '../types';
 
 /**
  * Resolves an edit hook result into the next text state.

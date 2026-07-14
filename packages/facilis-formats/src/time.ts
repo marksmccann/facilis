@@ -1,15 +1,16 @@
+import { defineFormat, type Format } from 'facilis';
 import {
-    defineFormat,
     isAppendDuplicateFormattingAt,
     isAppendExpectedFormattingAt,
     isAppendFormatting,
     isDeleteBackwardOverFormatting,
     isInsertAtMaxLength,
+} from 'facilis/guards';
+import {
     insertBeforeCharacter,
     insertSeparators,
     rejectInvalidSegments,
-    type Format,
-} from 'facilis';
+} from 'facilis/transforms';
 import { reporter } from './reporter';
 
 /**

@@ -1,4 +1,4 @@
-import type { FormatDefinition } from './types';
+import type { FormatDefinition } from '../types';
 
 /**
  * Builds the formatted text for a normalized value.

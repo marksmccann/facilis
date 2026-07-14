@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import isDeleteBackwardBeforeFormatting from './isDeleteBackwardBeforeFormatting';
-import type { DeleteBackwardEditContext } from './types';
+import type { DeleteBackwardEditContext } from '../types';
 
 function context(
     overrides: Partial<DeleteBackwardEditContext> = {}

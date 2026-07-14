@@ -1,4 +1,4 @@
-import type { InsertEditContext } from './types';
+import type { InsertEditContext } from '../types';
 
 /**
  * Determines whether a middle insertion adds semantic text after the normalized

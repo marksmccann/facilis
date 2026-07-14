@@ -1,4 +1,4 @@
-import type { FormatEditResult, RunEditContext } from './types';
+import type { FormatEditResult, RunEditContext } from '../types';
 
 /**
  * Runs the backward-delete edit hook with a context built from the current edit.

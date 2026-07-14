@@ -1,17 +1,15 @@
+import { clampNumber, defineFormat, type Format } from 'facilis';
+import { isDeleteBackwardBeforeFormatting } from 'facilis/guards';
+import { resolveSelectionAtDeletedBoundary } from 'facilis/selection';
 import {
-    clampNumber,
-    defineFormat,
     filterNumberCharacters,
     insertLeadingZero,
-    isDeleteBackwardBeforeFormatting,
     limitDecimalPlaces,
     normalizeNegativeSign,
     padDecimalPlaces,
     removeExtraDecimalSeparators,
-    resolveSelectionAtDeletedBoundary,
     trimLeadingZeros,
-    type Format,
-} from 'facilis';
+} from 'facilis/transforms';
 
 const PERCENT_SYMBOL = '%';
 

@@ -1,4 +1,4 @@
-import type { FormatDefinition, Selection } from './types';
+import type { FormatDefinition, Selection } from '../types';
 
 /**
  * Options for resolving where a deletion boundary lands in formatted text.

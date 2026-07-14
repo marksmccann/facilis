@@ -1,19 +1,22 @@
+import { defineFormat, type Format } from 'facilis';
 import {
-    defineFormat,
+    isDeleteBackwardBeforeFormatting,
+    isDeleteBackwardOverFormatting,
+} from 'facilis/guards';
+import {
+    resolveSelectionAtDeletedBoundary,
+    resolveSelectionBeforeFormatting,
+} from 'facilis/selection';
+import {
     filterNumberCharacters,
     insertLeadingZero,
     insertThousandsSeparators,
-    isDeleteBackwardBeforeFormatting,
-    isDeleteBackwardOverFormatting,
     limitDecimalPlaces,
     normalizeNegativeSign,
     padDecimalPlaces,
     removeExtraDecimalSeparators,
-    resolveSelectionAtDeletedBoundary,
-    resolveSelectionBeforeFormatting,
     trimLeadingZeros,
-    type Format,
-} from 'facilis';
+} from 'facilis/transforms';
 
 /**
  * The configuration options for a currency format.

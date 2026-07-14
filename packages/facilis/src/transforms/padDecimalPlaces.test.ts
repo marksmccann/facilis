@@ -3,9 +3,7 @@ import padDecimalPlaces from './padDecimalPlaces';
 
 describe('padDecimalPlaces', () => {
     it('pads an existing fractional portion', () => {
-        expect(padDecimalPlaces('1.5', { decimalPlaces: 2 })).toBe(
-            '1.50'
-        );
+        expect(padDecimalPlaces('1.5', { decimalPlaces: 2 })).toBe('1.50');
     });
 
     it('creates a fractional portion when one does not exist', () => {
@@ -13,9 +11,7 @@ describe('padDecimalPlaces', () => {
     });
 
     it('leaves longer fractional portions unchanged', () => {
-        expect(padDecimalPlaces('1.234', { decimalPlaces: 2 })).toBe(
-            '1.234'
-        );
+        expect(padDecimalPlaces('1.234', { decimalPlaces: 2 })).toBe('1.234');
     });
 
     it('supports a custom decimal separator', () => {

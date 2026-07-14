@@ -1,4 +1,4 @@
-import type { Selection } from './types';
+import type { Selection } from '../types';
 
 /**
  * Options for resolving a collapsed selection before known formatting text.

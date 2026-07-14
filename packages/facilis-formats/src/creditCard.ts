@@ -1,13 +1,12 @@
+import { defineFormat, type Format } from 'facilis';
 import {
-    defineFormat,
     isAppendAtMaxLength,
     isAppendDuplicateFormatting,
     isAppendExpectedFormattingAt,
     isDeleteBackwardOverFormatting,
     isInsertAtMaxLength,
-    insertSeparators,
-    type Format,
-} from 'facilis';
+} from 'facilis/guards';
+import { insertSeparators } from 'facilis/transforms';
 
 /**
  * The prefixes that identify the American Express card-number layout.

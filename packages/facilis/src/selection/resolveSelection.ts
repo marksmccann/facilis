@@ -1,5 +1,5 @@
-import type { FormatDefinition, Selection, TextState } from './types';
-import runFormat from './runFormat';
+import type { FormatDefinition, Selection, TextState } from '../types';
+import runFormat from '../runtime/runFormat';
 
 /**
  * Resolves one cursor boundary through a boundary lookup table.

@@ -1,5 +1,5 @@
 import isAppendFormatting from './isAppendFormatting';
-import type { AppendEditContext } from './types';
+import type { AppendEditContext } from '../types';
 
 /**
  * Determines whether an append added expected formatting text at one display

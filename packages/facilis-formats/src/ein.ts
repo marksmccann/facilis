@@ -1,13 +1,12 @@
+import { defineFormat, type Format } from 'facilis';
 import {
-    defineFormat,
     isAppendDuplicateFormattingAt,
     isAppendExpectedFormattingAt,
     isAppendFormatting,
     isDeleteBackwardOverFormatting,
     isInsertAtMaxLength,
-    insertSeparators,
-    type Format,
-} from 'facilis';
+} from 'facilis/guards';
+import { insertSeparators } from 'facilis/transforms';
 
 /**
  * The number of digits supported by the default EIN layout.

@@ -1,41 +1,56 @@
 {
-  "name": "facilis",
-  "version": "0.0.1",
-  "description": "A framework-agnostic input formatting library.",
-  "type": "module",
-  "main": "./index.js",
-  "types": "./src/index.ts",
-  "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "default": "./index.js"
+    "name": "facilis",
+    "version": "0.0.1",
+    "description": "A framework-agnostic input formatting library.",
+    "type": "module",
+    "main": "./index.js",
+    "types": "./src/index.ts",
+    "exports": {
+        ".": {
+            "types": "./src/index.ts",
+            "default": "./index.js"
+        },
+        "./guards": {
+            "types": "./src/guards/index.ts",
+            "default": "./guards.js"
+        },
+        "./selection": {
+            "types": "./src/selection/index.ts",
+            "default": "./selection.js"
+        },
+        "./transforms": {
+            "types": "./src/transforms/index.ts",
+            "default": "./transforms.js"
+        }
+    },
+    "files": [
+        "guards.js",
+        "index.js",
+        "selection.js",
+        "src",
+        "transforms.js",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "node -e \"console.log('facilis: no build step defined yet')\"",
+        "test": "vitest run",
+        "test:watch": "vitest"
+    },
+    "keywords": [
+        "facilis",
+        "format",
+        "input",
+        "mask",
+        "formatter"
+    ],
+    "license": "MIT",
+    "dependencies": {
+        "runtime-reporter": "^0.10.1"
+    },
+    "devDependencies": {
+        "@types/node": "^26.0.1",
+        "facilis-testing": "0.0.1",
+        "vitest": "^4.1.9"
     }
-  },
-  "files": [
-    "index.js",
-    "src",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "build": "node -e \"console.log('facilis: no build step defined yet')\"",
-    "test": "vitest run",
-    "test:watch": "vitest"
-  },
-  "keywords": [
-    "facilis",
-    "format",
-    "input",
-    "mask",
-    "formatter"
-  ],
-  "license": "MIT",
-  "dependencies": {
-    "runtime-reporter": "^0.10.1"
-  },
-  "devDependencies": {
-    "@types/node": "^26.0.1",
-    "facilis-testing": "0.0.1",
-    "vitest": "^4.1.9"
-  }
 }

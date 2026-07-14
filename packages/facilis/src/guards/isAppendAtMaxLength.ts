@@ -1,4 +1,4 @@
-import type { AppendEditContext } from './types';
+import type { AppendEditContext } from '../types';
 
 /**
  * Determines whether an append happened after the normalized value reached a

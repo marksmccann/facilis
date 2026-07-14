@@ -1,4 +1,4 @@
-import type { AppendEditContext } from './types';
+import type { AppendEditContext } from '../types';
 
 /**
  * Determines whether an append added formatting text without changing the

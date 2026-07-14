@@ -9,12 +9,14 @@ describe('rejectInvalidSegments', () => {
                 ['MM', 'DD', 'YYYY'],
                 (segment, candidate) => {
                     if (segment === 'MM') {
-                        if (candidate.length === 1) return /^[0-1]$/.test(candidate);
+                        if (candidate.length === 1)
+                            return /^[0-1]$/.test(candidate);
                         return /^(0[1-9]|1[0-2])$/.test(candidate);
                     }
 
                     if (segment === 'DD') {
-                        if (candidate.length === 1) return /^[0-3]$/.test(candidate);
+                        if (candidate.length === 1)
+                            return /^[0-3]$/.test(candidate);
                         return /^(0[1-9]|[1-2]\d|3[0-1])$/.test(candidate);
                     }
 
@@ -27,10 +29,14 @@ describe('rejectInvalidSegments', () => {
     it('passes the previous accepted segment value to the callback', () => {
         const previousValues: string[] = [];
 
-        rejectInvalidSegments('29', ['HH'], (_segment, _candidate, previous) => {
-            previousValues.push(previous);
-            return true;
-        });
+        rejectInvalidSegments(
+            '29',
+            ['HH'],
+            (_segment, _candidate, previous) => {
+                previousValues.push(previous);
+                return true;
+            }
+        );
 
         expect(previousValues).toEqual(['', '2']);
     });

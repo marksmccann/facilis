@@ -1,4 +1,4 @@
-import type { DeleteBackwardEditContext } from './types';
+import type { DeleteBackwardEditContext } from '../types';
 
 /**
  * Determines whether a backward delete is over formatting text: display text

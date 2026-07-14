@@ -1,12 +1,11 @@
+import { defineFormat, type Format } from 'facilis';
 import {
-    defineFormat,
     isAppendDuplicateFormattingAt,
     isAppendExpectedFormattingAt,
     isAppendFormatting,
     isDeleteBackwardOverFormatting,
     isInsertAtMaxLength,
-    type Format,
-} from 'facilis';
+} from 'facilis/guards';
 import { reporter } from './reporter';
 
 /**

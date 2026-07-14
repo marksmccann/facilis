@@ -1,4 +1,4 @@
-import type { InputDetails, TextState } from './types';
+import type { InputDetails, TextState } from '../types';
 
 /**
  * Determines whether an input edit deleted text backward from a collapsed cursor.

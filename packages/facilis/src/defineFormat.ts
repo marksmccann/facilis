@@ -1,14 +1,14 @@
 import type { Format, FormatDefinition, TextState } from './types';
-import isAppendEdit from './isAppendEdit';
-import isDeleteBackwardEdit from './isDeleteBackwardEdit';
-import isInsertEdit from './isInsertEdit';
-import resolveEditResult from './resolveEditResult';
-import resolveSelection from './resolveSelection';
-import runAppend from './runAppend';
-import runBlur from './runBlur';
-import runDeleteBackward from './runDeleteBackward';
-import runFormat from './runFormat';
-import runInsert from './runInsert';
+import isAppendEdit from './runtime/isAppendEdit';
+import isDeleteBackwardEdit from './runtime/isDeleteBackwardEdit';
+import isInsertEdit from './runtime/isInsertEdit';
+import resolveEditResult from './runtime/resolveEditResult';
+import runAppend from './runtime/runAppend';
+import runBlur from './runtime/runBlur';
+import runDeleteBackward from './runtime/runDeleteBackward';
+import runFormat from './runtime/runFormat';
+import runInsert from './runtime/runInsert';
+import resolveSelection from './selection/resolveSelection';
 
 /** Creates a reusable format from a format definition. */
 export default function defineFormat(definition: FormatDefinition): Format {
