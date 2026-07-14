@@ -1,12 +1,14 @@
 ---
 title: Formats Overview
-description: API reference entry point for the first-party formats published from facilis-formats.
+description: Entry point for the first-party formats published from facilis-formats.
 ---
 
 import { CardGrid, LinkCard } from '@astrojs/starlight/components';
 
-The primary format API reference lives here. These pages document the current
-first-party exports from `facilis-formats`.
+First-party formats cover common input shapes with reusable Facilis format
+definitions. Use these when the field you need already has a named domain shape,
+then drop down to `pattern`, `text`, or a custom format when the behavior is
+more specific to your app.
 
 ## Package
 
@@ -36,67 +38,67 @@ building a custom one directly with `defineFormat()`.
 <CardGrid>
     <LinkCard
         title="creditCard"
-        description="Credit card formatting with automatic American Express grouping."
+        description="Use for credit card numbers, including American Express grouping."
         href="/facilis/reference/formats/credit-card/"
     />
     <LinkCard
         title="currency"
-        description="Currency formatting with configurable symbol, separators, and optional cents."
+        description="Use for money-like values with symbols, separators, and optional cents."
         href="/facilis/reference/formats/currency/"
     />
     <LinkCard
         title="date"
-        description="Numeric date formatting with explicit date-part patterns."
+        description="Use for numeric date fields with supported patterns and separators."
         href="/facilis/reference/formats/date/"
     />
     <LinkCard
         title="ein"
-        description="Employer Identification Number formatting with the default 9-digit EIN layout."
+        description="Use for Employer Identification Numbers in the ##-####### shape."
         href="/facilis/reference/formats/ein/"
     />
     <LinkCard
         title="expirationDate"
-        description="Card expiration-date formatting with the common MM/YY layout."
+        description="Use for payment card expiration dates in the MM/YY shape."
         href="/facilis/reference/formats/expiration-date/"
     />
     <LinkCard
         title="number"
-        description="Numeric formatting with configurable decimal places, separators, and negative-value support."
+        description="Use for general numeric input with decimals, separators, and limits."
         href="/facilis/reference/formats/number/"
     />
     <LinkCard
         title="pattern"
-        description="A token-based pattern format with shorthand and explicit configuration forms."
+        description="Use for structural formats made from reusable token patterns."
         href="/facilis/reference/formats/pattern/"
     />
     <LinkCard
         title="percent"
-        description="Percent formatting with decimal places, range limits, and an optional percent symbol."
+        description="Use for percentage values with optional decimal and range behavior."
         href="/facilis/reference/formats/percent/"
     />
     <LinkCard
         title="phoneNumber"
-        description="Phone-number formatting with the default 10-digit North American layout."
+        description="Use for US phone numbers in the (###) ###-#### shape."
         href="/facilis/reference/formats/phone-number/"
     />
     <LinkCard
         title="socialSecurityNumber"
-        description="Social Security number formatting with the default 9-digit layout."
+        description="Use for Social Security Numbers in the ###-##-#### shape."
         href="/facilis/reference/formats/social-security-number/"
     />
     <LinkCard
         title="text"
-        description="A text format that preserves only characters matched by a regular expression."
+        description="Use for character filtering when structure is not the main concern."
         href="/facilis/reference/formats/text/"
     />
     <LinkCard
         title="time"
-        description="Numeric time formatting with explicit time-part patterns."
+        description="Use for numeric time fields with supported patterns and separators."
         href="/facilis/reference/formats/time/"
     />
     <LinkCard
         title="zipCode"
-        description="ZIP code formatting with optional ZIP+4 support."
+        description="Use for US ZIP Codes with optional ZIP+4 extension support."
         href="/facilis/reference/formats/zip-code/"
     />
 </CardGrid>

@@ -1,0 +1,32 @@
+---
+title: API Reference
+description: Package-oriented reference for Facilis exports.
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+The Facilis reference is organized by package. Use guides when you want a
+walkthrough; use these pages when you need the shape of an export.
+
+<CardGrid>
+    <LinkCard
+        title="Core"
+        description="defineFormat, runtime types, guards, selection helpers, and transforms."
+        href="/facilis/reference/core/"
+    />
+    <LinkCard
+        title="Adapters"
+        description="Reference links for adapter packages."
+        href="/facilis/reference/adapters/"
+    />
+    <LinkCard
+        title="First-Party Formats"
+        description="A pointer to the full formats section."
+        href="/facilis/reference/first-party-formats/"
+    />
+    <LinkCard
+        title="Testing"
+        description="setupInput, textState, and test helper types."
+        href="/facilis/reference/testing/"
+    />
+</CardGrid>

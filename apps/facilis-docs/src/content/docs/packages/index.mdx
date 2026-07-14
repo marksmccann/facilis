@@ -1,0 +1,42 @@
+---
+title: Packages
+description: The packages that make up the Facilis monorepo.
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+Facilis is split by responsibility. Formats stay portable, adapters own
+platform wiring, and tests can drive the same format behavior without a browser.
+
+<CardGrid>
+    <LinkCard
+        title="facilis"
+        description="Core runtime contract, format definition API, types, guards, selection helpers, and transforms."
+        href="/facilis/reference/core/"
+    />
+    <LinkCard
+        title="facilis-dom"
+        description="DOM adapter for binding formats to HTML inputs."
+        href="/facilis/adapters/dom/"
+    />
+    <LinkCard
+        title="facilis-react"
+        description="React adapter for creating formatted input props."
+        href="/facilis/adapters/react/"
+    />
+    <LinkCard
+        title="facilis-formats"
+        description="First-party reusable formats for common input shapes."
+        href="/facilis/reference/formats/"
+    />
+    <LinkCard
+        title="facilis-testing"
+        description="Test helpers for driving formats through input-like operations."
+        href="/facilis/reference/testing/"
+    />
+    <LinkCard
+        title="facilis-docs"
+        description="Astro Starlight documentation app and live demo host."
+        href="/facilis/demos/"
+    />
+</CardGrid>

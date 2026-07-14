@@ -1,0 +1,22 @@
+---
+title: Adapters
+description: API reference entry point for Facilis adapter packages.
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+Adapter APIs live in their package-specific reference pages. The top-level
+[Adapters section](/facilis/adapters/) explains when and why to use each one.
+
+<CardGrid>
+    <LinkCard
+        title="DOM Adapter"
+        description="bindFormat for plain HTML inputs."
+        href="/facilis/reference/dom/"
+    />
+    <LinkCard
+        title="React Adapter"
+        description="useFormat and the React adapter types."
+        href="/facilis/reference/react/"
+    />
+</CardGrid>

@@ -1,0 +1,44 @@
+---
+title: Create a Format
+description: The path for creating custom Facilis formats.
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+Create a custom format when a first-party format, `pattern()`, or `text()` does
+not describe the behavior your field needs.
+
+Creating a format starts with `defineFormat()`. Most formats are built from a
+small pipeline:
+
+- `normalize` extracts the semantic value from any display value.
+- `format` builds the focused display value.
+- `blur` applies formatting that should wait until the user leaves the field.
+- `edit` hooks handle exceptional append, insert, and backward-delete behavior.
+
+Core helpers live close to that pipeline. Use transforms to build values, guards
+to recognize edit situations, and selection helpers when an edit hook needs to
+control the next cursor position.
+
+<CardGrid>
+    <LinkCard
+        title="Define a Format"
+        description="Learn the normalize, format, blur, and edit hook shape."
+        href="/facilis/create-a-format/define-a-format/"
+    />
+    <LinkCard
+        title="Guards"
+        description="Recognize append, insert, and delete situations inside edit hooks."
+        href="/facilis/create-a-format/guards/"
+    />
+    <LinkCard
+        title="Transforms"
+        description="Reuse value-shaping helpers inside normalize, format, and blur."
+        href="/facilis/create-a-format/transforms/"
+    />
+    <LinkCard
+        title="Selection"
+        description="Resolve custom cursor behavior from edit hooks."
+        href="/facilis/create-a-format/selection/"
+    />
+</CardGrid>

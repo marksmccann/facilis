@@ -19,26 +19,50 @@ export default defineConfig({
             ],
             sidebar: [
                 {
-                    label: 'Introduction',
+                    label: 'Start Here',
                     items: [
                         { label: 'Overview', slug: '' },
-                        { label: 'Vision', slug: 'vision' },
-                        { label: 'Mental Model', slug: 'mental-model' },
+                        { label: 'Quick Start', slug: 'quick-start' },
+                        { label: 'Core Ideas', slug: 'core-ideas' },
+                        { label: 'Why Facilis', slug: 'vision' },
                     ],
                 },
                 {
-                    label: 'Demos',
-                    items: [{ label: 'Demo App', slug: 'demo-app' }],
-                },
-                {
-                    label: 'Packages',
+                    label: 'Guides',
                     items: [
-                        { label: 'Core Package', slug: 'packages/core' },
-                        { label: 'Docs App', slug: 'packages/docs' },
+                        {
+                            label: 'Choose a Format',
+                            slug: 'guides/choose-a-format',
+                        },
+                        { label: 'Test a Format', slug: 'guides/test-a-format' },
                     ],
                 },
                 {
-                    label: 'API Reference',
+                    label: 'Create a Format',
+                    items: [
+                        { label: 'Overview', slug: 'create-a-format' },
+                        {
+                            label: 'Define a Format',
+                            slug: 'create-a-format/define-a-format',
+                        },
+                        { label: 'Guards', slug: 'create-a-format/guards' },
+                        {
+                            label: 'Transforms',
+                            slug: 'create-a-format/transforms',
+                        },
+                        { label: 'Selection', slug: 'create-a-format/selection' },
+                    ],
+                },
+                {
+                    label: 'Adapters',
+                    items: [
+                        { label: 'Adapters Overview', slug: 'adapters' },
+                        { label: 'DOM', slug: 'adapters/dom' },
+                        { label: 'React', slug: 'adapters/react' },
+                    ],
+                },
+                {
+                    label: 'Formats',
                     items: [
                         {
                             label: 'Formats Overview',
@@ -76,6 +100,27 @@ export default defineConfig({
                             slug: 'reference/formats/zip-code',
                         },
                     ],
+                },
+                {
+                    label: 'API Reference',
+                    items: [
+                        { label: 'Reference Overview', slug: 'reference' },
+                        { label: 'Core', slug: 'reference/core' },
+                        { label: 'Adapters', slug: 'reference/adapters' },
+                        {
+                            label: 'First-Party Formats',
+                            slug: 'reference/first-party-formats',
+                        },
+                        { label: 'Testing', slug: 'reference/testing' },
+                    ],
+                },
+                {
+                    label: 'Demos',
+                    items: [{ label: 'Demos Overview', slug: 'demos' }],
+                },
+                {
+                    label: 'Project',
+                    items: [{ label: 'Packages', slug: 'packages' }],
                 },
             ],
         }),

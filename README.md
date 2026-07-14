@@ -3,8 +3,9 @@
 `facilis` is a framework-agnostic input formatting library centered on reusable,
 shareable formats and thin integration adapters.
 
-This repository is scaffolded as a monorepo so the core package, documentation
-site, and future adapters can evolve together.
+This repository is organized as a monorepo so the core package, adapters,
+first-party formats, testing helpers, documentation, and demos can evolve
+together.
 
 ## Deployment
 
@@ -12,11 +13,15 @@ site, and future adapters can evolve together.
 
 ## Workspace
 
-- `packages/facilis`: the published package placeholder
+- `packages/facilis`: the framework-agnostic formatting runtime
+- `packages/facilis-dom`: DOM adapter for binding formats to inputs
+- `packages/facilis-react`: React adapter for formatted input props
+- `packages/facilis-formats`: first-party reusable format definitions
+- `packages/facilis-testing`: test helpers for formats and adapters
 - `apps/facilis-docs`: the documentation app
 
 ## Status
 
-The repository is currently in project-setup mode. The package name is claimed,
-the workspace is ready, and the implementation can grow into the monorepo
-without reshaping the repository later.
+Facilis is early, but the core package split is in place: reusable formats live
+outside adapters, adapters own platform wiring, and the docs app hosts both
+reference pages and live demos.

@@ -1,7 +1,9 @@
 ---
 title: Mental Model
-description: The foundational concepts behind Facilis.
+description: A short legacy overview of the foundational Facilis concepts.
 ---
+
+The main concept page now lives at [Core Ideas](/facilis/core-ideas/).
 
 Facilis treats **format** as the primary mental model.
 

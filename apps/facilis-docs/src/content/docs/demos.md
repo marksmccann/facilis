@@ -1,15 +1,15 @@
 ---
-title: Demo App
-description: Deployment notes for the Facilis demo surface.
-slug: demo-app
+title: Demos Overview
+description: Live routes for trying Facilis formats in the browser.
 ---
 
-Facilis ships its demo surface from the docs app so guides, examples, and live
-experiments can share the same deployment target.
+Facilis ships live demos from the docs app so guides, examples, and format
+exploration share the same public surface.
 
-## Routes
+Each format reference page links to its matching demo near the top. Use this
+page when you want the full route list in one place.
 
-Dedicated format demos live at:
+## Format demos
 
 - `/facilis/demos/formats/credit-card/`
 - `/facilis/demos/formats/currency/`
@@ -25,13 +25,8 @@ Dedicated format demos live at:
 - `/facilis/demos/formats/time/`
 - `/facilis/demos/formats/zip-code/`
 
-## Current focus
+## How to use the demos
 
-The docs app now hosts dedicated demo pages per format so the same routes can
-support documentation, regression testing, and format exploration.
-
-## Why this setup
-
-- It matches the deployment shape already used in `ornata`.
-- It gives the project a stable public URL for future interactive examples.
-- It keeps demo hosting concerns out of the core package workspace.
+The demos are intentionally separate from reference pages. Reference pages stay
+compact, while demos can cover more scenarios without making the API docs
+harder to scan.

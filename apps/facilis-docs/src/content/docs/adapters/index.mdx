@@ -1,0 +1,35 @@
+---
+title: Adapters Overview
+description: How Facilis connects portable formats to real input surfaces.
+---
+
+import { CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+Adapters are the bridge between portable Facilis formats and a specific UI
+environment.
+
+A format owns value behavior: normalization, display formatting, blur behavior,
+and edit handling. An adapter owns platform wiring: reading the input state,
+listening to events, calling the Facilis runtime, and writing the next value and
+selection back to the UI.
+
+That split is why the same format can work in a plain DOM input, a React input,
+tests, and future framework adapters.
+
+<CardGrid>
+    <LinkCard
+        title="DOM"
+        description="Bind a Facilis format to an HTML input or selector."
+        href="/facilis/adapters/dom/"
+    />
+    <LinkCard
+        title="React"
+        description="Create formatted input props with the React adapter."
+        href="/facilis/adapters/react/"
+    />
+</CardGrid>
+
+## When to use core directly
+
+Use the core `facilis` package directly when you are writing a new adapter or
+building a custom format. App code should usually start with an adapter.
