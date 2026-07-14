@@ -18,6 +18,19 @@ function updateInput(
 }
 
 /**
+ * Reads the current input value and selection.
+ *
+ * @private
+ */
+function readTextState(input: HTMLInputElement): TextState {
+    return {
+        value: input.value,
+        selectionStart: input.selectionStart,
+        selectionEnd: input.selectionEnd,
+    };
+}
+
+/**
  * Binds a format instance to an input element or selector and applies
  * formatting on `input` and `blur`.
  *
@@ -28,55 +41,40 @@ export function bindFormat(
     format: Format
 ): () => void {
     const input = resolveInput(target);
-    let textState: TextState = format.onMount({
-        value: input.value,
-        selectionStart: input.selectionStart,
-        selectionEnd: input.selectionEnd,
-    });
+    let textState: TextState = format.onMount(readTextState(input));
 
-    const syncTextState = () => {
-        textState = {
-            value: input.value,
-            selectionStart: input.selectionStart,
-            selectionEnd: input.selectionEnd,
-        };
+    const handleSelectionChange = () => {
+        textState = readTextState(input);
     };
 
     const handleInput = (event: InputEvent) => {
+        const inputDetails = {
+            inputType: event.inputType ?? null,
+            data: event.data ?? null,
+        };
+
         textState = format.onInput(
-            {
-                inputType: event.inputType ?? null,
-                data: event.data ?? null,
-            },
+            inputDetails,
             textState,
-            {
-                value: input.value,
-                selectionStart: input.selectionStart,
-                selectionEnd: input.selectionEnd,
-            }
+            readTextState(input)
         );
 
         updateInput(input, textState);
     };
 
     const handleBlur = () => {
-        textState = format.onBlur({
-            value: input.value,
-            selectionStart: input.selectionStart,
-            selectionEnd: input.selectionEnd,
-        });
-
+        textState = format.onBlur(readTextState(input));
         updateInput(input, textState);
     };
 
     updateInput(input, textState);
 
-    document.addEventListener('selectionchange', syncTextState);
+    document.addEventListener('selectionchange', handleSelectionChange);
     input.addEventListener('input', handleInput);
     input.addEventListener('blur', handleBlur);
 
     return () => {
-        document.removeEventListener('selectionchange', syncTextState);
+        document.removeEventListener('selectionchange', handleSelectionChange);
         input.removeEventListener('input', handleInput);
         input.removeEventListener('blur', handleBlur);
     };
