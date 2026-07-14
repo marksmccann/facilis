@@ -20,8 +20,8 @@
     ],
     "scripts": {
         "build": "tsup",
-        "test": "node -e \"console.log('facilis-testing: no tests defined yet')\"",
-        "test:watch": "node -e \"console.log('facilis-testing: no watch tests defined yet')\""
+        "test": "vitest run",
+        "test:watch": "vitest"
     },
     "keywords": [
         "facilis",
@@ -36,6 +36,7 @@
     },
     "devDependencies": {
         "@types/node": "^26.0.1",
-        "facilis": "0.0.1"
+        "facilis": "0.0.1",
+        "vitest": "^4.1.9"
     }
 }
