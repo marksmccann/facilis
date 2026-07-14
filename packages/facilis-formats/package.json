@@ -1,42 +1,108 @@
 {
-  "name": "facilis-formats",
-  "version": "0.0.1",
-  "description": "First-party format definitions for the Facilis input formatting library.",
-  "type": "module",
-  "main": "./index.js",
-  "types": "./src/index.ts",
-  "exports": {
-    ".": {
-      "types": "./src/index.ts",
-      "default": "./index.js"
+    "name": "facilis-formats",
+    "version": "0.0.1",
+    "description": "First-party format definitions for the Facilis input formatting library.",
+    "type": "module",
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js",
+            "require": "./dist/index.cjs"
+        },
+        "./creditCard": {
+            "types": "./dist/creditCard.d.ts",
+            "import": "./dist/creditCard.js",
+            "require": "./dist/creditCard.cjs"
+        },
+        "./currency": {
+            "types": "./dist/currency.d.ts",
+            "import": "./dist/currency.js",
+            "require": "./dist/currency.cjs"
+        },
+        "./date": {
+            "types": "./dist/date.d.ts",
+            "import": "./dist/date.js",
+            "require": "./dist/date.cjs"
+        },
+        "./ein": {
+            "types": "./dist/ein.d.ts",
+            "import": "./dist/ein.js",
+            "require": "./dist/ein.cjs"
+        },
+        "./expirationDate": {
+            "types": "./dist/expirationDate.d.ts",
+            "import": "./dist/expirationDate.js",
+            "require": "./dist/expirationDate.cjs"
+        },
+        "./number": {
+            "types": "./dist/number.d.ts",
+            "import": "./dist/number.js",
+            "require": "./dist/number.cjs"
+        },
+        "./pattern": {
+            "types": "./dist/pattern.d.ts",
+            "import": "./dist/pattern.js",
+            "require": "./dist/pattern.cjs"
+        },
+        "./percent": {
+            "types": "./dist/percent.d.ts",
+            "import": "./dist/percent.js",
+            "require": "./dist/percent.cjs"
+        },
+        "./phoneNumber": {
+            "types": "./dist/phoneNumber.d.ts",
+            "import": "./dist/phoneNumber.js",
+            "require": "./dist/phoneNumber.cjs"
+        },
+        "./socialSecurityNumber": {
+            "types": "./dist/socialSecurityNumber.d.ts",
+            "import": "./dist/socialSecurityNumber.js",
+            "require": "./dist/socialSecurityNumber.cjs"
+        },
+        "./text": {
+            "types": "./dist/text.d.ts",
+            "import": "./dist/text.js",
+            "require": "./dist/text.cjs"
+        },
+        "./time": {
+            "types": "./dist/time.d.ts",
+            "import": "./dist/time.js",
+            "require": "./dist/time.cjs"
+        },
+        "./zipCode": {
+            "types": "./dist/zipCode.d.ts",
+            "import": "./dist/zipCode.js",
+            "require": "./dist/zipCode.cjs"
+        }
+    },
+    "files": [
+        "dist",
+        "README.md",
+        "LICENSE"
+    ],
+    "scripts": {
+        "build": "tsup",
+        "test": "vitest run",
+        "test:watch": "vitest"
+    },
+    "keywords": [
+        "facilis",
+        "formats",
+        "format",
+        "input",
+        "formatter"
+    ],
+    "license": "MIT",
+    "dependencies": {
+        "facilis": "0.0.1",
+        "runtime-reporter": "^0.10.1"
+    },
+    "devDependencies": {
+        "@types/node": "^26.0.1",
+        "facilis-testing": "0.0.1",
+        "vitest": "^4.1.9"
     }
-  },
-  "files": [
-    "index.js",
-    "src",
-    "README.md",
-    "LICENSE"
-  ],
-  "scripts": {
-    "build": "node -e \"console.log('facilis-formats: no build step defined yet')\"",
-    "test": "vitest run",
-    "test:watch": "vitest"
-  },
-  "keywords": [
-    "facilis",
-    "formats",
-    "format",
-    "input",
-    "formatter"
-  ],
-  "license": "MIT",
-  "dependencies": {
-    "facilis": "0.0.1",
-    "runtime-reporter": "^0.10.1"
-  },
-  "devDependencies": {
-    "@types/node": "^26.0.1",
-    "facilis-testing": "0.0.1",
-    "vitest": "^4.1.9"
-  }
 }

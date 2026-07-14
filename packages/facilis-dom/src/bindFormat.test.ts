@@ -16,6 +16,7 @@ class FakeInputElement extends EventTarget {
 }
 
 globalThis.HTMLInputElement = FakeInputElement as typeof HTMLInputElement;
+globalThis.document = new EventTarget() as Document;
 
 function bindToFakeInput(
     input: FakeInputElement,
@@ -54,13 +55,13 @@ describe('bindFormat', () => {
         input.setSelectionRange(2, 2);
 
         const format = defineFormat({
-            name: 'mount-test',
-            normalize(character, state) {
-                state.append(character.toUpperCase());
+            normalize(raw) {
+                return raw.replace(/[^a-z]/gi, '').toUpperCase();
             },
-            format(character, state) {
-                state.append(`[${character}]`);
-                state.advance();
+            format(normalized) {
+                return Array.from(normalized)
+                    .map((character) => `[${character}]`)
+                    .join('');
             },
         });
 
@@ -71,44 +72,37 @@ describe('bindFormat', () => {
         expect(input.selectionEnd).toBe(6);
     });
 
-    it('passes the previous committed snapshot into live input formatting', () => {
+    it('passes the previous committed value into live input formatting', () => {
         const input = new FakeInputElement();
         input.value = 'ab';
         input.setSelectionRange(2, 2);
 
         let previousValueSeen: string | null = null;
-        let previousSelectionStartSeen: number | null = null;
-        let previousSelectionEndSeen: number | null = null;
+        let previousCursorSeen: number | null = null;
 
         const format = defineFormat({
-            name: 'previous-snapshot',
-            normalize(character, state) {
-                if (state.index === 0) {
-                    previousValueSeen = state.edit.previous.value;
-                    previousSelectionStartSeen =
-                        state.edit.previous.selectionStart;
-                    previousSelectionEndSeen = state.edit.previous.selectionEnd;
-                }
-
-                state.append(character.toUpperCase());
+            normalize(raw) {
+                return raw.toUpperCase();
             },
-            format(character, state) {
-                state.append(character);
-                state.advance();
+            edit: {
+                append(context) {
+                    previousValueSeen = context.previous;
+                    previousCursorSeen = context.cursor;
+                },
             },
         });
 
         bindToFakeInput(input, format);
 
         dispatchInputMutation(input, {
+            inputType: 'insertText',
             nextSelectionEnd: 3,
             nextSelectionStart: 3,
             nextValue: 'ABc',
         });
 
         expect(previousValueSeen).toBe('AB');
-        expect(previousSelectionStartSeen).toBe(2);
-        expect(previousSelectionEndSeen).toBe(2);
+        expect(previousCursorSeen).toBe(2);
         expect(input.value).toBe('ABC');
         expect(input.selectionStart).toBe(3);
         expect(input.selectionEnd).toBe(3);
