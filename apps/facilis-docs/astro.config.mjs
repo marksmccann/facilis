@@ -24,6 +24,7 @@ export default defineConfig({
                         { label: 'Overview', slug: '' },
                         { label: 'Quick Start', slug: 'quick-start' },
                         { label: 'Core Ideas', slug: 'core-ideas' },
+                        { label: 'Compare Facilis', slug: 'compare-facilis' },
                         { label: 'Why Facilis', slug: 'vision' },
                     ],
                 },

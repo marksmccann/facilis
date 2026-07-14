@@ -1,0 +1,96 @@
+---
+title: Compare Facilis
+description: A feature-oriented comparison of Facilis and other input formatting tools.
+---
+
+Facilis is designed around **Format Definitions**: small, reusable definitions
+that describe how a value is normalized, formatted, blurred, edited, selected,
+and tested.
+
+This comparison focuses on documented capabilities rather than ranking projects.
+IMask, Cleave.js, and React Number Format are established tools with useful
+ideas and real production histories. Facilis aims to cover the same everyday
+formatting needs while making the format itself modular, composable, extendable,
+and shareable.
+
+## Why Format Definitions matter
+
+A Format Definition is product logic, not just input wiring. You can create a
+format once, share it across apps or packages, bind it to a DOM input, use it in
+React, and test it without a browser.
+
+```ts
+import { defineFormat } from 'facilis';
+
+export const productCode = () =>
+    defineFormat({
+        normalize(raw) {
+            return raw.replace(/[^a-z0-9]/gi, '').slice(0, 8);
+        },
+        format(normalized) {
+            return normalized.toUpperCase();
+        },
+    });
+```
+
+First-party formats follow the same idea. Import the group from
+`facilis-formats`, or import only the formats your app needs.
+
+```ts
+import { currency } from 'facilis-formats/currency';
+import { phoneNumber } from 'facilis-formats/phoneNumber';
+```
+
+## Feature snapshot
+
+| Capability | Facilis | IMask | Cleave.js | React Number Format |
+| --- | --- | --- | --- | --- |
+| Framework-agnostic formatting core | Yes: `facilis` formats are adapter-independent | Yes: model and view layers are documented separately | DOM-first API; React component documented | React-first library |
+| Format as the primary reusable unit | Yes: Format Definitions are created once and used through adapters, tests, or packages | Yes: masked model instances can be used without UI | Partial: behavior is primarily configured at the input/component level | Partial: formatting logic is primarily component/hook oriented |
+| Modular first-party imports | Yes: each first-party format has its own `facilis-formats/<format>` subpath | Core package exposes mask classes and plugins | Package-level imports are documented | Component-level imports are documented |
+| Composable format building blocks | Yes: core transforms, guards, and selection helpers are public authoring tools | Yes: blocks, custom definitions, and model classes support composition | Partial: blocks, delimiters, prefixes, and options compose common cases | Yes: customization hooks and formatter utilities support extension |
+| Shareable custom formats | Yes: custom formats are plain reusable factories you can publish or share internally | Yes: custom masks can be defined through IMask APIs | Partial: custom options can be reused, but the input binding is central | Partial: custom logic can be wrapped in React components or hooks |
+| Plain DOM usage | Yes: `facilis-dom` | Yes | Yes | Not the primary surface |
+| React usage | Yes: `facilis-react` | Yes: `react-imask` | Yes: `cleave.js/react` | Yes |
+| First-party common formats | Yes: credit card, currency, date, EIN, expiration date, number, pattern, percent, phone, SSN, text, time, ZIP code | Yes: number, pattern, range, enum, date, dynamic masks | Yes: credit card, phone, date, time, numeral, custom blocks | Yes: numeric and pattern-focused components |
+| Pattern-style formatting | Yes: `pattern()` | Yes: pattern mask | Yes: `blocks`, delimiters, and prefixes | Yes: `PatternFormat` |
+| Regex or character filtering | Yes: `text({ matches })` plus custom formats | Yes: RegExp and Function masks | Limited to documented block and option configuration | Custom formatting hooks and handlers |
+| Blur-time formatting | Yes: explicit `blur` hook | Yes: commit/postprocessing and number options cover blur-like behavior | Not emphasized in the public docs | Yes for some numeric behavior, such as leading-zero cleanup and fixed decimal scale |
+| Custom reusable formats | Yes: `defineFormat()` | Yes: custom masks and subclassing are documented | Partial: custom blocks/options are documented | Yes: custom formatting and hooks are documented |
+| Edit-intent hooks | Yes: append, insert, and backward-delete hooks | Not exposed in the same documented shape | Not documented in the same shape | Partial: customization APIs expose change metadata and caret utilities |
+| Public caret/selection helpers | Yes: `facilis/selection` | View layer controls changes internally | Not highlighted in the public docs | Yes: numeric and pattern caret boundary helpers |
+| Dedicated testing helpers | Yes: `facilis-testing` | Not highlighted in the public docs | Not highlighted in the public docs | Not highlighted in the public docs |
+| Adapter growth path | Yes: adapters are separate packages by design | UI glue exists around the masking model | DOM and React surfaces are documented | React is the core surface |
+
+## What Facilis is trying to make obvious
+
+Facilis puts the Format Definition at the center:
+
+- formats are reusable outside any one framework or adapter;
+- formats can be imported one at a time instead of as one kitchen-sink bundle;
+- custom formats can be shared like any other package-level function;
+- adapters are thin and replaceable;
+- normalize, format, blur, and edit behavior are named directly;
+- cursor behavior can be handled with public selection helpers;
+- format behavior can be tested without a browser.
+
+That shape matters when a formatting rule starts in one input and later needs
+to move into another UI surface, another adapter, a regression test, or a
+first-party format package.
+
+## When another tool may fit
+
+Another input formatting tool may be a good choice when your app already uses
+it successfully, when you need a mature mask feature Facilis has not added yet,
+or when you want a framework-specific component API instead of a portable format
+definition.
+
+Facilis is aimed at teams that expect formatting behavior to become shared
+product logic, not just input-local wiring.
+
+## Sources checked
+
+- [IMask guide](https://imask.js.org/guide.html)
+- [React IMask package](https://github.com/uNmAnNeR/imaskjs/tree/master/packages/react-imask)
+- [Cleave.js documentation](https://nosir.github.io/cleave.js/)
+- [React Number Format documentation](https://s-yadav.github.io/react-number-format/docs/intro/)
