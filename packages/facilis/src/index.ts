@@ -17,6 +17,7 @@ export { default as limitDecimalPlaces } from './limitDecimalPlaces';
 export { default as normalizeNegativeSign } from './normalizeNegativeSign';
 export { default as padDecimalPlaces } from './padDecimalPlaces';
 export { default as removeExtraDecimalSeparators } from './removeExtraDecimalSeparators';
+export { default as rejectInvalidSegments } from './rejectInvalidSegments';
 export { default as resolveSelectionAtDeletedBoundary } from './resolveSelectionAtDeletedBoundary';
 export { default as resolveSelectionBeforeFormatting } from './resolveSelectionBeforeFormatting';
 export { default as trimLeadingZeros } from './trimLeadingZeros';

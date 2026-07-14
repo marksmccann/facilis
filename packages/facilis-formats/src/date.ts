@@ -7,6 +7,7 @@ import {
     isInsertAtMaxLength,
     insertBeforeCharacter,
     insertSeparators,
+    rejectInvalidSegments,
     type Format,
 } from 'facilis';
 import { reporter } from './reporter';
@@ -195,43 +196,20 @@ export function date(options: DateOptions): Format {
     return defineFormat({
         normalize(raw) {
             let digits = raw.replace(/\D/g, '');
-            let normalized = '';
-            let digitIndex = 0;
 
             if (insertLeadingZero) {
                 digits = insertBeforeCharacter(digits, leadingZeroRules);
             }
 
-            for (const segment of segments) {
-                let segmentValue = '';
-
-                while (
-                    digitIndex < digits.length &&
-                    segmentValue.length < segment.length
-                ) {
-                    const digit = digits[digitIndex];
-
-                    const nextSegmentValue = `${segmentValue}${digit}`;
-
-                    if (
-                        strictMonthAndDay &&
-                        !isPossibleMonthOrDay(segment, nextSegmentValue)
-                    ) {
-                        break;
-                    }
-
-                    segmentValue = nextSegmentValue;
-                    digitIndex += 1;
-                }
-
-                normalized += segmentValue;
-
-                if (segmentValue.length < segment.length) {
-                    break;
-                }
+            if (strictMonthAndDay) {
+                digits = rejectInvalidSegments(
+                    digits,
+                    segments,
+                    isPossibleMonthOrDay
+                );
             }
 
-            return normalized.slice(0, maxDigits);
+            return digits.slice(0, maxDigits);
         },
         format(normalized) {
             return insertSeparators(normalized, {
@@ -241,36 +219,34 @@ export function date(options: DateOptions): Format {
         },
         edit: {
             append(context) {
-                const { attempted } = context;
+                const { attempted, previous } = context;
+                const expectedPosition = previous.length;
+                const duplicatePosition = previous.length - separator.length;
 
                 if (!isAppendFormatting(context)) {
                     return;
                 }
 
-                let position = 0;
+                if (
+                    separatorPositions.includes(expectedPosition) &&
+                    isAppendExpectedFormattingAt(
+                        context,
+                        separator,
+                        expectedPosition
+                    )
+                ) {
+                    return attempted;
+                }
 
-                for (const length of segmentLengths.slice(0, -1)) {
-                    position += length + separator.length;
-
-                    if (
-                        isAppendExpectedFormattingAt(
-                            context,
-                            separator,
-                            position - separator.length
-                        )
-                    ) {
-                        return attempted;
-                    }
-
-                    if (
-                        isAppendDuplicateFormattingAt(
-                            context,
-                            separator,
-                            position - separator.length
-                        )
-                    ) {
-                        return null;
-                    }
+                if (
+                    separatorPositions.includes(duplicatePosition) &&
+                    isAppendDuplicateFormattingAt(
+                        context,
+                        separator,
+                        duplicatePosition
+                    )
+                ) {
+                    return null;
                 }
             },
             insert(context) {

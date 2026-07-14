@@ -17,6 +17,7 @@ export { default as limitDecimalPlaces } from './src/limitDecimalPlaces.ts';
 export { default as normalizeNegativeSign } from './src/normalizeNegativeSign.ts';
 export { default as padDecimalPlaces } from './src/padDecimalPlaces.ts';
 export { default as removeExtraDecimalSeparators } from './src/removeExtraDecimalSeparators.ts';
+export { default as rejectInvalidSegments } from './src/rejectInvalidSegments.ts';
 export { default as resolveSelectionAtDeletedBoundary } from './src/resolveSelectionAtDeletedBoundary.ts';
 export { default as resolveSelectionBeforeFormatting } from './src/resolveSelectionBeforeFormatting.ts';
 export { default as trimLeadingZeros } from './src/trimLeadingZeros.ts';
