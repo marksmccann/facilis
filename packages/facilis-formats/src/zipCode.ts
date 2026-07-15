@@ -1,12 +1,4 @@
-import { defineFormat, type Format } from 'facilis';
-import {
-    isAppendDuplicateFormattingAt,
-    isAppendExpectedFormattingAt,
-    isAppendFormatting,
-    isDeleteBackwardOverFormatting,
-    isInsertAtMaxLength,
-} from 'facilis/guards';
-import { insertSeparators } from 'facilis/transforms';
+import { defineSegmentedFormat, type Format } from 'facilis';
 
 /**
  * Describes ZIP code format options.
@@ -21,74 +13,15 @@ export type ZipCodeOptions = {
 };
 
 /**
- * The number of digits supported by the default ZIP code layout.
- *
- * @private
- */
-const DIGIT_LIMIT = 5;
-
-/**
- * The number of digits supported by the ZIP+4 layout.
- *
- * @private
- */
-const PLUS_FOUR_DIGIT_LIMIT = 9;
-
-/**
  * Creates a ZIP code format.
  *
  * @since 0.1.0
  */
 export function zipCode(options: ZipCodeOptions = {}): Format {
     const { includePlusFour = false } = options;
-    const maxDigits = includePlusFour ? PLUS_FOUR_DIGIT_LIMIT : DIGIT_LIMIT;
 
-    return defineFormat({
-        normalize(raw) {
-            return raw.replace(/\D/g, '').slice(0, maxDigits);
-        },
-        format(normalized) {
-            if (!includePlusFour) {
-                return normalized;
-            }
-
-            return insertSeparators(normalized, {
-                positions: [DIGIT_LIMIT],
-                separator: '-',
-            });
-        },
-        edit: {
-            append(context) {
-                const { attempted } = context;
-
-                if (!includePlusFour || !isAppendFormatting(context)) {
-                    return;
-                }
-
-                if (isAppendExpectedFormattingAt(context, '-', DIGIT_LIMIT)) {
-                    return attempted;
-                }
-
-                if (isAppendDuplicateFormattingAt(context, '-', DIGIT_LIMIT)) {
-                    return null;
-                }
-            },
-            insert(context) {
-                if (isInsertAtMaxLength(context, maxDigits)) {
-                    return null;
-                }
-            },
-            deleteBackward(context) {
-                const { cursor, previous } = context;
-
-                if (isDeleteBackwardOverFormatting(context)) {
-                    return {
-                        value: previous,
-                        selectionStart: cursor - 1,
-                        selectionEnd: cursor - 1,
-                    };
-                }
-            },
-        },
+    return defineSegmentedFormat({
+        characters: 'digits',
+        segments: includePlusFour ? [5, '-', 4] : [5],
     });
 }

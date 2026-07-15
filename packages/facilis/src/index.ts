@@ -1,4 +1,17 @@
 export { default as defineFormat } from './defineFormat';
+export { default as defineDateFormat } from './defineDateFormat';
+export type {
+    DateFormatOptions,
+    DateFormatPattern,
+    DateFormatSeparator,
+} from './defineDateFormat';
+export { default as defineSegmentedFormat } from './defineSegmentedFormat';
+export type {
+    SegmentedFormatCharacters,
+    SegmentedFormatOptions,
+    SegmentedFormatSegment,
+    SegmentedFormatSegments,
+} from './defineSegmentedFormat';
 export * from './guards';
 export * from './selection';
 export * from './transforms';
