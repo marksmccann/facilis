@@ -1,30 +1,15 @@
-import { defineFormat, type Format } from 'facilis';
 import {
-    isDeleteBackwardBeforeFormatting,
-    isDeleteBackwardOverFormatting,
-} from 'facilis/guards';
-import {
-    resolveSelectionAtDeletedBoundary,
-    resolveSelectionBeforeFormatting,
-} from 'facilis/selection';
-import {
-    clampNumber,
-    filterNumberCharacters,
-    insertLeadingZero,
-    insertThousandsSeparators,
-    limitDecimalPlaces,
-    normalizeNegativeSign,
-    padDecimalPlaces,
-    removeExtraDecimalSeparators,
-    trimLeadingZeros,
-} from 'facilis/transforms';
+    defineNumberFormat,
+    type Format,
+    type NumberFormatOptions,
+} from 'facilis';
 
 /**
  * The configuration options for a number format.
  *
  * @since 0.1.0
  */
-export type NumberOptions = {
+export interface NumberOptions extends NumberFormatOptions {
     /**
      * The maximum number of decimal places to preserve. The default is `0`,
      * which produces an integer-only format.
@@ -77,7 +62,7 @@ export type NumberOptions = {
      * The maximum complete numeric value to allow while typing.
      */
     max?: number;
-};
+}
 
 /**
  * The complete number-format options after defaults have been applied.
@@ -114,115 +99,5 @@ function normalizeNumberOptions(
  * @since 0.1.0
  */
 export function number(options?: NumberOptions): Format {
-    const normalizedOptions = normalizeNumberOptions(options);
-    const {
-        thousandsSeparator,
-        decimalSeparator,
-        allowNegative,
-        decimalPlaces,
-        trimLeadingZeros: shouldTrimLeadingZeros,
-        padDecimalPlaces: decimalPlacesToPad,
-        insertLeadingZero: shouldInsertLeadingZero,
-        min,
-        max,
-    } = normalizedOptions;
-
-    return defineFormat({
-        normalize(raw) {
-            let value = raw;
-
-            value = filterNumberCharacters(value, {
-                decimalSeparator,
-            });
-
-            value = removeExtraDecimalSeparators(value, {
-                decimalSeparator,
-            });
-
-            value = normalizeNegativeSign(value, {
-                allowNegative,
-            });
-
-            value = limitDecimalPlaces(value, {
-                decimalPlaces,
-                decimalSeparator,
-            });
-
-            if (shouldTrimLeadingZeros) {
-                value = trimLeadingZeros(value, {
-                    allowNegative,
-                    decimalSeparator,
-                });
-            }
-
-            return clampNumber(value, {
-                decimalSeparator,
-                max: max,
-                min: min,
-            });
-        },
-        format(normalized) {
-            return insertThousandsSeparators(normalized, {
-                allowNegative,
-                decimalSeparator,
-                thousandsSeparator,
-            });
-        },
-        blur(formatted) {
-            let value = formatted;
-
-            if (shouldInsertLeadingZero) {
-                value = insertLeadingZero(formatted, {
-                    allowNegative,
-                    decimalSeparator,
-                });
-            }
-
-            value = padDecimalPlaces(value, {
-                decimalPlaces: decimalPlacesToPad,
-                decimalSeparator,
-            });
-
-            return value;
-        },
-        edit: {
-            deleteBackward(context) {
-                const { cursor, formatted, previous, start } = context;
-                const formatting = thousandsSeparator;
-
-                // prettier-ignore
-                const selectionBeforeFormatting = resolveSelectionBeforeFormatting({
-                    value: previous,
-                    position: cursor,
-                    formatting,
-                });
-
-                if (
-                    selectionBeforeFormatting &&
-                    isDeleteBackwardOverFormatting(context)
-                ) {
-                    return {
-                        value: previous,
-                        ...selectionBeforeFormatting,
-                    };
-                }
-
-                if (isDeleteBackwardBeforeFormatting(context, formatting)) {
-                    const selection = resolveSelectionAtDeletedBoundary({
-                        previous,
-                        formatted,
-                        start,
-                        normalize: context.normalize,
-                    });
-
-                    if (selection) {
-                        return {
-                            value: formatted,
-                            ...selection,
-                        };
-                    }
-                }
-            },
-        },
-    });
+    return defineNumberFormat(normalizeNumberOptions(options));
 }

@@ -5,6 +5,8 @@ export type {
     DateFormatPattern,
     DateFormatSeparator,
 } from './defineDateFormat';
+export { default as defineNumberFormat } from './defineNumberFormat';
+export type { NumberFormatOptions } from './defineNumberFormat';
 export { default as defineTimeFormat } from './defineTimeFormat';
 export type {
     TimeFormatOptions,
