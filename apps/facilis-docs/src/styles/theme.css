@@ -1,0 +1,222 @@
+:root {
+    --facilis-coral: #ff6b5a;
+    --facilis-coral-strong: #e84f40;
+    --facilis-coral-soft: #fff0ed;
+    --facilis-ink: #0f172a;
+    --facilis-ink-soft: #151f32;
+    --facilis-paper: #fffdfb;
+    --facilis-paper-soft: #f8f6f3;
+    --facilis-line: rgb(15 23 42 / 0.1);
+}
+
+:root,
+::backdrop {
+    --sl-color-accent-low: #382126;
+    --sl-color-accent: var(--facilis-coral);
+    --sl-color-accent-high: #ffb0a5;
+    --sl-color-text-accent: var(--sl-color-accent-high);
+    --sl-color-bg-accent: var(--facilis-coral);
+    --sl-color-bg-nav: var(--facilis-ink);
+    --sl-color-bg-sidebar: var(--facilis-ink);
+    --sl-rapide-ui-header-bg-color: rgb(15 23 42 / 0.86);
+    --sl-rapide-ui-border-color: rgb(255 255 255 / 0.1);
+}
+
+:root[data-theme='light'],
+[data-theme='light'] ::backdrop {
+    --sl-color-accent-low: var(--facilis-coral-soft);
+    --sl-color-accent: var(--facilis-coral);
+    --sl-color-accent-high: #c94134;
+    --sl-color-text-accent: var(--sl-color-accent-high);
+    --sl-color-bg-accent: var(--facilis-coral);
+    --sl-color-bg-nav: var(--facilis-paper);
+    --sl-color-bg-sidebar: var(--facilis-paper);
+    --sl-rapide-ui-header-bg-color: rgb(255 253 251 / 0.86);
+    --sl-rapide-ui-border-color: var(--facilis-line);
+}
+
+header.header {
+    border-bottom-color: var(--sl-rapide-ui-border-color);
+}
+
+header.header .site-title {
+    color: var(--sl-color-white);
+    font-weight: 650;
+    letter-spacing: 0;
+}
+
+.sl-link-button.primary {
+    border-color: var(--facilis-coral);
+    background: var(--facilis-coral);
+    color: #ffffff;
+    font-weight: 650;
+}
+
+.sl-link-button.primary:is(:hover, :focus-visible) {
+    border-color: #ff7f70;
+    background: #ff7f70;
+    color: #ffffff;
+}
+
+.sl-link-button.secondary {
+    border-color: color-mix(in srgb, var(--sl-color-white) 24%, transparent);
+}
+
+.expressive-code {
+    --facilis-code-bg: #121212;
+    --facilis-code-fg: #dbd7ca;
+    --facilis-code-header-bg: #171717;
+    --facilis-code-border: var(--sl-rapide-ui-border-color);
+
+    position: relative;
+    font-size: var(--sl-text-code);
+}
+
+:root:not([data-theme='dark']) .expressive-code {
+    --facilis-code-bg: #ffffff;
+    --facilis-code-fg: #393a34;
+    --facilis-code-header-bg: #f7f5f2;
+    --facilis-code-border: var(--facilis-line);
+}
+
+.expressive-code .frame {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border: 1px solid var(--facilis-code-border);
+    border-radius: 0.5rem;
+    background: var(--facilis-code-bg);
+}
+
+.expressive-code .frame .header {
+    display: none;
+}
+
+.expressive-code .frame.is-terminal .header {
+    display: flex;
+    align-items: center;
+    min-height: 2.15rem;
+    border-bottom: 1px solid var(--facilis-code-border);
+    background: var(--facilis-code-header-bg);
+}
+
+.expressive-code .frame.is-terminal .header::before {
+    width: 0.58rem;
+    height: 0.58rem;
+    margin-inline-start: 1rem;
+    border-radius: 999px;
+    content: '';
+    background: var(--facilis-coral);
+    box-shadow:
+        1rem 0 #f6bd24,
+        2rem 0 #2ec866;
+}
+
+.expressive-code pre {
+    margin: 0;
+    overflow-x: auto;
+    border: 0;
+    background: var(--facilis-code-bg);
+}
+
+.expressive-code pre > code {
+    display: block;
+    min-width: max-content;
+    padding: 0.85rem 1rem;
+    color: var(--facilis-code-fg);
+    font-family: var(--__sl-font-mono);
+    font-size: var(--sl-text-code);
+    line-height: var(--sl-line-height);
+}
+
+.expressive-code .ec-line .code {
+    padding-inline-end: 2.75rem;
+    white-space: pre;
+}
+
+.expressive-code .ec-line :where(span[style^='--']:not([class])) {
+    color: var(--0, inherit);
+    background-color: var(--0bg, transparent);
+    font-style: var(--0fs, inherit);
+    font-weight: var(--0fw, inherit);
+    text-decoration: var(--0td, inherit);
+}
+
+:root:not([data-theme='dark']) .expressive-code .ec-line :where(span[style^='--']:not([class])) {
+    color: var(--1, var(--0, inherit));
+    background-color: var(--1bg, var(--0bg, transparent));
+    font-style: var(--1fs, var(--0fs, inherit));
+    font-weight: var(--1fw, var(--0fw, inherit));
+    text-decoration: var(--1td, var(--0td, inherit));
+}
+
+html[data-has-hero] .hero {
+    position: relative;
+    margin-block: -1.5rem 2.5rem;
+    margin-inline: calc(-1 * var(--sl-content-pad-x));
+    min-height: clamp(23rem, 54vh, 38rem);
+    overflow: hidden;
+    padding: clamp(5rem, 12vw, 8rem) var(--sl-content-pad-x);
+}
+
+html[data-has-hero] .hero::before {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    content: '';
+    background:
+        radial-gradient(circle at 14% 18%, rgb(255 107 90 / 0.42), transparent 31rem),
+        radial-gradient(circle at 86% 100%, rgb(255 107 90 / 0.24), transparent 28rem),
+        linear-gradient(135deg, var(--facilis-ink), #08111f 58%, #111c2d);
+}
+
+html[data-has-hero] .hero h1 {
+    font-size: clamp(var(--sl-text-5xl), calc(1.6rem + 5vw), 4.35rem);
+    font-weight: 700;
+    text-wrap: balance;
+}
+
+html[data-has-hero] .hero .stack {
+    text-align: start;
+}
+
+html[data-has-hero] .hero .copy {
+    align-items: flex-start;
+}
+
+html[data-has-hero] .hero .tagline {
+    max-width: 42rem;
+    text-wrap: pretty;
+}
+
+html[data-has-hero] .hero .tagline::before {
+    display: block;
+    width: 2.75rem;
+    height: 2px;
+    margin-block-end: 1.1rem;
+    content: '';
+    background: var(--facilis-coral);
+}
+
+html[data-has-hero] .hero .actions {
+    justify-content: flex-start;
+}
+
+html[data-has-hero][data-theme='light'] .hero::before {
+    background:
+        radial-gradient(circle at 12% 18%, rgb(255 107 90 / 0.3), transparent 30rem),
+        radial-gradient(circle at 88% 100%, rgb(255 107 90 / 0.22), transparent 28rem),
+        linear-gradient(135deg, #fff0eb, #f4ece7 48%, #fff6f1);
+}
+
+@media (min-width: 50rem) {
+    html[data-has-hero] .hero {
+        --hero-bleed: max(
+            var(--sl-content-pad-x),
+            calc((100vw - var(--sl-content-inline-start, 0rem) - var(--sl-content-width)) / 2)
+        );
+
+        margin-inline: calc(-1 * var(--hero-bleed));
+        padding-inline: var(--hero-bleed);
+    }
+}

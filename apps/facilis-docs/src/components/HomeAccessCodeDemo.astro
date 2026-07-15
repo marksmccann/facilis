@@ -1,0 +1,69 @@
+<div class="home-access-code-demo">
+    <label class="home-access-code-demo__label" for="home-access-code">
+        Access code
+    </label>
+    <input
+        class="home-access-code-demo__input"
+        id="home-access-code"
+        data-home-access-code
+        inputmode="numeric"
+        placeholder="Try 12a-3456"
+        type="text"
+    />
+    <p class="home-access-code-demo__note">
+        Messy input like <code>12a-3456</code> becomes <code>123-456</code>.
+    </p>
+</div>
+
+<script>
+    import { mountHomeAccessCodeDemo } from '../demo/mountHomeAccessCodeDemo.ts';
+
+    mountHomeAccessCodeDemo();
+</script>
+
+<style>
+    .home-access-code-demo {
+        display: grid;
+        gap: 0.75rem;
+        max-width: 30rem;
+        margin-block: 1.25rem 1.5rem;
+        padding: 1rem;
+        border: 1px solid var(--sl-color-gray-5);
+        border-radius: 0.5rem;
+        background: var(--sl-color-black);
+    }
+
+    .home-access-code-demo__label {
+        color: var(--sl-color-white);
+        font-size: var(--sl-text-sm);
+        font-weight: 650;
+    }
+
+    .home-access-code-demo__input {
+        width: 100%;
+        padding: 0.75rem 0.85rem;
+        border: 1px solid var(--sl-color-gray-5);
+        border-radius: 0.4rem;
+        background: var(--sl-rapide-ui-bg-color);
+        color: var(--sl-color-white);
+        font: inherit;
+        font-size: var(--sl-text-lg);
+    }
+
+    .home-access-code-demo__input:focus {
+        border-color: var(--sl-color-accent);
+        outline: 2px solid var(--sl-color-accent-low);
+        outline-offset: 2px;
+    }
+
+    .home-access-code-demo__input::placeholder {
+        color: var(--sl-color-gray-3);
+    }
+
+    .home-access-code-demo__note {
+        margin: 0;
+        color: var(--sl-color-gray-2);
+        font-size: var(--sl-text-sm);
+        line-height: 1.5;
+    }
+</style>

@@ -1,6 +1,7 @@
 import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import starlight from '@astrojs/starlight';
+import starlightThemeRapide from 'starlight-theme-rapide';
 
 export default defineConfig({
     site: 'https://marksmccann.github.io',
@@ -10,6 +11,8 @@ export default defineConfig({
             title: 'Facilis',
             description:
                 'Framework-agnostic input formatting built around reusable formats and thin adapters.',
+            customCss: ['./src/styles/theme.css'],
+            plugins: [starlightThemeRapide()],
             social: [
                 {
                     icon: 'github',

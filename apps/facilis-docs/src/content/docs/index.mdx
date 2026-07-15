@@ -4,25 +4,31 @@ slug: ''
 description: Facilis is a framework-agnostic input formatting engine built around portable format definitions.
 template: splash
 hero:
-  title: Input formatting, redefined.
-  tagline: Facilis is a framework-agnostic input formatting engine built around portable format definitions. Define formats once, compose them freely, and integrate them anywhere.
-  actions:
-    - text: Start Formatting
-      link: /facilis/quick-start/
-      variant: primary
-    - text: Learn the Core Ideas
-      link: /facilis/core-ideas/
-      variant: secondary
+    title: Input formatting, redefined.
+    tagline: Facilis is a framework-agnostic input formatting engine built around portable format definitions. Define formats once, compose them freely, and integrate them anywhere.
+    actions:
+        - text: Start Formatting
+          link: /facilis/quick-start/
+          variant: primary
+        - text: Learn the Core Ideas
+          link: /facilis/core-ideas/
+          variant: secondary
 ---
 
-import { CardGrid, LinkCard, Tabs, TabItem } from '@astrojs/starlight/components';
+import {
+    CardGrid,
+    LinkCard,
+    Tabs,
+    TabItem,
+} from '@astrojs/starlight/components';
+import HomeAccessCodeDemo from '../../components/HomeAccessCodeDemo.astro';
 
-## Define the format once.
+## Define a format once, use it anywhere.
 
 Formats are plain definitions. They describe how to normalize input, how to
 display the normalized value, and what should happen when the field blurs. The
 definition stays free of DOM events, component state, and framework lifecycle
-details.
+details, so the same format can be mounted wherever you need it.
 
 ```ts
 import { defineFormat } from 'facilis';
@@ -30,22 +36,21 @@ import { defineFormat } from 'facilis';
 export const accessCode = () =>
     defineFormat({
         normalize(raw) {
-            return raw.replace(/[^a-z0-9]/gi, '').toUpperCase().slice(0, 8);
+            // Normalize raw input by removing formatted characters.
+            return raw.replace(/\D/g, '').slice(0, 6);
         },
         format(normalized) {
-            return normalized.replace(/(.{4})(?=.)/g, '$1-');
+            // Prepare the display value by formatting the normalized value.
+            return normalized.replace(/(\d{3})(?=\d)/, '$1-');
         },
     });
 ```
 
-`defineFormat()` creates a portable format instance. The same behavior can be
-mounted by an adapter, reused in another project, or tested directly without a
-browser.
+<HomeAccessCodeDemo />
 
-## Use the format everywhere.
-
-Adapters are intentionally thin. They connect real inputs to the same runtime
-hooks, while your format keeps the behavior in one place.
+The demo uses the same format shape as the code above. Adapters are
+intentionally thin: they connect real inputs to the runtime hooks while your
+format keeps the behavior in one place.
 
 <Tabs>
     <TabItem label="DOM">
@@ -72,6 +77,7 @@ function AccessCodeField() {
 ```
 
     </TabItem>
+
 </Tabs>
 
 The core package owns formatting behavior. Adapter packages own the wiring:
