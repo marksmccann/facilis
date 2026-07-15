@@ -27,7 +27,4 @@ export type {
     SegmentedFormatSegment,
     SegmentedFormatSegments,
 } from './defineSegmentedFormat';
-export * from './guards';
-export * from './selection';
-export * from './transforms';
 export type * from './types';

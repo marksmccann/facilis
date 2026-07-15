@@ -4,5 +4,4 @@
 formats and thin adapters.
 
 This package exports the core runtime contract for reusable formats, including
-`defineFormat`, shared types, edit guards, selection helpers, and formatting
-transforms.
+`defineFormat`, layered format factories, and shared runtime types.

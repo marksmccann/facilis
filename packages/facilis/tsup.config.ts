@@ -5,9 +5,6 @@ const EXTERNAL_PACKAGES = ['runtime-reporter'];
 export default defineConfig({
     entry: {
         index: 'src/index.ts',
-        guards: 'src/guards/index.ts',
-        selection: 'src/selection/index.ts',
-        transforms: 'src/transforms/index.ts',
     },
     format: ['esm', 'cjs'],
     dts: true,

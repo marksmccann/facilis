@@ -38,7 +38,10 @@ export default defineConfig({
                             label: 'Choose a Format',
                             slug: 'guides/choose-a-format',
                         },
-                        { label: 'Test a Format', slug: 'guides/test-a-format' },
+                        {
+                            label: 'Test a Format',
+                            slug: 'guides/test-a-format',
+                        },
                     ],
                 },
                 {
@@ -49,12 +52,6 @@ export default defineConfig({
                             label: 'Define a Format',
                             slug: 'create-a-format/define-a-format',
                         },
-                        { label: 'Guards', slug: 'create-a-format/guards' },
-                        {
-                            label: 'Transforms',
-                            slug: 'create-a-format/transforms',
-                        },
-                        { label: 'Selection', slug: 'create-a-format/selection' },
                     ],
                 },
                 {

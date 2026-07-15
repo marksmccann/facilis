@@ -16,29 +16,14 @@ small pipeline:
 - `blur` applies formatting that should wait until the user leaves the field.
 - `edit` hooks handle exceptional append, insert, and backward-delete behavior.
 
-Core helpers live close to that pipeline. Use transforms to build values, guards
-to recognize edit situations, and selection helpers when an edit hook needs to
-control the next cursor position.
+The layered format factories cover common format families when you want more
+behavior out of the box. Reach for `defineFormat()` when a field needs behavior
+outside those factory defaults.
 
 <CardGrid>
     <LinkCard
         title="Define a Format"
         description="Learn the normalize, format, blur, and edit hook shape."
         href="/facilis/create-a-format/define-a-format/"
-    />
-    <LinkCard
-        title="Guards"
-        description="Recognize append, insert, and delete situations inside edit hooks."
-        href="/facilis/create-a-format/guards/"
-    />
-    <LinkCard
-        title="Transforms"
-        description="Reuse value-shaping helpers inside normalize, format, and blur."
-        href="/facilis/create-a-format/transforms/"
-    />
-    <LinkCard
-        title="Selection"
-        description="Resolve custom cursor behavior from edit hooks."
-        href="/facilis/create-a-format/selection/"
     />
 </CardGrid>

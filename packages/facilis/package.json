@@ -11,21 +11,6 @@
             "types": "./dist/index.d.ts",
             "import": "./dist/index.js",
             "require": "./dist/index.cjs"
-        },
-        "./guards": {
-            "types": "./dist/guards.d.ts",
-            "import": "./dist/guards.js",
-            "require": "./dist/guards.cjs"
-        },
-        "./selection": {
-            "types": "./dist/selection.d.ts",
-            "import": "./dist/selection.js",
-            "require": "./dist/selection.cjs"
-        },
-        "./transforms": {
-            "types": "./dist/transforms.d.ts",
-            "import": "./dist/transforms.js",
-            "require": "./dist/transforms.cjs"
         }
     },
     "files": [

@@ -69,13 +69,3 @@ Edit hooks can return:
 
 The runtime currently recognizes append, insert, and backward-delete edit
 intentions.
-
-## Use the helper families
-
-The core package includes helper families for format authors:
-
-- [Guards](/facilis/create-a-format/guards/) recognize common edit-hook situations.
-- [Transforms](/facilis/create-a-format/transforms/) shape values in `normalize`,
-  `format`, and `blur`.
-- [Selection helpers](/facilis/create-a-format/selection/) resolve custom cursor
-  behavior from edit hooks.

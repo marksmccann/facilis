@@ -6,7 +6,7 @@ description: Reference for the framework-agnostic facilis package.
 The `facilis` package contains the framework-agnostic runtime contract.
 
 ```ts
-import { defineFormat } from 'facilis';
+import { defineFormat, defineNumberFormat } from 'facilis';
 import type { Format, FormatDefinition, TextState } from 'facilis';
 ```
 
@@ -33,31 +33,13 @@ A `FormatDefinition` can include:
 - `Format`: adapter-facing runtime with `onMount`, `onInput`, and `onBlur`.
 - `FormatEditResult`: return type for edit hooks.
 
-## Guards
+## Format factories
 
-Guard helpers live under `facilis/guards` and are useful when custom formats
-need to recognize common editing situations.
-See [Guards](/facilis/create-a-format/guards/) for usage guidance.
+Layered factories provide common behavior for format families while still
+returning regular formats.
 
-```ts
-import { isAppendFormatting } from 'facilis/guards';
-```
-
-## Selection helpers
-
-Selection helpers live under `facilis/selection`.
-See [Selection](/facilis/create-a-format/selection/) for usage guidance.
-
-```ts
-import { resolveSelectionBeforeFormatting } from 'facilis/selection';
-```
-
-## Transforms
-
-Reusable value transforms live under `facilis/transforms`. They cover common
-number and separator operations used by first-party formats.
-See [Transforms](/facilis/create-a-format/transforms/) for usage guidance.
-
-```ts
-import { insertThousandsSeparators, trimLeadingZeros } from 'facilis/transforms';
-```
+- `defineSegmentedFormat`
+- `definePatternFormat`
+- `defineDateFormat`
+- `defineTimeFormat`
+- `defineNumberFormat`
