@@ -1,15 +1,4 @@
-import { clampNumber, defineFormat, type Format } from 'facilis';
-import { isDeleteBackwardBeforeFormatting } from 'facilis/guards';
-import { resolveSelectionAtDeletedBoundary } from 'facilis/selection';
-import {
-    filterNumberCharacters,
-    insertLeadingZero,
-    limitDecimalPlaces,
-    normalizeNegativeSign,
-    padDecimalPlaces,
-    removeExtraDecimalSeparators,
-    trimLeadingZeros,
-} from 'facilis/transforms';
+import { defineNumberFormat, type Format } from 'facilis';
 
 const PERCENT_SYMBOL = '%';
 
@@ -122,132 +111,37 @@ export function percent(options?: PercentOptions): Format {
         min,
         padDecimalPlaces: decimalPlacesToPad,
     } = normalizedOptions;
-    const symbol = includeSymbol ? PERCENT_SYMBOL : '';
 
-    return defineFormat({
-        normalize(raw) {
-            let value = raw;
-
-            value = filterNumberCharacters(value, {
-                decimalSeparator,
-            });
-
-            value = removeExtraDecimalSeparators(value, {
-                decimalSeparator,
-            });
-
-            value = normalizeNegativeSign(value, {
-                allowNegative,
-            });
-
-            value = limitDecimalPlaces(value, {
-                decimalPlaces,
-                decimalSeparator,
-            });
-
-            value = trimLeadingZeros(value, {
-                allowNegative,
-                decimalSeparator,
-            });
-
-            return clampNumber(value, {
-                decimalSeparator,
-                max,
-                min,
-            });
-        },
-        format(normalized) {
-            const formattedValue = normalized;
-
+    return defineNumberFormat({
+        allowNegative,
+        decimalPlaces,
+        decimalSeparator,
+        insertLeadingZero: true,
+        max,
+        min,
+        padDecimalPlaces: decimalPlacesToPad,
+        trimLeadingZeros: true,
+        format(normalized, context) {
             if (
                 !includeSymbol ||
-                isIncompletePercentValue(formattedValue, { decimalSeparator })
+                isIncompletePercentValue(normalized, { decimalSeparator })
             ) {
-                return formattedValue;
+                return context.resolved;
             }
 
-            return `${formattedValue}${PERCENT_SYMBOL}`;
+            return `${context.resolved}${PERCENT_SYMBOL}`;
         },
-        blur(formatted) {
-            let value = formatted;
-
-            if (symbol && value.endsWith(symbol)) {
-                value = value.slice(0, -symbol.length);
-            }
-
-            value = insertLeadingZero(value, {
-                allowNegative,
-                decimalSeparator,
-            });
-
-            value = padDecimalPlaces(value, {
-                decimalPlaces: decimalPlacesToPad,
-                decimalSeparator,
-            });
-
+        blur(_formatted, context) {
             if (
                 !includeSymbol ||
-                isIncompletePercentValue(value, { decimalSeparator })
+                isIncompletePercentValue(context.resolved, {
+                    decimalSeparator,
+                })
             ) {
-                return value;
+                return context.resolved;
             }
 
-            return `${value}${PERCENT_SYMBOL}`;
-        },
-        edit: {
-            append(context) {
-                if (!symbol || !context.formatted.endsWith(symbol)) return;
-
-                const cursor = context.formatted.length - symbol.length;
-
-                return {
-                    value: context.formatted,
-                    selectionStart: cursor,
-                    selectionEnd: cursor,
-                };
-            },
-            insert(context) {
-                if (!symbol || !context.formatted.endsWith(symbol)) return;
-
-                const cursor = context.formatted.length - symbol.length;
-
-                return {
-                    value: context.formatted,
-                    selectionStart: cursor,
-                    selectionEnd: cursor,
-                };
-            },
-            deleteBackward(context) {
-                const { formatted, previous, start } = context;
-
-                if (
-                    symbol &&
-                    context.deleted === symbol &&
-                    context.normalized.deleted === ''
-                ) {
-                    return {
-                        value: previous,
-                        selectionStart: start,
-                        selectionEnd: start,
-                    };
-                }
-
-                if (isDeleteBackwardBeforeFormatting(context, symbol)) {
-                    const selection = resolveSelectionAtDeletedBoundary({
-                        previous,
-                        formatted,
-                        start,
-                        normalize: context.normalize,
-                    });
-
-                    if (selection) {
-                        return {
-                            value: formatted,
-                            ...selection,
-                        };
-                    }
-                }
-            },
+            return `${context.resolved}${PERCENT_SYMBOL}`;
         },
     });
 }

@@ -81,14 +81,35 @@ function mapNormalizedToFormatted(
 ) {
     const total = normalized.length;
     const rawToNormalized = mapRawToNormalized(formatted, normalize);
-    const boundaries = Array.from({ length: total + 1 }, () => 0);
+    const boundaries = Array.from({ length: total + 1 }, (_, boundary) => {
+        if (boundary === 0) {
+            const firstSemanticIndex = rawToNormalized.findIndex(
+                (normalizedBoundary) => normalizedBoundary > 0
+            );
 
-    Array.from(rawToNormalized.entries()).forEach((entry) => {
-        const [formattedBoundary, normalizedBoundary] = entry;
-
-        if (normalizedBoundary <= total) {
-            boundaries[normalizedBoundary] = formattedBoundary;
+            return firstSemanticIndex === -1 ? 0 : firstSemanticIndex - 1;
         }
+
+        if (boundary === total) {
+            const formattedBoundary = rawToNormalized.findIndex(
+                (normalizedBoundary) => normalizedBoundary >= boundary
+            );
+            const trailingText = formatted.slice(formattedBoundary);
+
+            if (formattedBoundary !== -1 && normalize(trailingText) === '') {
+                return formattedBoundary;
+            }
+        }
+
+        let formattedBoundary = -1;
+
+        rawToNormalized.forEach((normalizedBoundary, index) => {
+            if (normalizedBoundary === boundary) {
+                formattedBoundary = index;
+            }
+        });
+
+        return formattedBoundary === -1 ? formatted.length : formattedBoundary;
     });
 
     return boundaries;

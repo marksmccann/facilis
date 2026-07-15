@@ -1,22 +1,4 @@
-import { defineFormat, type Format } from 'facilis';
-import {
-    isDeleteBackwardBeforeFormatting,
-    isDeleteBackwardOverFormatting,
-} from 'facilis/guards';
-import {
-    resolveSelectionAtDeletedBoundary,
-    resolveSelectionBeforeFormatting,
-} from 'facilis/selection';
-import {
-    filterNumberCharacters,
-    insertLeadingZero,
-    insertThousandsSeparators,
-    limitDecimalPlaces,
-    normalizeNegativeSign,
-    padDecimalPlaces,
-    removeExtraDecimalSeparators,
-    trimLeadingZeros,
-} from 'facilis/transforms';
+import { defineNumberFormat, type Format } from 'facilis';
 
 /**
  * The configuration options for a currency format.
@@ -73,100 +55,38 @@ export function currency(options?: CurrencyOptions): Format {
     const { decimalSeparator, includeCents, symbol, thousandsSeparator } =
         normalizedOptions;
 
-    return defineFormat({
-        normalize(raw) {
-            let value = raw;
-
-            value = filterNumberCharacters(value, {
-                decimalSeparator,
-            });
-
-            value = removeExtraDecimalSeparators(value, {
-                decimalSeparator,
-            });
-
-            value = normalizeNegativeSign(value);
-
-            value = limitDecimalPlaces(value, {
-                decimalPlaces: includeCents ? 2 : 0,
-                decimalSeparator,
-            });
-
-            return trimLeadingZeros(value, {
-                decimalSeparator,
-            });
-        },
-        format(normalized) {
+    return defineNumberFormat({
+        decimalPlaces: includeCents ? 2 : 0,
+        decimalSeparator,
+        insertLeadingZero: includeCents,
+        padDecimalPlaces: includeCents ? 2 : 0,
+        thousandsSeparator,
+        trimLeadingZeros: true,
+        format(normalized, context) {
             if (normalized === '') return '';
 
-            const formattedValue = insertThousandsSeparators(normalized, {
-                decimalSeparator,
-                thousandsSeparator,
-            });
-
-            return `${symbol}${formattedValue}`;
+            return `${symbol}${context.resolved}`;
         },
-        blur(formatted) {
-            let value = formatted;
+        blur(_formatted, context) {
+            if (context.resolved === '') return '';
 
-            if (!includeCents) return formatted;
-
-            if (symbol) value = value.slice(symbol.length);
-
-            value = insertLeadingZero(value, { decimalSeparator });
-
-            value = padDecimalPlaces(value, {
-                decimalPlaces: 2,
-                decimalSeparator,
-            });
-
-            return `${symbol}${value}`;
+            return `${symbol}${context.resolved}`;
         },
         edit: {
             deleteBackward(context) {
-                const { cursor, formatted, previous, start } = context;
-                const formatting = thousandsSeparator;
-
-                // prettier-ignore
-                const selectionBeforeSeparator = resolveSelectionBeforeFormatting({
-                    value: previous,
-                    position: cursor,
-                    formatting,
-                });
-
                 if (
-                    selectionBeforeSeparator &&
-                    isDeleteBackwardOverFormatting(context)
+                    symbol &&
+                    context.deleted === symbol &&
+                    context.normalized.deleted === ''
                 ) {
                     return {
-                        value: previous,
-                        ...selectionBeforeSeparator,
+                        value: context.previous,
+                        selectionStart: context.start,
+                        selectionEnd: context.start,
                     };
                 }
 
-                if (isDeleteBackwardOverFormatting(context)) {
-                    return {
-                        value: previous,
-                        selectionStart: cursor - 1,
-                        selectionEnd: cursor - 1,
-                    };
-                }
-
-                if (isDeleteBackwardBeforeFormatting(context, formatting)) {
-                    const selection = resolveSelectionAtDeletedBoundary({
-                        previous,
-                        formatted,
-                        start,
-                        normalize: context.normalize,
-                    });
-
-                    if (selection) {
-                        return {
-                            value: formatted,
-                            ...selection,
-                        };
-                    }
-                }
+                return context.resolved;
             },
         },
     });

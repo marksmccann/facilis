@@ -69,7 +69,12 @@ export interface NumberOptions extends NumberFormatOptions {
  *
  * @private
  */
-type NormalizedNumberOptions = Required<Omit<NumberOptions, 'max' | 'min'>> &
+type NormalizedNumberOptions = Required<
+    Omit<
+        NumberOptions,
+        'blur' | 'edit' | 'format' | 'max' | 'min' | 'normalize'
+    >
+> &
     Pick<NumberOptions, 'max' | 'min'>;
 
 /**
