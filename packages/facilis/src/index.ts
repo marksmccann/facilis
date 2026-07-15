@@ -5,6 +5,13 @@ export type {
     DateFormatPattern,
     DateFormatSeparator,
 } from './defineDateFormat';
+export { default as definePatternFormat } from './definePatternFormat';
+export type {
+    PatternFormatOptions,
+    PatternFormatPart,
+    PatternFormatTokenDefinition,
+    PatternFormatTokenDefinitions,
+} from './definePatternFormat';
 export { default as defineSegmentedFormat } from './defineSegmentedFormat';
 export type {
     SegmentedFormatCharacters,

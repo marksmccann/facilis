@@ -1,21 +1,37 @@
 import defineFormat from './defineFormat';
 import type { Format } from './types';
 
-/** Defines which raw characters are allowed into a segmented format. */
+/**
+ * Defines which raw characters are allowed into a segmented format.
+ *
+ * @since 0.1.0
+ */
 export type SegmentedFormatCharacters =
     | 'digits'
     | RegExp
     | ((character: string) => boolean);
 
-/** Defines one piece of a segmented display layout. */
+/**
+ * Defines one piece of a segmented display layout.
+ *
+ * @since 0.1.0
+ */
 export type SegmentedFormatSegment = number | string;
 
-/** Defines the segmented display layout or resolves it from a value. */
+/**
+ * Defines the segmented display layout or resolves it from a normalized value.
+ *
+ * @since 0.1.0
+ */
 export type SegmentedFormatSegments =
     | SegmentedFormatSegment[]
     | ((normalized: string) => SegmentedFormatSegment[]);
 
-/** Defines a segmented format from character rules and display segments. */
+/**
+ * The configuration options for a segmented format.
+ *
+ * @since 0.1.0
+ */
 export type SegmentedFormatOptions = {
     /** The characters allowed into the normalized value. */
     characters: SegmentedFormatCharacters;
@@ -27,6 +43,11 @@ export type SegmentedFormatOptions = {
     segments: SegmentedFormatSegments;
 };
 
+/**
+ * Tests whether one raw character is allowed into the normalized value.
+ *
+ * @private
+ */
 function matchesSegmentedCharacter(
     characters: SegmentedFormatCharacters,
     character: string
@@ -43,6 +64,11 @@ function matchesSegmentedCharacter(
     return characters(character);
 }
 
+/**
+ * Counts the semantic character slots represented by one segment layout.
+ *
+ * @private
+ */
 function resolveSegmentedMaxLength(segments: SegmentedFormatSegment[]) {
     return segments.reduce<number>((total, segment) => {
         if (typeof segment === 'number') {
@@ -53,6 +79,11 @@ function resolveSegmentedMaxLength(segments: SegmentedFormatSegment[]) {
     }, 0);
 }
 
+/**
+ * Resolves the active segment layout for one normalized value.
+ *
+ * @private
+ */
 function resolveSegmentedSegments(
     normalized: string,
     options: SegmentedFormatOptions
@@ -64,6 +95,11 @@ function resolveSegmentedSegments(
     return options.segments;
 }
 
+/**
+ * Filters, normalizes, and length-limits one raw value.
+ *
+ * @private
+ */
 function normalizeSegmentedValue(raw: string, options: SegmentedFormatOptions) {
     const value = Array.from(raw)
         .filter((character) =>
@@ -77,6 +113,11 @@ function normalizeSegmentedValue(raw: string, options: SegmentedFormatOptions) {
     return normalized.slice(0, maxLength);
 }
 
+/**
+ * Inserts literal segment text into one normalized value.
+ *
+ * @private
+ */
 function formatSegmentedValue(
     normalized: string,
     segments: SegmentedFormatSegment[]
@@ -107,6 +148,11 @@ function formatSegmentedValue(
     return formatted;
 }
 
+/**
+ * Resolves the literal formatting text at one visible position.
+ *
+ * @private
+ */
 function resolveFormattingAt(
     position: number,
     segments: SegmentedFormatSegment[]
@@ -130,6 +176,11 @@ function resolveFormattingAt(
     }
 }
 
+/**
+ * Determines whether an append attempted to type formatting text only.
+ *
+ * @private
+ */
 function isAppendFormatting(context: {
     appended: string;
     normalized: { appended: string; attempted: string; previous: string };
@@ -141,7 +192,11 @@ function isAppendFormatting(context: {
     );
 }
 
-/** Creates a reusable format from segmented display rules. */
+/**
+ * Creates a reusable format from segmented display rules.
+ *
+ * @since 0.1.0
+ */
 export default function defineSegmentedFormat(
     options: SegmentedFormatOptions
 ): Format {

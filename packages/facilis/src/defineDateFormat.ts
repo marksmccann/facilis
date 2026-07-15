@@ -5,7 +5,12 @@ import type { Format } from './types';
 import insertBeforeCharacter from './transforms/insertBeforeCharacter';
 import rejectInvalidSegments from './transforms/rejectInvalidSegments';
 
-/** The canonical date patterns supported by date format definitions. */
+/**
+ * The canonical date patterns supported by the date format. Patterns always
+ * use `/` as their separator, regardless of the rendered separator.
+ *
+ * @since 0.1.0
+ */
 export type DateFormatPattern =
     | 'MM/DD/YY'
     | 'MM/DD/YYYY'
@@ -18,10 +23,18 @@ export type DateFormatPattern =
     | 'YY/MM'
     | 'YYYY/MM';
 
-/** The rendered separator supported by date format definitions. */
+/**
+ * A rendered date separator.
+ *
+ * @since 0.1.0
+ */
 export type DateFormatSeparator = '/' | '-' | '.';
 
-/** Defines date-specific formatting behavior. */
+/**
+ * The configuration options for a date format.
+ *
+ * @since 0.1.0
+ */
 export type DateFormatOptions = {
     /** The canonical pattern that defines the date parts to format. */
     pattern: DateFormatPattern;
@@ -42,6 +55,12 @@ export type DateFormatOptions = {
     strictMonthAndDay?: boolean;
 };
 
+/**
+ * Determines whether one month or day segment can still resolve to a possible
+ * standalone segment value.
+ *
+ * @private
+ */
 function isPossibleMonthOrDay(segment: string, value: string) {
     if (segment === 'MM') {
         if (value.length === 1) return /^[0-1]$/.test(value);
@@ -56,6 +75,11 @@ function isPossibleMonthOrDay(segment: string, value: string) {
     return true;
 }
 
+/**
+ * Resolves the leading-zero insertion rules for month and day segments.
+ *
+ * @private
+ */
 function resolveLeadingZeroRules(segments: string[]) {
     const rules: { position: number; matches: RegExp; insert: string }[] = [];
     let position = 0;
@@ -75,6 +99,11 @@ function resolveLeadingZeroRules(segments: string[]) {
     return rules;
 }
 
+/**
+ * Resolves the segmented display layout for one canonical date pattern.
+ *
+ * @private
+ */
 function resolveDateSegments(
     patternSegments: string[],
     separator: DateFormatSeparator
@@ -92,7 +121,11 @@ function resolveDateSegments(
     return segments;
 }
 
-/** Creates a reusable date format from date-specific options. */
+/**
+ * Creates a date format for numeric date input.
+ *
+ * @since 0.1.0
+ */
 export default function defineDateFormat(options: DateFormatOptions): Format {
     const {
         insertLeadingZero = false,
