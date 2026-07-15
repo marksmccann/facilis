@@ -65,6 +65,21 @@ function matchesSegmentedCharacter(
 }
 
 /**
+ * Tests whether text contains at least one character allowed into the
+ * normalized value.
+ *
+ * @private
+ */
+function hasSegmentedCharacter(
+    characters: SegmentedFormatCharacters,
+    text: string
+) {
+    return Array.from(text).some((character) =>
+        matchesSegmentedCharacter(characters, character)
+    );
+}
+
+/**
  * Counts the semantic character slots represented by one segment layout.
  *
  * @private
@@ -181,12 +196,16 @@ function resolveFormattingAt(
  *
  * @private
  */
-function isAppendFormatting(context: {
-    appended: string;
-    normalized: { appended: string; attempted: string; previous: string };
-}) {
+function isAppendFormatting(
+    context: {
+        appended: string;
+        normalized: { appended: string; attempted: string; previous: string };
+    },
+    options: SegmentedFormatOptions
+) {
     return (
         context.appended !== '' &&
+        !hasSegmentedCharacter(options.characters, context.appended) &&
         context.normalized.appended === '' &&
         context.normalized.attempted === context.normalized.previous
     );
@@ -211,7 +230,7 @@ export default function defineSegmentedFormat(
         },
         edit: {
             append(context) {
-                if (!isAppendFormatting(context)) {
+                if (!isAppendFormatting(context, options)) {
                     return;
                 }
 
@@ -265,6 +284,10 @@ export default function defineSegmentedFormat(
 
                 if (
                     context.inserted !== '' &&
+                    !hasSegmentedCharacter(
+                        options.characters,
+                        context.inserted
+                    ) &&
                     context.normalized.inserted === '' &&
                     context.normalized.attempted === context.normalized.previous
                 ) {
