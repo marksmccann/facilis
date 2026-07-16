@@ -1,6 +1,7 @@
 import defineSegmentedFormat, {
     type SegmentedFormatSegment,
 } from './defineSegmentedFormat';
+import { reporter } from './reporter';
 import type { Format } from './types';
 import insertBeforeCharacter from './transforms/insertBeforeCharacter';
 import rejectInvalidSegments from './transforms/rejectInvalidSegments';
@@ -19,6 +20,28 @@ export type TimeFormatPattern = 'HH:mm' | 'HH:mm:ss' | 'hh:mm' | 'hh:mm:ss';
  * @since 0.1.0
  */
 export type TimeFormatSeparator = ':' | '.';
+
+/**
+ * The canonical time patterns supported by the time format.
+ *
+ * @private
+ */
+const TIME_PATTERNS = [
+    'HH:mm',
+    'HH:mm:ss',
+    'hh:mm',
+    'hh:mm:ss',
+] as const satisfies readonly TimeFormatPattern[];
+
+/**
+ * The separators supported when rendering formatted time values.
+ *
+ * @private
+ */
+const TIME_SEPARATORS = [
+    ':',
+    '.',
+] as const satisfies readonly TimeFormatSeparator[];
 
 /**
  * The configuration options for a time format.
@@ -44,6 +67,43 @@ export type TimeFormatOptions = {
      */
     strictTimeParts?: boolean;
 };
+
+/**
+ * The complete time-format options after defaults have been applied.
+ *
+ * @private
+ */
+type NormalizedTimeFormatOptions = Required<TimeFormatOptions>;
+
+/**
+ * Applies time-format defaults and validates the supported option values.
+ *
+ * @private
+ */
+function normalizeTimeFormatOptions(
+    options: TimeFormatOptions
+): NormalizedTimeFormatOptions {
+    if (!options || !Object.hasOwn(options, 'pattern')) {
+        reporter.fail('ERR09');
+    }
+
+    const separator = options.separator ?? ':';
+
+    if (!TIME_PATTERNS.includes(options.pattern)) {
+        reporter.fail('ERR10');
+    }
+
+    if (!TIME_SEPARATORS.includes(separator)) {
+        reporter.fail('ERR11');
+    }
+
+    return {
+        insertLeadingZero: options.insertLeadingZero ?? false,
+        pattern: options.pattern,
+        separator,
+        strictTimeParts: options.strictTimeParts ?? false,
+    };
+}
 
 /**
  * Determines whether one time segment can still resolve to a possible
@@ -126,12 +186,9 @@ function resolveTimeSegments(
  * @since 0.1.0
  */
 export default function defineTimeFormat(options: TimeFormatOptions): Format {
-    const {
-        insertLeadingZero = false,
-        pattern,
-        separator = ':',
-        strictTimeParts = false,
-    } = options;
+    const normalizedOptions = normalizeTimeFormatOptions(options);
+    const { insertLeadingZero, pattern, separator, strictTimeParts } =
+        normalizedOptions;
     const patternSegments = pattern.split(':');
     const leadingZeroRules = resolveLeadingZeroRules(patternSegments);
 

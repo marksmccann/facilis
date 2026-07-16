@@ -8,6 +8,9 @@ const messages = {
     ERR05: 'Date formats require a pattern option.',
     ERR07: 'Date formats require a supported pattern.',
     ERR08: 'Date formats require a supported separator.',
+    ERR09: 'Time formats require a pattern option.',
+    ERR10: 'Time formats require a supported pattern.',
+    ERR11: 'Time formats require a supported separator.',
 } as const;
 
 export const reporter = createReporter(
