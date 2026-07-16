@@ -10,6 +10,11 @@ function context(
         previous: '12,345',
         attempted: '1,345',
         formatted: '1,345',
+        resolved: {
+            value: '1,345',
+            selectionStart: 1,
+            selectionEnd: 1,
+        },
         normalize: (raw) => raw.replace(/\D/g, ''),
         cursor: 2,
         start: 1,

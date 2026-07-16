@@ -66,6 +66,11 @@ export type EditContext = {
     formatted: string;
 
     /**
+     * The default value and selection state resolved for this edit.
+     */
+    resolved: TextState;
+
+    /**
      * Extracts the semantic value from any display value using the active format
      * definition.
      */
@@ -283,6 +288,11 @@ export type RunEditContext = {
      * The default formatted text produced from the normalized value.
      */
     formatted: string;
+
+    /**
+     * The default value and selection state resolved from the current edit.
+     */
+    resolved: TextState;
 };
 
 /**

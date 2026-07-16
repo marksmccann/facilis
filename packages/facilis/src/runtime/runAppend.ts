@@ -6,7 +6,8 @@ import type { FormatEditResult, RunEditContext } from '../types';
  * @private
  */
 export default function runAppend(context: RunEditContext): FormatEditResult {
-    const { definition, previous, current, normalized, formatted } = context;
+    const { definition, previous, current, normalized, formatted, resolved } =
+        context;
     const { edit, normalize } = definition;
     let result: FormatEditResult;
 
@@ -19,6 +20,7 @@ export default function runAppend(context: RunEditContext): FormatEditResult {
             previous: previous.value,
             attempted: current.value,
             formatted,
+            resolved,
             normalize,
             cursor,
             start: cursor,

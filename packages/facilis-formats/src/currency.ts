@@ -57,22 +57,20 @@ export function currency(options: CurrencyOptions = {}): Format {
 
             return `${symbol}${resolved}`;
         },
-        edit: {
-            deleteBackward(context) {
-                if (
-                    symbol &&
-                    context.deleted === symbol &&
-                    context.normalized.deleted === ''
-                ) {
-                    return {
-                        value: context.previous,
-                        selectionStart: context.start,
-                        selectionEnd: context.start,
-                    };
-                }
+        delete(next, context) {
+            if (
+                symbol &&
+                context.deleted === symbol &&
+                context.normalized.deleted === ''
+            ) {
+                return {
+                    value: context.previous,
+                    selectionStart: context.start,
+                    selectionEnd: context.start,
+                };
+            }
 
-                return context.resolved;
-            },
+            return next;
         },
     });
 }

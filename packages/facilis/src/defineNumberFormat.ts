@@ -11,8 +11,8 @@ import type {
     AppendEditContext,
     DeleteBackwardEditContext,
     Format,
-    FormatEditResult,
     InsertEditContext,
+    TextState,
 } from './types';
 import clampNumber from './transforms/clampNumber';
 import filterNumberCharacters from './transforms/filterNumberCharacters';
@@ -112,46 +112,45 @@ export type NumberFormatBlurHook = (
 ) => string;
 
 /**
- * Describes the resolved edit result available to number-format edit hooks.
+ * Describes the context available to number-format edit hooks.
  *
  * @since 0.1.0
  */
-export type NumberFormatEditContext<TContext> = TContext &
-    NormalizedNumberFormatOptions & {
-        /**
-         * The edit result resolved by the built-in number-format behavior.
-         */
-        resolved: FormatEditResult;
-    };
+export type NumberFormatEditContext<TContext extends { resolved: TextState }> =
+    Omit<TContext, 'resolved'> & NormalizedNumberFormatOptions;
 
 /**
- * Customizes number-format edit behavior after the built-in edit behavior has
- * resolved its result.
+ * Customizes append behavior after the built-in number-format behavior has
+ * resolved the next text state.
  *
  * @since 0.1.0
  */
-export type NumberFormatEditHooks = {
-    /**
-     * Handles text appended to the end of the value.
-     */
-    append?: (
-        context: NumberFormatEditContext<AppendEditContext>
-    ) => FormatEditResult;
+export type NumberFormatAppendHook = (
+    next: TextState,
+    context: NumberFormatEditContext<AppendEditContext>
+) => TextState;
 
-    /**
-     * Handles text inserted before the end of the value.
-     */
-    insert?: (
-        context: NumberFormatEditContext<InsertEditContext>
-    ) => FormatEditResult;
+/**
+ * Customizes insert behavior after the built-in number-format behavior has
+ * resolved the next text state.
+ *
+ * @since 0.1.0
+ */
+export type NumberFormatInsertHook = (
+    next: TextState,
+    context: NumberFormatEditContext<InsertEditContext>
+) => TextState;
 
-    /**
-     * Handles backward deletion.
-     */
-    deleteBackward?: (
-        context: NumberFormatEditContext<DeleteBackwardEditContext>
-    ) => FormatEditResult;
-};
+/**
+ * Customizes delete behavior after the built-in number-format behavior has
+ * resolved the next text state.
+ *
+ * @since 0.1.0
+ */
+export type NumberFormatDeleteHook = (
+    next: TextState,
+    context: NumberFormatEditContext<DeleteBackwardEditContext>
+) => TextState;
 
 /**
  * The configuration options for a number format.
@@ -228,9 +227,22 @@ export type NumberFormatOptions = NumberFormatBaseOptions & {
     blur?: NumberFormatBlurHook;
 
     /**
-     * Customizes resolved edit behavior.
+     * Customizes append behavior after the built-in number-format behavior has
+     * resolved the next text state.
      */
-    edit?: NumberFormatEditHooks;
+    append?: NumberFormatAppendHook;
+
+    /**
+     * Customizes insert behavior after the built-in number-format behavior has
+     * resolved the next text state.
+     */
+    insert?: NumberFormatInsertHook;
+
+    /**
+     * Customizes delete behavior after the built-in number-format behavior has
+     * resolved the next text state.
+     */
+    delete?: NumberFormatDeleteHook;
 };
 
 /**
@@ -262,7 +274,7 @@ function normalizeNumberFormatOptions(
 function resolveDeleteBackward(
     context: DeleteBackwardEditContext,
     options: NormalizedNumberFormatOptions
-): FormatEditResult {
+): TextState | undefined {
     const { cursor, formatted, previous, start } = context;
     const formatting = options.thousandsSeparator;
 
@@ -295,6 +307,29 @@ function resolveDeleteBackward(
             };
         }
     }
+}
+
+/**
+ * Resolves the context passed to number-format edit hooks.
+ *
+ * @private
+ */
+function resolveEditContext<
+    TContext extends
+        | AppendEditContext
+        | InsertEditContext
+        | DeleteBackwardEditContext,
+>(
+    context: TContext,
+    options: NormalizedNumberFormatOptions
+): NumberFormatEditContext<TContext> {
+    const { resolved, ...editContext } = context;
+    void resolved;
+
+    return {
+        ...editContext,
+        ...options,
+    } as NumberFormatEditContext<TContext>;
 }
 
 /**
@@ -439,38 +474,31 @@ export default function defineNumberFormat(
         },
         edit: {
             append(context) {
-                if (options?.edit?.append) {
-                    return options.edit.append({
-                        ...context,
-                        ...normalizedOptions,
-                        resolved: undefined,
+                if (options?.append) {
+                    return options.append(context.resolved, {
+                        ...resolveEditContext(context, normalizedOptions),
                     });
                 }
             },
             insert(context) {
-                if (options?.edit?.insert) {
-                    return options.edit.insert({
-                        ...context,
-                        ...normalizedOptions,
-                        resolved: undefined,
+                if (options?.insert) {
+                    return options.insert(context.resolved, {
+                        ...resolveEditContext(context, normalizedOptions),
                     });
                 }
             },
             deleteBackward(context) {
-                const resolved = resolveDeleteBackward(
-                    context,
-                    normalizedOptions
-                );
+                const next =
+                    resolveDeleteBackward(context, normalizedOptions) ??
+                    context.resolved;
 
-                if (options?.edit?.deleteBackward) {
-                    return options.edit.deleteBackward({
-                        ...context,
-                        ...normalizedOptions,
-                        resolved,
+                if (options?.delete) {
+                    return options.delete(next, {
+                        ...resolveEditContext(context, normalizedOptions),
                     });
                 }
 
-                return resolved;
+                return next;
             },
         },
     });

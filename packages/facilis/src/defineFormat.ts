@@ -24,14 +24,15 @@ export default function defineFormat(definition: FormatDefinition): Format {
             const normalized = definition.normalize(current.value);
             const formatted = runFormat(definition, normalized);
             const selection = resolveSelection(definition, current);
+            let next: TextState = { value: formatted, ...selection };
             const editContext = {
                 definition,
                 previous,
                 current,
                 normalized,
                 formatted,
+                resolved: next,
             };
-            let next: TextState = { value: formatted, ...selection };
 
             if (isAppendEdit(details, previous, current)) {
                 const result = runAppend(editContext);

@@ -8,7 +8,8 @@ import type { FormatEditResult, RunEditContext } from '../types';
 export default function runDeleteBackward(
     context: RunEditContext
 ): FormatEditResult {
-    const { definition, previous, current, normalized, formatted } = context;
+    const { definition, previous, current, normalized, formatted, resolved } =
+        context;
     const cursor = previous.selectionStart;
     const { edit, normalize } = definition;
     let result: FormatEditResult;
@@ -23,6 +24,7 @@ export default function runDeleteBackward(
             previous: previous.value,
             attempted: current.value,
             formatted,
+            resolved,
             normalize,
             cursor,
             start,

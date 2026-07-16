@@ -6,7 +6,8 @@ import type { FormatEditResult, RunEditContext } from '../types';
  * @private
  */
 export default function runInsert(context: RunEditContext): FormatEditResult {
-    const { definition, previous, current, normalized, formatted } = context;
+    const { definition, previous, current, normalized, formatted, resolved } =
+        context;
     const { edit, normalize } = definition;
     const cursor = previous.selectionStart;
     let result: FormatEditResult;
@@ -21,6 +22,7 @@ export default function runInsert(context: RunEditContext): FormatEditResult {
             previous: previous.value,
             attempted: current.value,
             formatted,
+            resolved,
             normalize,
             cursor,
             start: cursor,
