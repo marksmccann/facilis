@@ -1,11 +1,10 @@
 import defineSegmentedFormat from './defineSegmentedFormat';
-import type { SegmentedFormatOptions } from './defineSegmentedFormat';
 import type { SegmentedFormatSegment } from './defineSegmentedFormat';
+import insertBeforeCharacter from '../helpers/insertBeforeCharacter';
+import rejectInvalidSegments from '../helpers/rejectInvalidSegments';
 import { reporter } from '../reporter';
 import type { FormatFactoryOptions } from '../types/factory';
 import type { Format } from '../types/format';
-import insertBeforeCharacter from '../transforms/insertBeforeCharacter';
-import rejectInvalidSegments from '../transforms/rejectInvalidSegments';
 
 /**
  * The canonical date patterns supported by the date format.
@@ -52,7 +51,7 @@ export type DateFormatSeparator = (typeof DATE_SEPARATORS)[number];
  *
  * @private
  */
-type DateFormatBaseOptions = {
+type DateFormatDateOptions = {
     /** The canonical pattern that defines the date parts to format. */
     pattern: DateFormatPattern;
 
@@ -77,7 +76,7 @@ type DateFormatBaseOptions = {
  *
  * @private
  */
-type NormalizedDateFormatOptions = Required<DateFormatBaseOptions>;
+type NormalizedDateFormatOptions = Required<DateFormatDateOptions>;
 
 /**
  * The configuration options for a date format.
@@ -85,7 +84,7 @@ type NormalizedDateFormatOptions = Required<DateFormatBaseOptions>;
  * @since 0.1.0
  */
 export type DateFormatOptions = FormatFactoryOptions<
-    DateFormatBaseOptions,
+    DateFormatDateOptions,
     NormalizedDateFormatOptions
 >;
 
@@ -197,7 +196,8 @@ export default function defineDateFormat(options: DateFormatOptions): Format {
     const patternSegments = pattern.split('/');
     const leadingZeroRules = resolveLeadingZeroRules(patternSegments);
     const maxLength = patternSegments.join('').length;
-    const segmentedOptions: SegmentedFormatOptions = {
+
+    return defineSegmentedFormat({
         matches: /\d/,
         segments: resolveDateSegments(patternSegments, separator),
         normalize(resolved, context) {
@@ -229,52 +229,55 @@ export default function defineDateFormat(options: DateFormatOptions): Format {
 
             return normalized;
         },
-    };
+        format(resolved, context) {
+            if (options.format) {
+                return options.format(resolved, {
+                    ...normalizedOptions,
+                    normalized: context.normalized,
+                });
+            }
 
-    if (options.format) {
-        const format = options.format;
-        segmentedOptions.format = (resolved, context) =>
-            format(resolved, {
-                ...normalizedOptions,
-                normalized: context.normalized,
-            });
-    }
+            return resolved;
+        },
+        blur(resolved, context) {
+            if (options.blur) {
+                return options.blur(resolved, {
+                    ...normalizedOptions,
+                    formatted: context.formatted,
+                });
+            }
 
-    if (options.blur) {
-        const blur = options.blur;
-        segmentedOptions.blur = (resolved, context) =>
-            blur(resolved, {
-                ...normalizedOptions,
-                formatted: context.formatted,
-            });
-    }
+            return resolved;
+        },
+        append(next, context) {
+            if (options.append) {
+                return options.append(next, {
+                    ...context,
+                    ...normalizedOptions,
+                });
+            }
 
-    if (options.append) {
-        const append = options.append;
-        segmentedOptions.append = (next, context) =>
-            append(next, {
-                ...context,
-                ...normalizedOptions,
-            });
-    }
+            return next;
+        },
+        insert(next, context) {
+            if (options.insert) {
+                return options.insert(next, {
+                    ...context,
+                    ...normalizedOptions,
+                });
+            }
 
-    if (options.insert) {
-        const insert = options.insert;
-        segmentedOptions.insert = (next, context) =>
-            insert(next, {
-                ...context,
-                ...normalizedOptions,
-            });
-    }
+            return next;
+        },
+        delete(next, context) {
+            if (options.delete) {
+                return options.delete(next, {
+                    ...context,
+                    ...normalizedOptions,
+                });
+            }
 
-    if (options.delete) {
-        const deleteHook = options.delete;
-        segmentedOptions.delete = (next, context) =>
-            deleteHook(next, {
-                ...context,
-                ...normalizedOptions,
-            });
-    }
-
-    return defineSegmentedFormat(segmentedOptions);
+            return next;
+        },
+    });
 }

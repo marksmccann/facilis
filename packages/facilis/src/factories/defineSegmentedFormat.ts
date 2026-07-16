@@ -1,4 +1,4 @@
-import defineFormat from './defineFormat';
+import defineFormat from '../core/defineFormat';
 import {
     resolveFormatFactoryEditHookContext,
     resolveFormatFactoryEditResult,
@@ -35,7 +35,7 @@ export type SegmentedFormatSegments =
  *
  * @private
  */
-type SegmentedFormatBaseOptions = {
+type SegmentedFormatSegmentedOptions = {
     /** The raw character pattern allowed into the normalized value. */
     matches: SegmentedFormatMatches;
 
@@ -48,7 +48,7 @@ type SegmentedFormatBaseOptions = {
  *
  * @private
  */
-type NormalizedSegmentedFormatOptions = SegmentedFormatBaseOptions;
+type NormalizedSegmentedFormatOptions = SegmentedFormatSegmentedOptions;
 
 /**
  * The configuration options for a segmented format.
@@ -56,7 +56,7 @@ type NormalizedSegmentedFormatOptions = SegmentedFormatBaseOptions;
  * @since 0.1.0
  */
 export type SegmentedFormatOptions = FormatFactoryOptions<
-    SegmentedFormatBaseOptions,
+    SegmentedFormatSegmentedOptions,
     NormalizedSegmentedFormatOptions
 >;
 

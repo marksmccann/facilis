@@ -1,15 +1,15 @@
-import defineFormat from './defineFormat';
+import defineFormat from '../core/defineFormat';
 import {
     resolveFormatFactoryEditHookContext,
     resolveFormatFactoryEditResult,
 } from './resolveFormatFactoryEdit';
-import isAppendDuplicateFormattingAt from '../guards/isAppendDuplicateFormattingAt';
-import isAppendExpectedFormattingAt from '../guards/isAppendExpectedFormattingAt';
-import isAppendFormatting from '../guards/isAppendFormatting';
-import isDeleteOverFormatting from '../guards/isDeleteOverFormatting';
-import isInsertAtMaxLength from '../guards/isInsertAtMaxLength';
+import isDeleteOverFormatting from '../helpers/isDeleteOverFormatting';
 import { reporter } from '../reporter';
-import type { FormatEditHookResult } from '../types/hooks';
+import type {
+    FormatAppendHookContext,
+    FormatEditHookResult,
+    FormatInsertHookContext,
+} from '../types/hooks';
 import type { FormatFactoryOptions } from '../types/factory';
 import type { Format } from '../types/format';
 
@@ -39,7 +39,7 @@ export type PatternFormatTokenDefinitions = Record<
  *
  * @private
  */
-type PatternFormatBaseOptions = {
+type PatternFormatPatternOptions = {
     /** The pattern string that defines literal characters and token slots. */
     pattern: string;
 
@@ -52,7 +52,7 @@ type PatternFormatBaseOptions = {
  *
  * @private
  */
-type NormalizedPatternFormatOptions = PatternFormatBaseOptions;
+type NormalizedPatternFormatOptions = PatternFormatPatternOptions;
 
 /**
  * The explicit configuration object for one parsed pattern definition.
@@ -60,7 +60,7 @@ type NormalizedPatternFormatOptions = PatternFormatBaseOptions;
  * @since 0.1.0
  */
 export type PatternFormatOptions = FormatFactoryOptions<
-    PatternFormatBaseOptions,
+    PatternFormatPatternOptions,
     NormalizedPatternFormatOptions
 >;
 
@@ -209,6 +209,84 @@ function getPatternLiteralRun(
     }
 
     return literalRun;
+}
+
+/**
+ * Determines whether an append added formatting text without changing the
+ * normalized value.
+ *
+ * @private
+ */
+function isAppendFormatting(context: FormatAppendHookContext): boolean {
+    const { appended, normalized } = context;
+
+    return (
+        appended !== '' &&
+        normalized.appended === '' &&
+        normalized.attempted === normalized.previous
+    );
+}
+
+/**
+ * Determines whether an append added formatting while the previous display
+ * already contains expected formatting text at one display position.
+ *
+ * @private
+ */
+function isAppendDuplicateFormattingAt(
+    context: FormatAppendHookContext,
+    expectedFormatting: string,
+    position: number
+): boolean {
+    const pending = context.previous.slice(context.formatted.length);
+    const offset = context.formatted.length - position;
+
+    return (
+        isAppendFormatting(context) &&
+        context.previous !== context.formatted &&
+        context.previous.startsWith(context.formatted) &&
+        pending !== '' &&
+        offset >= 0 &&
+        offset < expectedFormatting.length &&
+        expectedFormatting.slice(offset).startsWith(pending)
+    );
+}
+
+/**
+ * Determines whether an append added expected formatting text at one display
+ * position without changing the normalized value.
+ *
+ * @private
+ */
+function isAppendExpectedFormattingAt(
+    context: FormatAppendHookContext,
+    expectedFormatting: string,
+    position: number
+): boolean {
+    const offset = context.previous.length - position;
+
+    return (
+        isAppendFormatting(context) &&
+        offset >= 0 &&
+        offset < expectedFormatting.length &&
+        expectedFormatting.slice(offset).startsWith(context.appended)
+    );
+}
+
+/**
+ * Determines whether a middle insertion adds semantic text after the normalized
+ * value has reached a maximum length.
+ *
+ * @private
+ */
+function isInsertAtMaxLength(
+    context: FormatInsertHookContext,
+    maxLength: number
+): boolean {
+    return (
+        context.normalized.inserted !== '' &&
+        context.normalized.previous.length >= maxLength
+    );
 }
 
 /**

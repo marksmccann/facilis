@@ -1,4 +1,4 @@
-import resolveEditResult from '../runtime/resolveEditResult';
+import resolveEditResult from '../core/resolveEditResult';
 import type {
     FormatAppendHookContext,
     FormatDeleteHookContext,

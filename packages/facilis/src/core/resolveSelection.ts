@@ -1,6 +1,6 @@
 import type { FormatDefinition } from '../types/format';
 import type { Selection, TextState } from '../types/input';
-import runFormat from '../runtime/runFormat';
+import runFormat from './runFormat';
 
 /**
  * Resolves one cursor boundary through a boundary lookup table.
