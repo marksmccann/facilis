@@ -47,15 +47,15 @@ export function currency(options: CurrencyOptions = {}): Format {
         padDecimalPlaces: includeCents ? 2 : 0,
         thousandsSeparator,
         trimLeadingZeros: true,
-        format(normalized, context) {
-            if (normalized === '') return '';
+        format(resolved) {
+            if (resolved === '') return '';
 
-            return `${symbol}${context.resolved}`;
+            return `${symbol}${resolved}`;
         },
-        blur(_formatted, context) {
-            if (context.resolved === '') return '';
+        blur(resolved) {
+            if (resolved === '') return '';
 
-            return `${symbol}${context.resolved}`;
+            return `${symbol}${resolved}`;
         },
         edit: {
             deleteBackward(context) {

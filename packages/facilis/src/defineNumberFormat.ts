@@ -46,16 +46,36 @@ type NormalizedNumberFormatOptions = Required<
 > &
     Pick<NumberFormatBaseOptions, 'max' | 'min'>;
 
+type NumberFormatLifecycleContext = NormalizedNumberFormatOptions;
+
 /**
- * Describes the resolved value available to number-format lifecycle hooks.
+ * Describes the context available to number-format normalize hooks.
  *
  * @since 0.1.0
  */
-export type NumberFormatLifecycleContext = NormalizedNumberFormatOptions & {
-    /**
-     * The value resolved by the built-in number-format behavior for this stage.
-     */
-    resolved: string;
+export type NumberFormatNormalizeContext = NumberFormatLifecycleContext & {
+    /** The raw value passed into the normalize stage. */
+    raw: string;
+};
+
+/**
+ * Describes the context available to number-format format hooks.
+ *
+ * @since 0.1.0
+ */
+export type NumberFormatFormatContext = NumberFormatLifecycleContext & {
+    /** The normalized value passed into the format stage. */
+    normalized: string;
+};
+
+/**
+ * Describes the context available to number-format blur hooks.
+ *
+ * @since 0.1.0
+ */
+export type NumberFormatBlurContext = NumberFormatLifecycleContext & {
+    /** The formatted value passed into the blur stage. */
+    formatted: string;
 };
 
 /**
@@ -65,8 +85,8 @@ export type NumberFormatLifecycleContext = NormalizedNumberFormatOptions & {
  * @since 0.1.0
  */
 export type NumberFormatNormalizeHook = (
-    raw: string,
-    context: NumberFormatLifecycleContext
+    resolved: string,
+    context: NumberFormatNormalizeContext
 ) => string;
 
 /**
@@ -76,8 +96,8 @@ export type NumberFormatNormalizeHook = (
  * @since 0.1.0
  */
 export type NumberFormatFormatHook = (
-    normalized: string,
-    context: NumberFormatLifecycleContext
+    resolved: string,
+    context: NumberFormatFormatContext
 ) => string;
 
 /**
@@ -87,8 +107,8 @@ export type NumberFormatFormatHook = (
  * @since 0.1.0
  */
 export type NumberFormatBlurHook = (
-    formatted: string,
-    context: NumberFormatLifecycleContext
+    resolved: string,
+    context: NumberFormatBlurContext
 ) => string;
 
 /**
@@ -333,9 +353,9 @@ export default function defineNumberFormat(
             });
 
             if (options?.normalize) {
-                return options.normalize(raw, {
+                return options.normalize(resolved, {
                     ...normalizedOptions,
-                    resolved,
+                    raw,
                 });
             }
 
@@ -349,9 +369,9 @@ export default function defineNumberFormat(
             });
 
             if (options?.format) {
-                return options.format(normalized, {
+                return options.format(resolved, {
                     ...normalizedOptions,
-                    resolved,
+                    normalized,
                 });
             }
 
@@ -409,9 +429,9 @@ export default function defineNumberFormat(
             });
 
             if (options?.blur) {
-                return options.blur(formatted, {
+                return options.blur(resolved, {
                     ...normalizedOptions,
-                    resolved,
+                    formatted,
                 });
             }
 

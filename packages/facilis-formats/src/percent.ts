@@ -101,27 +101,29 @@ export function percent(options?: PercentOptions): Format {
         min,
         padDecimalPlaces: decimalPlacesToPad,
         trimLeadingZeros: true,
-        format(normalized, context) {
+        format(resolved, context) {
             if (
                 !includeSymbol ||
-                isIncompletePercentValue(normalized, { decimalSeparator })
-            ) {
-                return context.resolved;
-            }
-
-            return `${context.resolved}${PERCENT_SYMBOL}`;
-        },
-        blur(_formatted, context) {
-            if (
-                !includeSymbol ||
-                isIncompletePercentValue(context.resolved, {
+                isIncompletePercentValue(context.normalized, {
                     decimalSeparator,
                 })
             ) {
-                return context.resolved;
+                return resolved;
             }
 
-            return `${context.resolved}${PERCENT_SYMBOL}`;
+            return `${resolved}${PERCENT_SYMBOL}`;
+        },
+        blur(resolved) {
+            if (
+                !includeSymbol ||
+                isIncompletePercentValue(resolved, {
+                    decimalSeparator,
+                })
+            ) {
+                return resolved;
+            }
+
+            return `${resolved}${PERCENT_SYMBOL}`;
         },
     });
 }
