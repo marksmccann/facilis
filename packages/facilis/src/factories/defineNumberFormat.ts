@@ -11,11 +11,11 @@ import type { Format } from '../types/format';
 import type { Selection, TextState } from '../types/input';
 
 /**
- * The number-format options before defaults have been applied.
+ * The number-format configuration without factory hooks.
  *
  * @private
  */
-type NumberFormatNumberOptions = {
+type NumberFormatConfig = {
     /**
      * The maximum number of decimal places to preserve. The default is `0`,
      * which produces an integer-only format.
@@ -71,23 +71,23 @@ type NumberFormatNumberOptions = {
 };
 
 /**
- * The complete number-format options after defaults have been applied.
+ * The number-format configuration after defaults have been applied.
  *
  * @private
  */
-type NormalizedNumberFormatOptions = Required<
-    Omit<NumberFormatNumberOptions, 'max' | 'min'>
+type ResolvedNumberFormatConfig = Required<
+    Omit<NumberFormatConfig, 'max' | 'min'>
 > &
-    Pick<NumberFormatNumberOptions, 'max' | 'min'>;
+    Pick<NumberFormatConfig, 'max' | 'min'>;
 
 /**
- * The configuration options for a number format.
+ * The public number-format options, including configuration and hooks.
  *
  * @since 0.1.0
  */
 export type NumberFormatOptions = FormatFactoryOptions<
-    NumberFormatNumberOptions,
-    NormalizedNumberFormatOptions
+    NumberFormatConfig,
+    ResolvedNumberFormatConfig
 >;
 
 /**
@@ -95,9 +95,9 @@ export type NumberFormatOptions = FormatFactoryOptions<
  *
  * @private
  */
-function normalizeNumberFormatOptions(
+function resolveNumberFormatConfig(
     options: NumberFormatOptions = {}
-): NormalizedNumberFormatOptions {
+): ResolvedNumberFormatConfig {
     return {
         allowNegative: options.allowNegative ?? false,
         decimalPlaces: Math.max(0, options.decimalPlaces ?? 0),
@@ -462,7 +462,7 @@ function isDeleteBeforeFormatting(
  */
 function resolveDelete(
     context: FormatDeleteHookContext,
-    options: NormalizedNumberFormatOptions
+    options: ResolvedNumberFormatConfig
 ): TextState | undefined {
     const { cursor, formatted, previous, start } = context;
     const formatting = options.thousandsSeparator;
@@ -503,7 +503,7 @@ function resolveDelete(
 export default function defineNumberFormat(
     options?: NumberFormatOptions
 ): Format {
-    const normalizedOptions = normalizeNumberFormatOptions(options);
+    const resolvedConfig = resolveNumberFormatConfig(options);
     const {
         allowNegative,
         decimalPlaces,
@@ -514,7 +514,7 @@ export default function defineNumberFormat(
         padDecimalPlaces: decimalPlacesToPad,
         thousandsSeparator,
         trimLeadingZeros: shouldTrimLeadingZeros,
-    } = normalizedOptions;
+    } = resolvedConfig;
 
     return defineFormat({
         normalize(raw) {
@@ -540,7 +540,7 @@ export default function defineNumberFormat(
 
             if (options?.normalize) {
                 return options.normalize(resolved, {
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                     raw,
                 });
             }
@@ -557,7 +557,7 @@ export default function defineNumberFormat(
 
             if (options?.format) {
                 return options.format(resolved, {
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                     normalized,
                 });
             }
@@ -608,7 +608,7 @@ export default function defineNumberFormat(
 
             if (options?.blur) {
                 return options.blur(resolved, {
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                     formatted,
                 });
             }
@@ -620,7 +620,7 @@ export default function defineNumberFormat(
                 return options.append(context.resolved, {
                     ...resolveFormatFactoryEditHookContext(
                         context,
-                        normalizedOptions
+                        resolvedConfig
                     ),
                 });
             }
@@ -630,20 +630,20 @@ export default function defineNumberFormat(
                 return options.insert(context.resolved, {
                     ...resolveFormatFactoryEditHookContext(
                         context,
-                        normalizedOptions
+                        resolvedConfig
                     ),
                 });
             }
         },
         delete(context) {
             const next =
-                resolveDelete(context, normalizedOptions) ?? context.resolved;
+                resolveDelete(context, resolvedConfig) ?? context.resolved;
 
             if (options?.delete) {
                 return options.delete(next, {
                     ...resolveFormatFactoryEditHookContext(
                         context,
-                        normalizedOptions
+                        resolvedConfig
                     ),
                 });
             }

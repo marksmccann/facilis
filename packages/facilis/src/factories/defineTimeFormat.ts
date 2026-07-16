@@ -37,11 +37,11 @@ export type TimeFormatPattern = (typeof TIME_PATTERNS)[number];
 export type TimeFormatSeparator = (typeof TIME_SEPARATORS)[number];
 
 /**
- * The time-format options before defaults have been applied.
+ * The time-format configuration without factory hooks.
  *
  * @private
  */
-type TimeFormatTimeOptions = {
+type TimeFormatConfig = {
     /** The canonical pattern that defines the time parts to format. */
     pattern: TimeFormatPattern;
 
@@ -62,20 +62,20 @@ type TimeFormatTimeOptions = {
 };
 
 /**
- * The complete time-format options after defaults have been applied.
+ * The time-format configuration after defaults and validation have been applied.
  *
  * @private
  */
-type NormalizedTimeFormatOptions = Required<TimeFormatTimeOptions>;
+type ResolvedTimeFormatConfig = Required<TimeFormatConfig>;
 
 /**
- * The configuration options for a time format.
+ * The public time-format options, including configuration and hooks.
  *
  * @since 0.1.0
  */
 export type TimeFormatOptions = FormatFactoryOptions<
-    TimeFormatTimeOptions,
-    NormalizedTimeFormatOptions
+    TimeFormatConfig,
+    ResolvedTimeFormatConfig
 >;
 
 /**
@@ -83,9 +83,9 @@ export type TimeFormatOptions = FormatFactoryOptions<
  *
  * @private
  */
-function normalizeTimeFormatOptions(
+function resolveTimeFormatConfig(
     options: TimeFormatOptions
-): NormalizedTimeFormatOptions {
+): ResolvedTimeFormatConfig {
     if (!options || !Object.hasOwn(options, 'pattern')) {
         reporter.fail('ERR09');
     }
@@ -189,9 +189,9 @@ function resolveTimeSegments(
  * @since 0.1.0
  */
 export default function defineTimeFormat(options: TimeFormatOptions): Format {
-    const normalizedOptions = normalizeTimeFormatOptions(options);
+    const resolvedConfig = resolveTimeFormatConfig(options);
     const { insertLeadingZero, pattern, separator, strictTimeParts } =
-        normalizedOptions;
+        resolvedConfig;
     const patternSegments = pattern.split(':');
     const leadingZeroRules = resolveLeadingZeroRules(patternSegments);
     const maxLength = patternSegments.join('').length;
@@ -221,7 +221,7 @@ export default function defineTimeFormat(options: TimeFormatOptions): Format {
 
             if (options.normalize) {
                 return options.normalize(normalized, {
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                     raw: context.raw,
                 });
             }
@@ -231,7 +231,7 @@ export default function defineTimeFormat(options: TimeFormatOptions): Format {
         format(resolved, context) {
             if (options.format) {
                 return options.format(resolved, {
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                     normalized: context.normalized,
                 });
             }
@@ -241,7 +241,7 @@ export default function defineTimeFormat(options: TimeFormatOptions): Format {
         blur(resolved, context) {
             if (options.blur) {
                 return options.blur(resolved, {
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                     formatted: context.formatted,
                 });
             }
@@ -252,7 +252,7 @@ export default function defineTimeFormat(options: TimeFormatOptions): Format {
             if (options.append) {
                 return options.append(next, {
                     ...context,
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                 });
             }
 
@@ -262,7 +262,7 @@ export default function defineTimeFormat(options: TimeFormatOptions): Format {
             if (options.insert) {
                 return options.insert(next, {
                     ...context,
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                 });
             }
 
@@ -272,7 +272,7 @@ export default function defineTimeFormat(options: TimeFormatOptions): Format {
             if (options.delete) {
                 return options.delete(next, {
                     ...context,
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                 });
             }
 

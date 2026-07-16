@@ -31,11 +31,11 @@ export type SegmentedFormatSegments =
     | ((normalized: string) => SegmentedFormatSegment[]);
 
 /**
- * The segmented-format options before defaults have been applied.
+ * The segmented-format configuration without factory hooks.
  *
  * @private
  */
-type SegmentedFormatSegmentedOptions = {
+type SegmentedFormatConfig = {
     /** The raw character pattern allowed into the normalized value. */
     matches: SegmentedFormatMatches;
 
@@ -44,30 +44,14 @@ type SegmentedFormatSegmentedOptions = {
 };
 
 /**
- * The complete segmented-format options after defaults have been applied.
- *
- * @private
- */
-type NormalizedSegmentedFormatOptions = SegmentedFormatSegmentedOptions;
-
-/**
- * The configuration options for a segmented format.
+ * The public segmented-format options, including configuration and hooks.
  *
  * @since 0.1.0
  */
 export type SegmentedFormatOptions = FormatFactoryOptions<
-    SegmentedFormatSegmentedOptions,
-    NormalizedSegmentedFormatOptions
+    SegmentedFormatConfig,
+    SegmentedFormatConfig
 >;
-
-function normalizeSegmentedFormatOptions(
-    options: SegmentedFormatOptions
-): NormalizedSegmentedFormatOptions {
-    return {
-        matches: options.matches,
-        segments: options.segments,
-    };
-}
 
 /**
  * Tests whether one raw character is allowed into the normalized value.
@@ -116,7 +100,7 @@ function resolveSegmentedMaxLength(segments: SegmentedFormatSegment[]) {
  */
 function resolveSegmentedSegments(
     normalized: string,
-    options: NormalizedSegmentedFormatOptions
+    options: SegmentedFormatConfig
 ) {
     if (typeof options.segments === 'function') {
         return options.segments(normalized);
@@ -130,15 +114,12 @@ function resolveSegmentedSegments(
  *
  * @private
  */
-function normalizeSegmentedValue(
-    raw: string,
-    options: NormalizedSegmentedFormatOptions
-) {
-    const value = Array.from(raw)
-        .filter((character) =>
-            matchesSegmentedCharacter(options.matches, character)
-        )
-        .join('');
+function normalizeSegmentedValue(raw: string, options: SegmentedFormatConfig) {
+    const characters = Array.from(raw);
+    const matchedCharacters = characters.filter((character) =>
+        matchesSegmentedCharacter(options.matches, character)
+    );
+    const value = matchedCharacters.join('');
     const segments = resolveSegmentedSegments(value, options);
     const maxLength = resolveSegmentedMaxLength(segments);
 
@@ -218,7 +199,7 @@ function isAppendFormatting(
         appended: string;
         normalized: { appended: string; attempted: string; previous: string };
     },
-    options: NormalizedSegmentedFormatOptions
+    options: SegmentedFormatConfig
 ) {
     return (
         context.appended !== '' &&
@@ -236,15 +217,18 @@ function isAppendFormatting(
 export default function defineSegmentedFormat(
     options: SegmentedFormatOptions
 ): Format {
-    const normalizedOptions = normalizeSegmentedFormatOptions(options);
+    const config: SegmentedFormatConfig = {
+        matches: options.matches,
+        segments: options.segments,
+    };
 
     return defineFormat({
         normalize(raw) {
-            const resolved = normalizeSegmentedValue(raw, normalizedOptions);
+            const resolved = normalizeSegmentedValue(raw, config);
 
             if (options.normalize) {
                 return options.normalize(resolved, {
-                    ...normalizedOptions,
+                    ...config,
                     raw,
                 });
             }
@@ -252,15 +236,12 @@ export default function defineSegmentedFormat(
             return resolved;
         },
         format(normalized) {
-            const segments = resolveSegmentedSegments(
-                normalized,
-                normalizedOptions
-            );
+            const segments = resolveSegmentedSegments(normalized, config);
             const resolved = formatSegmentedValue(normalized, segments);
 
             if (options.format) {
                 return options.format(resolved, {
-                    ...normalizedOptions,
+                    ...config,
                     normalized,
                 });
             }
@@ -270,7 +251,7 @@ export default function defineSegmentedFormat(
         blur(formatted) {
             if (options.blur) {
                 return options.blur(formatted, {
-                    ...normalizedOptions,
+                    ...config,
                     formatted,
                 });
             }
@@ -280,10 +261,10 @@ export default function defineSegmentedFormat(
         append(context) {
             let result: FormatEditHookResult;
 
-            if (isAppendFormatting(context, normalizedOptions)) {
+            if (isAppendFormatting(context, config)) {
                 const segments = resolveSegmentedSegments(
                     context.normalized.previous,
-                    normalizedOptions
+                    config
                 );
                 const expectedFormatting = resolveFormattingAt(
                     context.previous.length,
@@ -327,10 +308,7 @@ export default function defineSegmentedFormat(
                 return options.append(
                     resolveFormatFactoryEditResult(result, context),
                     {
-                        ...resolveFormatFactoryEditHookContext(
-                            context,
-                            normalizedOptions
-                        ),
+                        ...resolveFormatFactoryEditHookContext(context, config),
                     }
                 );
             }
@@ -341,7 +319,7 @@ export default function defineSegmentedFormat(
             let result: FormatEditHookResult;
             const segments = resolveSegmentedSegments(
                 context.normalized.previous,
-                normalizedOptions
+                config
             );
             const maxLength = resolveSegmentedMaxLength(segments);
 
@@ -378,10 +356,7 @@ export default function defineSegmentedFormat(
                 return options.insert(
                     resolveFormatFactoryEditResult(result, context),
                     {
-                        ...resolveFormatFactoryEditHookContext(
-                            context,
-                            normalizedOptions
-                        ),
+                        ...resolveFormatFactoryEditHookContext(context, config),
                     }
                 );
             }
@@ -407,10 +382,7 @@ export default function defineSegmentedFormat(
                 return options.delete(
                     resolveFormatFactoryEditResult(result, context),
                     {
-                        ...resolveFormatFactoryEditHookContext(
-                            context,
-                            normalizedOptions
-                        ),
+                        ...resolveFormatFactoryEditHookContext(context, config),
                     }
                 );
             }

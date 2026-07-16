@@ -47,11 +47,11 @@ export type DateFormatPattern = (typeof DATE_PATTERNS)[number];
 export type DateFormatSeparator = (typeof DATE_SEPARATORS)[number];
 
 /**
- * The date-format options before defaults have been applied.
+ * The date-format configuration without factory hooks.
  *
  * @private
  */
-type DateFormatDateOptions = {
+type DateFormatConfig = {
     /** The canonical pattern that defines the date parts to format. */
     pattern: DateFormatPattern;
 
@@ -72,20 +72,20 @@ type DateFormatDateOptions = {
 };
 
 /**
- * The complete date-format options after defaults have been applied.
+ * The date-format configuration after defaults and validation have been applied.
  *
  * @private
  */
-type NormalizedDateFormatOptions = Required<DateFormatDateOptions>;
+type ResolvedDateFormatConfig = Required<DateFormatConfig>;
 
 /**
- * The configuration options for a date format.
+ * The public date-format options, including configuration and hooks.
  *
  * @since 0.1.0
  */
 export type DateFormatOptions = FormatFactoryOptions<
-    DateFormatDateOptions,
-    NormalizedDateFormatOptions
+    DateFormatConfig,
+    ResolvedDateFormatConfig
 >;
 
 /**
@@ -93,9 +93,9 @@ export type DateFormatOptions = FormatFactoryOptions<
  *
  * @private
  */
-function normalizeDateFormatOptions(
+function resolveDateFormatConfig(
     options: DateFormatOptions
-): NormalizedDateFormatOptions {
+): ResolvedDateFormatConfig {
     if (!options || !Object.hasOwn(options, 'pattern')) {
         reporter.fail('ERR05');
     }
@@ -190,9 +190,9 @@ function resolveDateSegments(
  * @since 0.1.0
  */
 export default function defineDateFormat(options: DateFormatOptions): Format {
-    const normalizedOptions = normalizeDateFormatOptions(options);
+    const resolvedConfig = resolveDateFormatConfig(options);
     const { insertLeadingZero, pattern, separator, strictDateSegments } =
-        normalizedOptions;
+        resolvedConfig;
     const patternSegments = pattern.split('/');
     const leadingZeroRules = resolveLeadingZeroRules(patternSegments);
     const maxLength = patternSegments.join('').length;
@@ -222,7 +222,7 @@ export default function defineDateFormat(options: DateFormatOptions): Format {
 
             if (options.normalize) {
                 return options.normalize(normalized, {
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                     raw: context.raw,
                 });
             }
@@ -232,7 +232,7 @@ export default function defineDateFormat(options: DateFormatOptions): Format {
         format(resolved, context) {
             if (options.format) {
                 return options.format(resolved, {
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                     normalized: context.normalized,
                 });
             }
@@ -242,7 +242,7 @@ export default function defineDateFormat(options: DateFormatOptions): Format {
         blur(resolved, context) {
             if (options.blur) {
                 return options.blur(resolved, {
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                     formatted: context.formatted,
                 });
             }
@@ -253,7 +253,7 @@ export default function defineDateFormat(options: DateFormatOptions): Format {
             if (options.append) {
                 return options.append(next, {
                     ...context,
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                 });
             }
 
@@ -263,7 +263,7 @@ export default function defineDateFormat(options: DateFormatOptions): Format {
             if (options.insert) {
                 return options.insert(next, {
                     ...context,
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                 });
             }
 
@@ -273,7 +273,7 @@ export default function defineDateFormat(options: DateFormatOptions): Format {
             if (options.delete) {
                 return options.delete(next, {
                     ...context,
-                    ...normalizedOptions,
+                    ...resolvedConfig,
                 });
             }
 

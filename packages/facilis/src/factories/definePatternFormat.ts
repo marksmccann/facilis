@@ -35,11 +35,11 @@ export type PatternFormatTokenDefinitions = Record<
 >;
 
 /**
- * The pattern-format options before defaults have been applied.
+ * The pattern-format configuration without factory hooks.
  *
  * @private
  */
-type PatternFormatPatternOptions = {
+type PatternFormatConfig = {
     /** The pattern string that defines literal characters and token slots. */
     pattern: string;
 
@@ -48,30 +48,14 @@ type PatternFormatPatternOptions = {
 };
 
 /**
- * The complete pattern-format options after defaults have been applied.
- *
- * @private
- */
-type NormalizedPatternFormatOptions = PatternFormatPatternOptions;
-
-/**
- * The explicit configuration object for one parsed pattern definition.
+ * The public pattern-format options, including configuration and hooks.
  *
  * @since 0.1.0
  */
 export type PatternFormatOptions = FormatFactoryOptions<
-    PatternFormatPatternOptions,
-    NormalizedPatternFormatOptions
+    PatternFormatConfig,
+    PatternFormatConfig
 >;
-
-function normalizePatternFormatOptions(
-    options: PatternFormatOptions
-): NormalizedPatternFormatOptions {
-    return {
-        pattern: options.pattern,
-        tokens: options.tokens,
-    };
-}
 
 /**
  * Describes one token-driven part in a parsed pattern definition.
@@ -119,7 +103,7 @@ export type PatternFormatPart =
  * @private
  */
 function parsePatternFormatOptions(
-    options: NormalizedPatternFormatOptions
+    options: PatternFormatConfig
 ): PatternFormatPart[] {
     const { pattern, tokens } = options;
 
@@ -339,8 +323,11 @@ function getPreviousPatternLiteralRunStart(
 export default function definePatternFormat(
     options: PatternFormatOptions
 ): Format {
-    const normalizedOptions = normalizePatternFormatOptions(options);
-    const patternParts = parsePatternFormatOptions(normalizedOptions);
+    const config: PatternFormatConfig = {
+        pattern: options.pattern,
+        tokens: options.tokens,
+    };
+    const patternParts = parsePatternFormatOptions(config);
     const maxLength = countPatternTokens(patternParts);
 
     return defineFormat({
@@ -369,7 +356,7 @@ export default function definePatternFormat(
 
             if (options.normalize) {
                 return options.normalize(value, {
-                    ...normalizedOptions,
+                    ...config,
                     raw,
                 });
             }
@@ -401,7 +388,7 @@ export default function definePatternFormat(
 
             if (options.format) {
                 return options.format(displayValue, {
-                    ...normalizedOptions,
+                    ...config,
                     normalized,
                 });
             }
@@ -411,7 +398,7 @@ export default function definePatternFormat(
         blur(formatted) {
             if (options.blur) {
                 return options.blur(formatted, {
-                    ...normalizedOptions,
+                    ...config,
                     formatted,
                 });
             }
@@ -461,10 +448,7 @@ export default function definePatternFormat(
                 return options.append(
                     resolveFormatFactoryEditResult(result, context),
                     {
-                        ...resolveFormatFactoryEditHookContext(
-                            context,
-                            normalizedOptions
-                        ),
+                        ...resolveFormatFactoryEditHookContext(context, config),
                     }
                 );
             }
@@ -482,10 +466,7 @@ export default function definePatternFormat(
                 return options.insert(
                     resolveFormatFactoryEditResult(result, context),
                     {
-                        ...resolveFormatFactoryEditHookContext(
-                            context,
-                            normalizedOptions
-                        ),
+                        ...resolveFormatFactoryEditHookContext(context, config),
                     }
                 );
             }
@@ -515,10 +496,7 @@ export default function definePatternFormat(
                 return options.delete(
                     resolveFormatFactoryEditResult(result, context),
                     {
-                        ...resolveFormatFactoryEditHookContext(
-                            context,
-                            normalizedOptions
-                        ),
+                        ...resolveFormatFactoryEditHookContext(context, config),
                     }
                 );
             }
