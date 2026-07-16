@@ -1,5 +1,5 @@
 import isAppendFormatting from './isAppendFormatting';
-import type { AppendEditContext } from '../types';
+import type { FormatAppendHookContext } from '../types/hooks';
 
 /**
  * Determines whether an append added expected formatting text at one display
@@ -8,7 +8,7 @@ import type { AppendEditContext } from '../types';
  * @since 0.1.0
  */
 export default function isAppendExpectedFormattingAt(
-    context: AppendEditContext,
+    context: FormatAppendHookContext,
     expectedFormatting: string,
     position: number
 ): boolean {

@@ -1,9 +1,9 @@
 /**
  * Options for inserting a leading zero into a number-like string.
  *
- * @since 0.1.0
+ * @private
  */
-export type InsertLeadingZeroOptions = {
+type InsertLeadingZeroOptions = {
     /**
      * The decimal separator that marks the start of the fractional portion.
      */

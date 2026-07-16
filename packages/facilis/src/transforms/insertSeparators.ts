@@ -1,9 +1,9 @@
 /**
  * Options for inserting separators into a string.
  *
- * @since 0.1.0
+ * @private
  */
-export type InsertSeparatorsOptions = {
+type InsertSeparatorsOptions = {
     /**
      * The formatted indexes before which the separator should be inserted.
      * Positions are resolved against the output value as it is built.

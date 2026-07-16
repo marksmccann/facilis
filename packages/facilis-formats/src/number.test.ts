@@ -384,19 +384,15 @@ describe('number', () => {
         expect(input.append('', '9.5')).toEqual(textState('9.5', 3));
     });
 
-    it('moves before a thousands separator when deleting backward over it', () => {
+    it('moves before a thousands separator when deleting over it', () => {
         const input = setupInput(number({ thousandsSeparator: ',' }));
 
-        expect(input.deleteBackward('12,345', 3)).toEqual(
-            textState('12,345', 2)
-        );
+        expect(input.delete('12,345', 3)).toEqual(textState('12,345', 2));
     });
 
     it('keeps the cursor before a thousands separator after deleting the previous digit', () => {
         const input = setupInput(number({ thousandsSeparator: ',' }));
 
-        expect(input.deleteBackward('12,345', 2)).toEqual(
-            textState('1,345', 1)
-        );
+        expect(input.delete('12,345', 2)).toEqual(textState('1,345', 1));
     });
 });

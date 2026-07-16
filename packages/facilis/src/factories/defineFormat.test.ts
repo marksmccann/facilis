@@ -8,11 +8,9 @@ describe('defineFormat', () => {
             normalize(raw) {
                 return raw.replace(/\D/g, '');
             },
-            edit: {
-                deleteBackward(context) {
-                    normalizedPrefix = context.normalize('$12');
-                    return context.formatted;
-                },
+            delete(context) {
+                normalizedPrefix = context.normalize('$12');
+                return context.formatted;
             },
         });
 

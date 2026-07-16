@@ -1,35 +1,11 @@
-import defineSegmentedFormat, {
-    type SegmentedFormatSegment,
-} from './defineSegmentedFormat';
-import { reporter } from './reporter';
-import type { Format } from './types';
-import insertBeforeCharacter from './transforms/insertBeforeCharacter';
-import rejectInvalidSegments from './transforms/rejectInvalidSegments';
-
-/**
- * The canonical date patterns supported by the date format. Patterns always
- * use `/` as their separator, regardless of the rendered separator.
- *
- * @since 0.1.0
- */
-export type DateFormatPattern =
-    | 'MM/DD/YY'
-    | 'MM/DD/YYYY'
-    | 'DD/MM/YY'
-    | 'DD/MM/YYYY'
-    | 'YY/MM/DD'
-    | 'YYYY/MM/DD'
-    | 'MM/YY'
-    | 'MM/YYYY'
-    | 'YY/MM'
-    | 'YYYY/MM';
-
-/**
- * A rendered date separator.
- *
- * @since 0.1.0
- */
-export type DateFormatSeparator = '/' | '-' | '.';
+import defineSegmentedFormat from './defineSegmentedFormat';
+import type { SegmentedFormatOptions } from './defineSegmentedFormat';
+import type { SegmentedFormatSegment } from './defineSegmentedFormat';
+import { reporter } from '../reporter';
+import type { FormatFactoryOptions } from '../types/factory';
+import type { Format } from '../types/format';
+import insertBeforeCharacter from '../transforms/insertBeforeCharacter';
+import rejectInvalidSegments from '../transforms/rejectInvalidSegments';
 
 /**
  * The canonical date patterns supported by the date format.
@@ -47,25 +23,36 @@ const DATE_PATTERNS = [
     'MM/YYYY',
     'YY/MM',
     'YYYY/MM',
-] as const satisfies readonly DateFormatPattern[];
+] as const;
 
 /**
  * The separators supported when rendering formatted date values.
  *
  * @private
  */
-const DATE_SEPARATORS = [
-    '/',
-    '-',
-    '.',
-] as const satisfies readonly DateFormatSeparator[];
+const DATE_SEPARATORS = ['/', '-', '.'] as const;
 
 /**
- * The configuration options for a date format.
+ * The canonical date patterns supported by the date format. Patterns always
+ * use `/` as their separator, regardless of the rendered separator.
  *
  * @since 0.1.0
  */
-export type DateFormatOptions = {
+export type DateFormatPattern = (typeof DATE_PATTERNS)[number];
+
+/**
+ * A rendered date separator.
+ *
+ * @since 0.1.0
+ */
+export type DateFormatSeparator = (typeof DATE_SEPARATORS)[number];
+
+/**
+ * The date-format options before defaults have been applied.
+ *
+ * @private
+ */
+type DateFormatBaseOptions = {
     /** The canonical pattern that defines the date parts to format. */
     pattern: DateFormatPattern;
 
@@ -90,7 +77,17 @@ export type DateFormatOptions = {
  *
  * @private
  */
-type NormalizedDateFormatOptions = Required<DateFormatOptions>;
+type NormalizedDateFormatOptions = Required<DateFormatBaseOptions>;
+
+/**
+ * The configuration options for a date format.
+ *
+ * @since 0.1.0
+ */
+export type DateFormatOptions = FormatFactoryOptions<
+    DateFormatBaseOptions,
+    NormalizedDateFormatOptions
+>;
 
 /**
  * Applies date-format defaults and validates the supported option values.
@@ -199,12 +196,12 @@ export default function defineDateFormat(options: DateFormatOptions): Format {
         normalizedOptions;
     const patternSegments = pattern.split('/');
     const leadingZeroRules = resolveLeadingZeroRules(patternSegments);
-
-    return defineSegmentedFormat({
+    const maxLength = patternSegments.join('').length;
+    const segmentedOptions: SegmentedFormatOptions = {
         matches: /\d/,
         segments: resolveDateSegments(patternSegments, separator),
-        normalize(value) {
-            let normalized = value;
+        normalize(resolved, context) {
+            let normalized = resolved;
 
             if (insertLeadingZero) {
                 normalized = insertBeforeCharacter(
@@ -221,7 +218,63 @@ export default function defineDateFormat(options: DateFormatOptions): Format {
                 );
             }
 
+            normalized = normalized.slice(0, maxLength);
+
+            if (options.normalize) {
+                return options.normalize(normalized, {
+                    ...normalizedOptions,
+                    raw: context.raw,
+                });
+            }
+
             return normalized;
         },
-    });
+    };
+
+    if (options.format) {
+        const format = options.format;
+        segmentedOptions.format = (resolved, context) =>
+            format(resolved, {
+                ...normalizedOptions,
+                normalized: context.normalized,
+            });
+    }
+
+    if (options.blur) {
+        const blur = options.blur;
+        segmentedOptions.blur = (resolved, context) =>
+            blur(resolved, {
+                ...normalizedOptions,
+                formatted: context.formatted,
+            });
+    }
+
+    if (options.append) {
+        const append = options.append;
+        segmentedOptions.append = (next, context) =>
+            append(next, {
+                ...context,
+                ...normalizedOptions,
+            });
+    }
+
+    if (options.insert) {
+        const insert = options.insert;
+        segmentedOptions.insert = (next, context) =>
+            insert(next, {
+                ...context,
+                ...normalizedOptions,
+            });
+    }
+
+    if (options.delete) {
+        const deleteHook = options.delete;
+        segmentedOptions.delete = (next, context) =>
+            deleteHook(next, {
+                ...context,
+                ...normalizedOptions,
+            });
+    }
+
+    return defineSegmentedFormat(segmentedOptions);
 }

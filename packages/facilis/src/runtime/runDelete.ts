@@ -1,26 +1,27 @@
-import type { FormatEditResult, RunEditContext } from '../types';
+import type { FormatEditHookResult } from '../types/hooks';
+import type { RunEditContext } from '../types/internal';
 
 /**
- * Runs the backward-delete edit hook with a context built from the current edit.
+ * Runs the delete edit hook with a context built from the current edit.
  *
  * @private
  */
-export default function runDeleteBackward(
+export default function runDelete(
     context: RunEditContext
-): FormatEditResult {
+): FormatEditHookResult {
     const { definition, previous, current, normalized, formatted, resolved } =
         context;
     const cursor = previous.selectionStart;
-    const { edit, normalize } = definition;
-    let result: FormatEditResult;
+    const { delete: deleteHook, normalize } = definition;
+    let result: FormatEditHookResult;
 
-    if (cursor !== null && edit?.deleteBackward) {
+    if (cursor !== null && deleteHook) {
         const start = Math.max(0, cursor - 1);
         const end = cursor;
         const deleted = previous.value.slice(start, end);
 
-        result = edit.deleteBackward({
-            intent: 'deleteBackward',
+        result = deleteHook({
+            intent: 'delete',
             previous: previous.value,
             attempted: current.value,
             formatted,

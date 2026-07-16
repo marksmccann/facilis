@@ -1,30 +1,30 @@
-export { default as defineFormat } from './defineFormat';
-export { default as defineDateFormat } from './defineDateFormat';
+export { default as defineFormat } from './factories/defineFormat';
+export { default as defineDateFormat } from './factories/defineDateFormat';
 export type {
     DateFormatOptions,
     DateFormatPattern,
     DateFormatSeparator,
-} from './defineDateFormat';
-export { default as defineNumberFormat } from './defineNumberFormat';
-export type { NumberFormatOptions } from './defineNumberFormat';
-export { default as defineTimeFormat } from './defineTimeFormat';
+} from './factories/defineDateFormat';
+export { default as defineNumberFormat } from './factories/defineNumberFormat';
+export type { NumberFormatOptions } from './factories/defineNumberFormat';
+export { default as defineTimeFormat } from './factories/defineTimeFormat';
 export type {
     TimeFormatOptions,
     TimeFormatPattern,
     TimeFormatSeparator,
-} from './defineTimeFormat';
-export { default as definePatternFormat } from './definePatternFormat';
+} from './factories/defineTimeFormat';
+export { default as definePatternFormat } from './factories/definePatternFormat';
 export type {
     PatternFormatOptions,
     PatternFormatPart,
     PatternFormatTokenDefinition,
     PatternFormatTokenDefinitions,
-} from './definePatternFormat';
-export { default as defineSegmentedFormat } from './defineSegmentedFormat';
+} from './factories/definePatternFormat';
+export { default as defineSegmentedFormat } from './factories/defineSegmentedFormat';
 export type {
     SegmentedFormatMatches,
     SegmentedFormatOptions,
     SegmentedFormatSegment,
     SegmentedFormatSegments,
-} from './defineSegmentedFormat';
-export type * from './types';
+} from './factories/defineSegmentedFormat';
+export type * from './types/public';

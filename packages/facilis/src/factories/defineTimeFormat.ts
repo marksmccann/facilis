@@ -1,10 +1,25 @@
-import defineSegmentedFormat, {
-    type SegmentedFormatSegment,
-} from './defineSegmentedFormat';
-import { reporter } from './reporter';
-import type { Format } from './types';
-import insertBeforeCharacter from './transforms/insertBeforeCharacter';
-import rejectInvalidSegments from './transforms/rejectInvalidSegments';
+import defineSegmentedFormat from './defineSegmentedFormat';
+import type { SegmentedFormatOptions } from './defineSegmentedFormat';
+import type { SegmentedFormatSegment } from './defineSegmentedFormat';
+import { reporter } from '../reporter';
+import type { FormatFactoryOptions } from '../types/factory';
+import type { Format } from '../types/format';
+import insertBeforeCharacter from '../transforms/insertBeforeCharacter';
+import rejectInvalidSegments from '../transforms/rejectInvalidSegments';
+
+/**
+ * The canonical time patterns supported by the time format.
+ *
+ * @private
+ */
+const TIME_PATTERNS = ['HH:mm', 'HH:mm:ss', 'hh:mm', 'hh:mm:ss'] as const;
+
+/**
+ * The separators supported when rendering formatted time values.
+ *
+ * @private
+ */
+const TIME_SEPARATORS = [':', '.'] as const;
 
 /**
  * The canonical time patterns supported by the time format. Patterns always
@@ -12,43 +27,21 @@ import rejectInvalidSegments from './transforms/rejectInvalidSegments';
  *
  * @since 0.1.0
  */
-export type TimeFormatPattern = 'HH:mm' | 'HH:mm:ss' | 'hh:mm' | 'hh:mm:ss';
+export type TimeFormatPattern = (typeof TIME_PATTERNS)[number];
 
 /**
  * A rendered time separator.
  *
  * @since 0.1.0
  */
-export type TimeFormatSeparator = ':' | '.';
+export type TimeFormatSeparator = (typeof TIME_SEPARATORS)[number];
 
 /**
- * The canonical time patterns supported by the time format.
+ * The time-format options before defaults have been applied.
  *
  * @private
  */
-const TIME_PATTERNS = [
-    'HH:mm',
-    'HH:mm:ss',
-    'hh:mm',
-    'hh:mm:ss',
-] as const satisfies readonly TimeFormatPattern[];
-
-/**
- * The separators supported when rendering formatted time values.
- *
- * @private
- */
-const TIME_SEPARATORS = [
-    ':',
-    '.',
-] as const satisfies readonly TimeFormatSeparator[];
-
-/**
- * The configuration options for a time format.
- *
- * @since 0.1.0
- */
-export type TimeFormatOptions = {
+type TimeFormatBaseOptions = {
     /** The canonical pattern that defines the time parts to format. */
     pattern: TimeFormatPattern;
 
@@ -73,7 +66,17 @@ export type TimeFormatOptions = {
  *
  * @private
  */
-type NormalizedTimeFormatOptions = Required<TimeFormatOptions>;
+type NormalizedTimeFormatOptions = Required<TimeFormatBaseOptions>;
+
+/**
+ * The configuration options for a time format.
+ *
+ * @since 0.1.0
+ */
+export type TimeFormatOptions = FormatFactoryOptions<
+    TimeFormatBaseOptions,
+    NormalizedTimeFormatOptions
+>;
 
 /**
  * Applies time-format defaults and validates the supported option values.
@@ -191,12 +194,12 @@ export default function defineTimeFormat(options: TimeFormatOptions): Format {
         normalizedOptions;
     const patternSegments = pattern.split(':');
     const leadingZeroRules = resolveLeadingZeroRules(patternSegments);
-
-    return defineSegmentedFormat({
+    const maxLength = patternSegments.join('').length;
+    const segmentedOptions: SegmentedFormatOptions = {
         matches: /\d/,
         segments: resolveTimeSegments(patternSegments, separator),
-        normalize(value) {
-            let normalized = value;
+        normalize(resolved, context) {
+            let normalized = resolved;
 
             if (insertLeadingZero) {
                 normalized = insertBeforeCharacter(
@@ -213,7 +216,63 @@ export default function defineTimeFormat(options: TimeFormatOptions): Format {
                 );
             }
 
+            normalized = normalized.slice(0, maxLength);
+
+            if (options.normalize) {
+                return options.normalize(normalized, {
+                    ...normalizedOptions,
+                    raw: context.raw,
+                });
+            }
+
             return normalized;
         },
-    });
+    };
+
+    if (options.format) {
+        const format = options.format;
+        segmentedOptions.format = (resolved, context) =>
+            format(resolved, {
+                ...normalizedOptions,
+                normalized: context.normalized,
+            });
+    }
+
+    if (options.blur) {
+        const blur = options.blur;
+        segmentedOptions.blur = (resolved, context) =>
+            blur(resolved, {
+                ...normalizedOptions,
+                formatted: context.formatted,
+            });
+    }
+
+    if (options.append) {
+        const append = options.append;
+        segmentedOptions.append = (next, context) =>
+            append(next, {
+                ...context,
+                ...normalizedOptions,
+            });
+    }
+
+    if (options.insert) {
+        const insert = options.insert;
+        segmentedOptions.insert = (next, context) =>
+            insert(next, {
+                ...context,
+                ...normalizedOptions,
+            });
+    }
+
+    if (options.delete) {
+        const deleteHook = options.delete;
+        segmentedOptions.delete = (next, context) =>
+            deleteHook(next, {
+                ...context,
+                ...normalizedOptions,
+            });
+    }
+
+    return defineSegmentedFormat(segmentedOptions);
 }

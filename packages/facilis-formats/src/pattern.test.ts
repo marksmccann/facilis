@@ -71,16 +71,16 @@ describe('pattern', () => {
         expect(input.insert('12/34', '9', 2)).toEqual(textState('12/34', 2));
     });
 
-    it('deletes a trailing literal run on backward delete at the end', () => {
+    it('deletes a trailing literal run at the end', () => {
         const input = setupInput(pattern('(###) ###-####'));
 
-        expect(input.deleteBackward('(123) ')).toEqual(textState('(123', 4));
+        expect(input.delete('(123) ')).toEqual(textState('(123', 4));
     });
 
-    it('moves backward-delete selection before a middle literal run', () => {
+    it('moves delete selection before a middle literal run', () => {
         const input = setupInput(pattern('(###) ###-####'));
 
-        expect(input.deleteBackward('(123) 456-7890', 6)).toEqual(
+        expect(input.delete('(123) 456-7890', 6)).toEqual(
             textState('(123) 456-7890', 4)
         );
     });
@@ -88,6 +88,6 @@ describe('pattern', () => {
     it('trims trailing literals left behind after deleting the last token', () => {
         const input = setupInput(pattern('(###) ###-####'));
 
-        expect(input.deleteBackward('(555) 5')).toEqual(textState('(555', 4));
+        expect(input.delete('(555) 5')).toEqual(textState('(555', 4));
     });
 });

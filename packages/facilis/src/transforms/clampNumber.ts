@@ -1,9 +1,9 @@
 /**
  * Options for clamping a number-like string to numeric bounds.
  *
- * @since 0.1.0
+ * @private
  */
-export type ClampNumberOptions = {
+type ClampNumberOptions = {
     /**
      * The decimal separator used by the number-like string.
      */

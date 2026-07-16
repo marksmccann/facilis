@@ -235,6 +235,6 @@ describe('time', () => {
             })
         );
 
-        expect(input.deleteBackward('14:30', 3)).toEqual(textState('14:30', 2));
+        expect(input.delete('14:30', 3)).toEqual(textState('14:30', 2));
     });
 });

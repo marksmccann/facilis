@@ -1,21 +1,24 @@
-import type { FormatEditResult, RunEditContext } from '../types';
+import type { FormatEditHookResult } from '../types/hooks';
+import type { RunEditContext } from '../types/internal';
 
 /**
  * Runs the append edit hook with a context built from the current edit.
  *
  * @private
  */
-export default function runAppend(context: RunEditContext): FormatEditResult {
+export default function runAppend(
+    context: RunEditContext
+): FormatEditHookResult {
     const { definition, previous, current, normalized, formatted, resolved } =
         context;
-    const { edit, normalize } = definition;
-    let result: FormatEditResult;
+    const { append, normalize } = definition;
+    let result: FormatEditHookResult;
 
-    if (edit?.append) {
+    if (append) {
         const cursor = previous.value.length;
         const appended = current.value.slice(cursor);
 
-        result = edit.append({
+        result = append({
             intent: 'append',
             previous: previous.value,
             attempted: current.value,

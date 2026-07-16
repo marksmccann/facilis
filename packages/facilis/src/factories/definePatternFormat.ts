@@ -1,13 +1,17 @@
 import defineFormat from './defineFormat';
 import {
-    isAppendDuplicateFormattingAt,
-    isAppendExpectedFormattingAt,
-    isAppendFormatting,
-    isDeleteBackwardOverFormatting,
-    isInsertAtMaxLength,
-} from './guards';
-import { reporter } from './reporter';
-import type { Format } from './types';
+    resolveFormatFactoryEditHookContext,
+    resolveFormatFactoryEditResult,
+} from './resolveFormatFactoryEdit';
+import isAppendDuplicateFormattingAt from '../guards/isAppendDuplicateFormattingAt';
+import isAppendExpectedFormattingAt from '../guards/isAppendExpectedFormattingAt';
+import isAppendFormatting from '../guards/isAppendFormatting';
+import isDeleteOverFormatting from '../guards/isDeleteOverFormatting';
+import isInsertAtMaxLength from '../guards/isInsertAtMaxLength';
+import { reporter } from '../reporter';
+import type { FormatEditHookResult } from '../types/hooks';
+import type { FormatFactoryOptions } from '../types/factory';
+import type { Format } from '../types/format';
 
 /**
  * Defines the matching rule for a single token symbol in a pattern format.
@@ -31,17 +35,43 @@ export type PatternFormatTokenDefinitions = Record<
 >;
 
 /**
- * The explicit configuration object for one parsed pattern definition.
+ * The pattern-format options before defaults have been applied.
  *
- * @since 0.1.0
+ * @private
  */
-export type PatternFormatOptions = {
+type PatternFormatBaseOptions = {
     /** The pattern string that defines literal characters and token slots. */
     pattern: string;
 
     /** The token definitions keyed by the wildcard characters used in the pattern. */
     tokens: PatternFormatTokenDefinitions;
 };
+
+/**
+ * The complete pattern-format options after defaults have been applied.
+ *
+ * @private
+ */
+type NormalizedPatternFormatOptions = PatternFormatBaseOptions;
+
+/**
+ * The explicit configuration object for one parsed pattern definition.
+ *
+ * @since 0.1.0
+ */
+export type PatternFormatOptions = FormatFactoryOptions<
+    PatternFormatBaseOptions,
+    NormalizedPatternFormatOptions
+>;
+
+function normalizePatternFormatOptions(
+    options: PatternFormatOptions
+): NormalizedPatternFormatOptions {
+    return {
+        pattern: options.pattern,
+        tokens: options.tokens,
+    };
+}
 
 /**
  * Describes one token-driven part in a parsed pattern definition.
@@ -89,7 +119,7 @@ export type PatternFormatPart =
  * @private
  */
 function parsePatternFormatOptions(
-    options: PatternFormatOptions
+    options: NormalizedPatternFormatOptions
 ): PatternFormatPart[] {
     const { pattern, tokens } = options;
 
@@ -231,7 +261,8 @@ function getPreviousPatternLiteralRunStart(
 export default function definePatternFormat(
     options: PatternFormatOptions
 ): Format {
-    const patternParts = parsePatternFormatOptions(options);
+    const normalizedOptions = normalizePatternFormatOptions(options);
+    const patternParts = parsePatternFormatOptions(normalizedOptions);
     const maxLength = countPatternTokens(patternParts);
 
     return defineFormat({
@@ -256,6 +287,13 @@ export default function definePatternFormat(
 
                 value += character;
                 partIndex += 1;
+            }
+
+            if (options.normalize) {
+                return options.normalize(value, {
+                    ...normalizedOptions,
+                    raw,
+                });
             }
 
             return value;
@@ -283,14 +321,29 @@ export default function definePatternFormat(
                 valueIndex += 1;
             }
 
+            if (options.format) {
+                return options.format(displayValue, {
+                    ...normalizedOptions,
+                    normalized,
+                });
+            }
+
             return displayValue;
         },
-        edit: {
-            append(context) {
-                if (!isAppendFormatting(context)) {
-                    return;
-                }
+        blur(formatted) {
+            if (options.blur) {
+                return options.blur(formatted, {
+                    ...normalizedOptions,
+                    formatted,
+                });
+            }
 
+            return formatted;
+        },
+        append(context) {
+            let result: FormatEditHookResult;
+
+            if (isAppendFormatting(context)) {
                 const pendingLiteralRun = getPatternLiteralRun(
                     patternParts,
                     context.formatted.length
@@ -303,40 +356,68 @@ export default function definePatternFormat(
                         context.formatted.length
                     )
                 ) {
-                    return null;
-                }
-
-                const literalRun = getPatternLiteralRun(
-                    patternParts,
-                    context.previous.length
-                );
-
-                if (literalRun === '') {
-                    return;
-                }
-
-                if (
-                    isAppendExpectedFormattingAt(
-                        context,
-                        literalRun,
+                    result = null;
+                } else {
+                    const literalRun = getPatternLiteralRun(
+                        patternParts,
                         context.previous.length
-                    )
-                ) {
-                    return context.attempted;
-                }
+                    );
 
-                return `${context.previous}${literalRun}`;
-            },
-            insert(context) {
-                if (isInsertAtMaxLength(context, maxLength)) {
-                    return null;
+                    if (literalRun !== '') {
+                        if (
+                            isAppendExpectedFormattingAt(
+                                context,
+                                literalRun,
+                                context.previous.length
+                            )
+                        ) {
+                            result = context.attempted;
+                        } else {
+                            result = `${context.previous}${literalRun}`;
+                        }
+                    }
                 }
-            },
-            deleteBackward(context) {
-                if (!isDeleteBackwardOverFormatting(context)) {
-                    return;
-                }
+            }
 
+            if (options.append) {
+                return options.append(
+                    resolveFormatFactoryEditResult(result, context),
+                    {
+                        ...resolveFormatFactoryEditHookContext(
+                            context,
+                            normalizedOptions
+                        ),
+                    }
+                );
+            }
+
+            return result;
+        },
+        insert(context) {
+            let result: FormatEditHookResult;
+
+            if (isInsertAtMaxLength(context, maxLength)) {
+                result = null;
+            }
+
+            if (options.insert) {
+                return options.insert(
+                    resolveFormatFactoryEditResult(result, context),
+                    {
+                        ...resolveFormatFactoryEditHookContext(
+                            context,
+                            normalizedOptions
+                        ),
+                    }
+                );
+            }
+
+            return result;
+        },
+        delete(context) {
+            let result: FormatEditHookResult;
+
+            if (isDeleteOverFormatting(context)) {
                 const literalStart = getPreviousPatternLiteralRunStart(
                     patternParts,
                     context.previous,
@@ -344,13 +425,27 @@ export default function definePatternFormat(
                 );
 
                 if (literalStart !== null) {
-                    return {
+                    result = {
                         value: context.previous,
                         selectionStart: literalStart,
                         selectionEnd: literalStart,
                     };
                 }
-            },
+            }
+
+            if (options.delete) {
+                return options.delete(
+                    resolveFormatFactoryEditResult(result, context),
+                    {
+                        ...resolveFormatFactoryEditHookContext(
+                            context,
+                            normalizedOptions
+                        ),
+                    }
+                );
+            }
+
+            return result;
         },
     });
 }

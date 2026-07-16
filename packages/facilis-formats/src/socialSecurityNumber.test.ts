@@ -18,9 +18,7 @@ describe('socialSecurityNumber', () => {
     it('accepts the second separator when it is typed at the group boundary', () => {
         const input = setupInput(socialSecurityNumber());
 
-        expect(input.append('123-45', '-')).toEqual(
-            textState('123-45-', 7)
-        );
+        expect(input.append('123-45', '-')).toEqual(textState('123-45-', 7));
     });
 
     it('rejects a middle digit insertion when the SSN is already full', () => {
@@ -34,7 +32,7 @@ describe('socialSecurityNumber', () => {
     it('moves backward over formatting instead of deleting it', () => {
         const input = setupInput(socialSecurityNumber());
 
-        expect(input.deleteBackward('123-45-6789', 4)).toEqual(
+        expect(input.delete('123-45-6789', 4)).toEqual(
             textState('123-45-6789', 3)
         );
     });

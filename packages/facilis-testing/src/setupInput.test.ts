@@ -15,16 +15,14 @@ const testFormat = defineFormat({
     blur(formatted) {
         return `${formatted}!`;
     },
-    edit: {
-        deleteBackward(context) {
-            if (context.deleted === ']') {
-                return {
-                    value: context.previous.slice(0, context.cursor - 3),
-                    selectionStart: context.cursor - 3,
-                    selectionEnd: context.cursor - 3,
-                };
-            }
-        },
+    delete(context) {
+        if (context.deleted === ']') {
+            return {
+                value: context.previous.slice(0, context.cursor - 3),
+                selectionStart: context.cursor - 3,
+                selectionEnd: context.cursor - 3,
+            };
+        }
     },
 });
 
@@ -74,7 +72,7 @@ describe('setupInput', () => {
     });
 
     it('deletes backward from one cursor position', () => {
-        expect(input.deleteBackward('[A][B]', 6)).toEqual(textState('[A]', 3));
+        expect(input.delete('[A][B]', 6)).toEqual(textState('[A]', 3));
     });
 
     it('types a sequence from an empty value', () => {

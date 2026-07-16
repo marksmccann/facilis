@@ -1,11 +1,11 @@
-import type { InputDetails, TextState } from '../types';
+import type { InputDetails, TextState } from '../types/input';
 
 /**
- * Determines whether an input edit deleted text backward from a collapsed cursor.
+ * Determines whether an input edit deleted text from a collapsed cursor.
  *
  * @private
  */
-export default function isDeleteBackwardEdit(
+export default function isDeleteEdit(
     details: InputDetails,
     previous: TextState
 ): boolean {

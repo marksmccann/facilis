@@ -1,4 +1,4 @@
-import type { InputDetails, TextState } from '../types';
+import type { InputDetails, TextState } from '../types/input';
 
 /**
  * Determines whether the selection is collapsed to one cursor position.

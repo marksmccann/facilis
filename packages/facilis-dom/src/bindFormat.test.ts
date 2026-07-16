@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import defineFormat from '../../facilis/src/defineFormat';
+import defineFormat from '../../facilis/src/factories/defineFormat';
 import { pattern } from '../../facilis-formats/src/pattern';
 import { bindFormat } from './bindFormat';
 
@@ -84,11 +84,9 @@ describe('bindFormat', () => {
             normalize(raw) {
                 return raw.toUpperCase();
             },
-            edit: {
-                append(context) {
-                    previousValueSeen = context.previous;
-                    previousCursorSeen = context.cursor;
-                },
+            append(context) {
+                previousValueSeen = context.previous;
+                previousCursorSeen = context.cursor;
             },
         });
 
@@ -108,7 +106,7 @@ describe('bindFormat', () => {
         expect(input.selectionEnd).toBe(3);
     });
 
-    it('deletes trailing pattern literals on backward delete at the end', () => {
+    it('deletes trailing pattern literals at the end', () => {
         const input = new FakeInputElement();
         input.value = '(123) ';
         input.setSelectionRange(6, 6);

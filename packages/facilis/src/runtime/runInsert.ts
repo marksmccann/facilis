@@ -1,23 +1,26 @@
-import type { FormatEditResult, RunEditContext } from '../types';
+import type { FormatEditHookResult } from '../types/hooks';
+import type { RunEditContext } from '../types/internal';
 
 /**
  * Runs the insert edit hook with a context built from the current edit.
  *
  * @private
  */
-export default function runInsert(context: RunEditContext): FormatEditResult {
+export default function runInsert(
+    context: RunEditContext
+): FormatEditHookResult {
     const { definition, previous, current, normalized, formatted, resolved } =
         context;
-    const { edit, normalize } = definition;
+    const { insert, normalize } = definition;
     const cursor = previous.selectionStart;
-    let result: FormatEditResult;
+    let result: FormatEditHookResult;
 
-    if (cursor !== null && edit?.insert) {
+    if (cursor !== null && insert) {
         const suffixLength = previous.value.length - cursor;
         const insertedEnd = current.value.length - suffixLength;
         const inserted = current.value.slice(cursor, insertedEnd);
 
-        result = edit.insert({
+        result = insert({
             intent: 'insert',
             previous: previous.value,
             attempted: current.value,

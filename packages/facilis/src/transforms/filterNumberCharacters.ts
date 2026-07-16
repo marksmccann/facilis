@@ -1,9 +1,9 @@
 /**
  * Options for filtering raw text into a number-like string.
  *
- * @since 0.1.0
+ * @private
  */
-export type FilterNumberCharactersOptions = {
+type FilterNumberCharactersOptions = {
     /**
      * The decimal separator to preserve when decimal places are supported.
      */

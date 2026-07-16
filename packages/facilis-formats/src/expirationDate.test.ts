@@ -54,6 +54,6 @@ describe('expirationDate', () => {
     it('moves backward over formatting instead of deleting it', () => {
         const input = setupInput(expirationDate());
 
-        expect(input.deleteBackward('12/34', 3)).toEqual(textState('12/34', 2));
+        expect(input.delete('12/34', 3)).toEqual(textState('12/34', 2));
     });
 });

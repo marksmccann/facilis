@@ -1,5 +1,5 @@
 import isAppendFormatting from './isAppendFormatting';
-import type { AppendEditContext } from '../types';
+import type { FormatAppendHookContext } from '../types/hooks';
 
 /**
  * Determines whether an append added formatting text already present at the
@@ -8,7 +8,7 @@ import type { AppendEditContext } from '../types';
  * @since 0.1.0
  */
 export default function isAppendDuplicateFormatting(
-    context: AppendEditContext
+    context: FormatAppendHookContext
 ): boolean {
     return (
         isAppendFormatting(context) &&

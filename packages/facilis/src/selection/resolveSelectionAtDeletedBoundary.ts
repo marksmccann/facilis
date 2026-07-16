@@ -1,11 +1,12 @@
-import type { FormatDefinition, Selection } from '../types';
+import type { FormatDefinition } from '../types/format';
+import type { Selection } from '../types/input';
 
 /**
  * Options for resolving where a deletion boundary lands in formatted text.
  *
- * @since 0.1.0
+ * @private
  */
-export type ResolveSelectionAtDeletedBoundaryOptions = {
+type ResolveSelectionAtDeletedBoundaryOptions = {
     /**
      * The display value before the deletion.
      */

@@ -237,7 +237,7 @@ describe('date', () => {
             })
         );
 
-        expect(input.deleteBackward('01/02/2026', 3)).toEqual(
+        expect(input.delete('01/02/2026', 3)).toEqual(
             textState('01/02/2026', 2)
         );
     });

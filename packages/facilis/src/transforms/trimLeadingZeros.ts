@@ -1,9 +1,9 @@
 /**
  * Options for trimming unnecessary leading zeros from a number-like string.
  *
- * @since 0.1.0
+ * @private
  */
-export type TrimLeadingZerosOptions = {
+type TrimLeadingZerosOptions = {
     /**
      * The decimal separator that marks the start of the fractional portion.
      */

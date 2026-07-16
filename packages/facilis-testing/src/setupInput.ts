@@ -66,7 +66,7 @@ export function setupInput(format: Format): TestInput {
                 textState(current, cursor)
             );
         },
-        deleteBackward(previous, cursor = previous.length) {
+        delete(previous, cursor = previous.length) {
             const start = Math.max(cursor - 1, 0);
             const current = replaceText(previous, '', start, cursor);
 

@@ -1,4 +1,5 @@
-import type { FormatDefinition, Selection, TextState } from '../types';
+import type { FormatDefinition } from '../types/format';
+import type { Selection, TextState } from '../types/input';
 import runFormat from '../runtime/runFormat';
 
 /**

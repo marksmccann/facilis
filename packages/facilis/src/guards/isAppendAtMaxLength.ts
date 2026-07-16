@@ -1,4 +1,4 @@
-import type { AppendEditContext } from '../types';
+import type { FormatAppendHookContext } from '../types/hooks';
 
 /**
  * Determines whether an append happened after the normalized value reached a
@@ -7,7 +7,7 @@ import type { AppendEditContext } from '../types';
  * @since 0.1.0
  */
 export default function isAppendAtMaxLength(
-    context: AppendEditContext,
+    context: FormatAppendHookContext,
     maxLength: number
 ): boolean {
     return context.normalized.previous.length >= maxLength;

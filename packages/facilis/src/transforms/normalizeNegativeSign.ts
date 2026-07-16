@@ -1,9 +1,9 @@
 /**
  * Options for normalizing negative signs in a number-like string.
  *
- * @since 0.1.0
+ * @private
  */
-export type NormalizeNegativeSignOptions = {
+type NormalizeNegativeSignOptions = {
     /**
      * Whether the normalized value should preserve one leading minus sign.
      */

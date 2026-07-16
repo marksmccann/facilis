@@ -1,9 +1,9 @@
 /**
  * Determines whether a candidate segment value can be accepted.
  *
- * @since 0.1.0
+ * @private
  */
-export type RejectInvalidSegmentsAccept = (
+type RejectInvalidSegmentsAccept = (
     segment: string,
     candidate: string,
     previous: string

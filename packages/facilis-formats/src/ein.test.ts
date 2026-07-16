@@ -26,7 +26,7 @@ describe('ein', () => {
     it('moves backward over formatting instead of deleting it', () => {
         const input = setupInput(ein());
 
-        expect(input.deleteBackward('12-3456789', 3)).toEqual(
+        expect(input.delete('12-3456789', 3)).toEqual(
             textState('12-3456789', 2)
         );
     });

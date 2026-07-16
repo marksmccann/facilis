@@ -1,9 +1,9 @@
 /**
  * Options for padding the fractional portion of a number-like string.
  *
- * @since 0.1.0
+ * @private
  */
-export type PadDecimalPlacesOptions = {
+type PadDecimalPlacesOptions = {
     /**
      * The decimal separator that marks the start of the fractional portion.
      */

@@ -1,9 +1,9 @@
 /**
  * Options for inserting thousands separators into a number-like string.
  *
- * @since 0.1.0
+ * @private
  */
-export type InsertThousandsSeparatorsOptions = {
+type InsertThousandsSeparatorsOptions = {
     /**
      * The decimal separator that marks the start of the fractional portion.
      */

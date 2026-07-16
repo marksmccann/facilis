@@ -1,11 +1,11 @@
-import type { Selection } from '../types';
+import type { Selection } from '../types/input';
 
 /**
  * Options for resolving a collapsed selection before known formatting text.
  *
- * @since 0.1.0
+ * @private
  */
-export type ResolveSelectionBeforeFormattingOptions = {
+type ResolveSelectionBeforeFormattingOptions = {
     /**
      * The display value that contains the formatting text.
      */

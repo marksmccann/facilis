@@ -22,9 +22,7 @@ describe('zipCode', () => {
             })
         );
 
-        expect(input.type('123456789')).toEqual(
-            textState('12345-6789', 10)
-        );
+        expect(input.type('123456789')).toEqual(textState('12345-6789', 10));
     });
 
     it('accepts the plus-four separator when it is typed at the group boundary', () => {
@@ -66,7 +64,7 @@ describe('zipCode', () => {
             })
         );
 
-        expect(input.deleteBackward('12345-6789', 6)).toEqual(
+        expect(input.delete('12345-6789', 6)).toEqual(
             textState('12345-6789', 5)
         );
     });

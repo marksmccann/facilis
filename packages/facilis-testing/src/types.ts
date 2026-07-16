@@ -60,13 +60,13 @@ export type TestInput = {
     ): TextState;
 
     /**
-     * Deletes backward from one cursor position.
+     * Deletes from one cursor position.
      *
-     * @param previous The text value before the backward delete.
-     * @param cursor The cursor position to delete backward from. Defaults to the end of the value.
+     * @param previous The text value before the delete.
+     * @param cursor The cursor position to delete from. Defaults to the end of the value.
      * @since 0.1.0
      */
-    deleteBackward(previous: string, cursor?: number): TextState;
+    delete(previous: string, cursor?: number): TextState;
 
     /**
      * Types a sequence of characters from an empty value and returns the final

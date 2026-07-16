@@ -12,9 +12,7 @@ describe('currency', () => {
     it('pads cents to two digits on blur', () => {
         const input = setupInput(currency());
 
-        expect(input.blur('12345.6')).toEqual(
-            textState('$12,345.60', null)
-        );
+        expect(input.blur('12345.6')).toEqual(textState('$12,345.60', null));
     });
 
     it('supports a custom symbol', () => {
@@ -48,9 +46,7 @@ describe('currency', () => {
             })
         );
 
-        expect(input.blur('12345,6')).toEqual(
-            textState('€12.345,60', null)
-        );
+        expect(input.blur('12345,6')).toEqual(textState('€12.345,60', null));
     });
 
     it('ignores decimal separators when cents are disabled', () => {
@@ -96,25 +92,21 @@ describe('currency', () => {
         expect(input.type('00012')).toEqual(textState('$12', 3));
     });
 
-    it('moves before a thousands separator when deleting backward over it', () => {
+    it('moves before a thousands separator when deleting over it', () => {
         const input = setupInput(currency());
 
-        expect(input.deleteBackward('$12,345', 4)).toEqual(
-            textState('$12,345', 3)
-        );
+        expect(input.delete('$12,345', 4)).toEqual(textState('$12,345', 3));
     });
 
     it('keeps the cursor before a thousands separator after deleting the previous digit', () => {
         const input = setupInput(currency());
 
-        expect(input.deleteBackward('$12,345', 3)).toEqual(
-            textState('$1,345', 2)
-        );
+        expect(input.delete('$12,345', 3)).toEqual(textState('$1,345', 2));
     });
 
-    it('moves before the currency symbol when deleting backward over it', () => {
+    it('moves before the currency symbol when deleting over it', () => {
         const input = setupInput(currency());
 
-        expect(input.deleteBackward('$12', 1)).toEqual(textState('$12', 0));
+        expect(input.delete('$12', 1)).toEqual(textState('$12', 0));
     });
 });

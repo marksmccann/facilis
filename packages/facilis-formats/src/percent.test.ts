@@ -121,15 +121,15 @@ describe('percent', () => {
         expect(input.type('-')).toEqual(textState('-', 1));
     });
 
-    it('moves before the percent symbol when deleting backward over it', () => {
+    it('moves before the percent symbol when deleting over it', () => {
         const input = setupInput(percent());
 
-        expect(input.deleteBackward('12%', 3)).toEqual(textState('12%', 2));
+        expect(input.delete('12%', 3)).toEqual(textState('12%', 2));
     });
 
     it('keeps the cursor before the percent symbol after deleting the previous digit', () => {
         const input = setupInput(percent());
 
-        expect(input.deleteBackward('12%', 2)).toEqual(textState('1%', 1));
+        expect(input.delete('12%', 2)).toEqual(textState('1%', 1));
     });
 });

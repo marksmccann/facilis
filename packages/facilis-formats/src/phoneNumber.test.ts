@@ -28,7 +28,7 @@ describe('phoneNumber', () => {
     it('moves backward over formatting instead of deleting it', () => {
         const input = setupInput(phoneNumber());
 
-        expect(input.deleteBackward('(555) 123-4567', 6)).toEqual(
+        expect(input.delete('(555) 123-4567', 6)).toEqual(
             textState('(555) 123-4567', 5)
         );
     });

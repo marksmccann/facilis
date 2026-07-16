@@ -1,9 +1,9 @@
 /**
  * Describes one conditional insertion before a character.
  *
- * @since 0.1.0
+ * @private
  */
-export type InsertBeforeCharacterRule = {
+type InsertBeforeCharacterRule = {
     /**
      * The formatted position where the rule should be tested.
      */

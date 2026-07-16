@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import isDeleteBackwardBeforeFormatting from './isDeleteBackwardBeforeFormatting';
-import type { DeleteBackwardEditContext } from '../types';
+import isDeleteBeforeFormatting from './isDeleteBeforeFormatting';
+import type { FormatDeleteHookContext } from '../types/hooks';
 
 function context(
-    overrides: Partial<DeleteBackwardEditContext> = {}
-): DeleteBackwardEditContext {
+    overrides: Partial<FormatDeleteHookContext> = {}
+): FormatDeleteHookContext {
     return {
-        intent: 'deleteBackward',
+        intent: 'delete',
         previous: '12,345',
         attempted: '1,345',
         formatted: '1,345',
@@ -29,14 +29,14 @@ function context(
     };
 }
 
-describe('isDeleteBackwardBeforeFormatting', () => {
+describe('isDeleteBeforeFormatting', () => {
     it('returns true when semantic text was deleted immediately before formatting', () => {
-        expect(isDeleteBackwardBeforeFormatting(context(), ',')).toBe(true);
+        expect(isDeleteBeforeFormatting(context(), ',')).toBe(true);
     });
 
     it('returns false when the deleted text did not change the normalized value', () => {
         expect(
-            isDeleteBackwardBeforeFormatting(
+            isDeleteBeforeFormatting(
                 context({
                     deleted: ',',
                     normalized: {
@@ -51,8 +51,8 @@ describe('isDeleteBackwardBeforeFormatting', () => {
     });
 
     it('returns false when the cursor is not before the formatting text', () => {
-        expect(
-            isDeleteBackwardBeforeFormatting(context({ cursor: 1 }), ',')
-        ).toBe(false);
+        expect(isDeleteBeforeFormatting(context({ cursor: 1 }), ',')).toBe(
+            false
+        );
     });
 });

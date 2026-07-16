@@ -1,4 +1,5 @@
-import type { FormatEditResult, TextState } from '../types';
+import type { FormatEditHookResult } from '../types/hooks';
+import type { TextState } from '../types/input';
 
 /**
  * Resolves an edit hook result into the next text state.
@@ -10,7 +11,7 @@ import type { FormatEditResult, TextState } from '../types';
  * @private
  */
 export default function resolveEditResult(
-    result: FormatEditResult,
+    result: FormatEditHookResult,
     previous: TextState,
     fallback: TextState
 ): TextState {

@@ -1,4 +1,4 @@
-import type { InsertEditContext } from '../types';
+import type { FormatInsertHookContext } from '../types/hooks';
 
 /**
  * Determines whether a middle insertion adds semantic text after the normalized
@@ -7,7 +7,7 @@ import type { InsertEditContext } from '../types';
  * @since 0.1.0
  */
 export default function isInsertAtMaxLength(
-    context: InsertEditContext,
+    context: FormatInsertHookContext,
     maxLength: number
 ): boolean {
     return (

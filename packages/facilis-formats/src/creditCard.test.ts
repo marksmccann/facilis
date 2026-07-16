@@ -58,9 +58,7 @@ describe('creditCard', () => {
     it('ignores non-digit characters away from a group boundary', () => {
         const input = setupInput(creditCard());
 
-        expect(input.append('4111 111', 'x')).toEqual(
-            textState('4111 111', 8)
-        );
+        expect(input.append('4111 111', 'x')).toEqual(textState('4111 111', 8));
     });
 
     it('caps American Express numbers at fifteen digits', () => {
@@ -82,6 +80,6 @@ describe('creditCard', () => {
     it('does not preserve a trailing separator after deleting the next digit', () => {
         const input = setupInput(creditCard());
 
-        expect(input.deleteBackward('4111 1')).toEqual(textState('4111', 4));
+        expect(input.delete('4111 1')).toEqual(textState('4111', 4));
     });
 });

@@ -1,16 +1,21 @@
-import type { Format, FormatDefinition, TextState } from './types';
-import isAppendEdit from './runtime/isAppendEdit';
-import isDeleteBackwardEdit from './runtime/isDeleteBackwardEdit';
-import isInsertEdit from './runtime/isInsertEdit';
-import resolveEditResult from './runtime/resolveEditResult';
-import runAppend from './runtime/runAppend';
-import runBlur from './runtime/runBlur';
-import runDeleteBackward from './runtime/runDeleteBackward';
-import runFormat from './runtime/runFormat';
-import runInsert from './runtime/runInsert';
-import resolveSelection from './selection/resolveSelection';
+import type { Format, FormatDefinition } from '../types/format';
+import type { TextState } from '../types/input';
+import isAppendEdit from '../runtime/isAppendEdit';
+import isDeleteEdit from '../runtime/isDeleteEdit';
+import isInsertEdit from '../runtime/isInsertEdit';
+import resolveEditResult from '../runtime/resolveEditResult';
+import runAppend from '../runtime/runAppend';
+import runBlur from '../runtime/runBlur';
+import runDelete from '../runtime/runDelete';
+import runFormat from '../runtime/runFormat';
+import runInsert from '../runtime/runInsert';
+import resolveSelection from '../selection/resolveSelection';
 
-/** Creates a reusable format from a format definition. */
+/**
+ * Creates a reusable format from a format definition.
+ *
+ * @since v0.1.0
+ */
 export default function defineFormat(definition: FormatDefinition): Format {
     return {
         onMount(current) {
@@ -40,8 +45,8 @@ export default function defineFormat(definition: FormatDefinition): Format {
             } else if (isInsertEdit(details, previous, current)) {
                 const result = runInsert(editContext);
                 next = resolveEditResult(result, previous, next);
-            } else if (isDeleteBackwardEdit(details, previous)) {
-                const result = runDeleteBackward(editContext);
+            } else if (isDeleteEdit(details, previous)) {
+                const result = runDelete(editContext);
                 next = resolveEditResult(result, previous, next);
             }
 

@@ -1,163 +1,33 @@
 import defineFormat from './defineFormat';
-import {
-    isDeleteBackwardBeforeFormatting,
-    isDeleteBackwardOverFormatting,
-} from './guards';
-import {
-    resolveSelectionAtDeletedBoundary,
-    resolveSelectionBeforeFormatting,
-} from './selection';
+import { resolveFormatFactoryEditHookContext } from './resolveFormatFactoryEdit';
+import type { FormatFactoryOptions } from '../types/factory';
+import isDeleteBeforeFormatting from '../guards/isDeleteBeforeFormatting';
+import isDeleteOverFormatting from '../guards/isDeleteOverFormatting';
+import resolveSelectionAtDeletedBoundary from '../selection/resolveSelectionAtDeletedBoundary';
+import resolveSelectionBeforeFormatting from '../selection/resolveSelectionBeforeFormatting';
 import type {
-    AppendEditContext,
-    DeleteBackwardEditContext,
-    Format,
-    InsertEditContext,
-    TextState,
-} from './types';
-import clampNumber from './transforms/clampNumber';
-import filterNumberCharacters from './transforms/filterNumberCharacters';
-import insertLeadingZero from './transforms/insertLeadingZero';
-import insertThousandsSeparators from './transforms/insertThousandsSeparators';
-import limitDecimalPlaces from './transforms/limitDecimalPlaces';
-import normalizeNegativeSign from './transforms/normalizeNegativeSign';
-import padDecimalPlaces from './transforms/padDecimalPlaces';
-import removeExtraDecimalSeparators from './transforms/removeExtraDecimalSeparators';
-import trimLeadingZeros from './transforms/trimLeadingZeros';
-
-type NumberFormatBaseOptions = {
-    decimalPlaces?: number;
-    padDecimalPlaces?: number;
-    decimalSeparator?: string;
-    thousandsSeparator?: string;
-    allowNegative?: boolean;
-    insertLeadingZero?: boolean;
-    trimLeadingZeros?: boolean;
-    min?: number;
-    max?: number;
-};
+    FormatAppendHookContext,
+    FormatDeleteHookContext,
+    FormatInsertHookContext,
+} from '../types/hooks';
+import type { Format } from '../types/format';
+import type { TextState } from '../types/input';
+import clampNumber from '../transforms/clampNumber';
+import filterNumberCharacters from '../transforms/filterNumberCharacters';
+import insertLeadingZero from '../transforms/insertLeadingZero';
+import insertThousandsSeparators from '../transforms/insertThousandsSeparators';
+import limitDecimalPlaces from '../transforms/limitDecimalPlaces';
+import normalizeNegativeSign from '../transforms/normalizeNegativeSign';
+import padDecimalPlaces from '../transforms/padDecimalPlaces';
+import removeExtraDecimalSeparators from '../transforms/removeExtraDecimalSeparators';
+import trimLeadingZeros from '../transforms/trimLeadingZeros';
 
 /**
- * The complete number-format options after defaults have been applied.
+ * The number-format options before defaults have been applied.
  *
  * @private
  */
-type NormalizedNumberFormatOptions = Required<
-    Omit<NumberFormatBaseOptions, 'max' | 'min'>
-> &
-    Pick<NumberFormatBaseOptions, 'max' | 'min'>;
-
-type NumberFormatLifecycleContext = NormalizedNumberFormatOptions;
-
-/**
- * Describes the context available to number-format normalize hooks.
- *
- * @since 0.1.0
- */
-export type NumberFormatNormalizeContext = NumberFormatLifecycleContext & {
-    /** The raw value passed into the normalize stage. */
-    raw: string;
-};
-
-/**
- * Describes the context available to number-format format hooks.
- *
- * @since 0.1.0
- */
-export type NumberFormatFormatContext = NumberFormatLifecycleContext & {
-    /** The normalized value passed into the format stage. */
-    normalized: string;
-};
-
-/**
- * Describes the context available to number-format blur hooks.
- *
- * @since 0.1.0
- */
-export type NumberFormatBlurContext = NumberFormatLifecycleContext & {
-    /** The formatted value passed into the blur stage. */
-    formatted: string;
-};
-
-/**
- * Customizes number normalization after the built-in normalization pipeline has
- * resolved its value.
- *
- * @since 0.1.0
- */
-export type NumberFormatNormalizeHook = (
-    resolved: string,
-    context: NumberFormatNormalizeContext
-) => string;
-
-/**
- * Customizes number formatting after the built-in formatting pipeline has
- * resolved its value.
- *
- * @since 0.1.0
- */
-export type NumberFormatFormatHook = (
-    resolved: string,
-    context: NumberFormatFormatContext
-) => string;
-
-/**
- * Customizes blur formatting after the built-in blur pipeline has resolved its
- * value.
- *
- * @since 0.1.0
- */
-export type NumberFormatBlurHook = (
-    resolved: string,
-    context: NumberFormatBlurContext
-) => string;
-
-/**
- * Describes the context available to number-format edit hooks.
- *
- * @since 0.1.0
- */
-export type NumberFormatEditContext<TContext extends { resolved: TextState }> =
-    Omit<TContext, 'resolved'> & NormalizedNumberFormatOptions;
-
-/**
- * Customizes append behavior after the built-in number-format behavior has
- * resolved the next text state.
- *
- * @since 0.1.0
- */
-export type NumberFormatAppendHook = (
-    next: TextState,
-    context: NumberFormatEditContext<AppendEditContext>
-) => TextState;
-
-/**
- * Customizes insert behavior after the built-in number-format behavior has
- * resolved the next text state.
- *
- * @since 0.1.0
- */
-export type NumberFormatInsertHook = (
-    next: TextState,
-    context: NumberFormatEditContext<InsertEditContext>
-) => TextState;
-
-/**
- * Customizes delete behavior after the built-in number-format behavior has
- * resolved the next text state.
- *
- * @since 0.1.0
- */
-export type NumberFormatDeleteHook = (
-    next: TextState,
-    context: NumberFormatEditContext<DeleteBackwardEditContext>
-) => TextState;
-
-/**
- * The configuration options for a number format.
- *
- * @since 0.1.0
- */
-export type NumberFormatOptions = NumberFormatBaseOptions & {
+type NumberFormatBaseOptions = {
     /**
      * The maximum number of decimal places to preserve. The default is `0`,
      * which produces an integer-only format.
@@ -210,40 +80,27 @@ export type NumberFormatOptions = NumberFormatBaseOptions & {
      * The maximum complete numeric value to allow while typing.
      */
     max?: number;
-
-    /**
-     * Customizes the resolved normalized value.
-     */
-    normalize?: NumberFormatNormalizeHook;
-
-    /**
-     * Customizes the resolved formatted value.
-     */
-    format?: NumberFormatFormatHook;
-
-    /**
-     * Customizes the resolved blurred value.
-     */
-    blur?: NumberFormatBlurHook;
-
-    /**
-     * Customizes append behavior after the built-in number-format behavior has
-     * resolved the next text state.
-     */
-    append?: NumberFormatAppendHook;
-
-    /**
-     * Customizes insert behavior after the built-in number-format behavior has
-     * resolved the next text state.
-     */
-    insert?: NumberFormatInsertHook;
-
-    /**
-     * Customizes delete behavior after the built-in number-format behavior has
-     * resolved the next text state.
-     */
-    delete?: NumberFormatDeleteHook;
 };
+
+/**
+ * The complete number-format options after defaults have been applied.
+ *
+ * @private
+ */
+type NormalizedNumberFormatOptions = Required<
+    Omit<NumberFormatBaseOptions, 'max' | 'min'>
+> &
+    Pick<NumberFormatBaseOptions, 'max' | 'min'>;
+
+/**
+ * The configuration options for a number format.
+ *
+ * @since 0.1.0
+ */
+export type NumberFormatOptions = FormatFactoryOptions<
+    NumberFormatBaseOptions,
+    NormalizedNumberFormatOptions
+>;
 
 /**
  * Applies the default number-format options when an option is omitted.
@@ -267,12 +124,12 @@ function normalizeNumberFormatOptions(
 }
 
 /**
- * Resolves the built-in backward-delete behavior for a number format.
+ * Resolves the built-in delete behavior for a number format.
  *
  * @private
  */
-function resolveDeleteBackward(
-    context: DeleteBackwardEditContext,
+function resolveDelete(
+    context: FormatDeleteHookContext,
     options: NormalizedNumberFormatOptions
 ): TextState | undefined {
     const { cursor, formatted, previous, start } = context;
@@ -285,14 +142,14 @@ function resolveDeleteBackward(
         formatting,
     });
 
-    if (selectionBeforeFormatting && isDeleteBackwardOverFormatting(context)) {
+    if (selectionBeforeFormatting && isDeleteOverFormatting(context)) {
         return {
             value: previous,
             ...selectionBeforeFormatting,
         };
     }
 
-    if (isDeleteBackwardBeforeFormatting(context, formatting)) {
+    if (isDeleteBeforeFormatting(context, formatting)) {
         const selection = resolveSelectionAtDeletedBoundary({
             previous,
             formatted,
@@ -307,29 +164,6 @@ function resolveDeleteBackward(
             };
         }
     }
-}
-
-/**
- * Resolves the context passed to number-format edit hooks.
- *
- * @private
- */
-function resolveEditContext<
-    TContext extends
-        | AppendEditContext
-        | InsertEditContext
-        | DeleteBackwardEditContext,
->(
-    context: TContext,
-    options: NormalizedNumberFormatOptions
-): NumberFormatEditContext<TContext> {
-    const { resolved, ...editContext } = context;
-    void resolved;
-
-    return {
-        ...editContext,
-        ...options,
-    } as NumberFormatEditContext<TContext>;
 }
 
 /**
@@ -472,34 +306,40 @@ export default function defineNumberFormat(
 
             return resolved;
         },
-        edit: {
-            append(context) {
-                if (options?.append) {
-                    return options.append(context.resolved, {
-                        ...resolveEditContext(context, normalizedOptions),
-                    });
-                }
-            },
-            insert(context) {
-                if (options?.insert) {
-                    return options.insert(context.resolved, {
-                        ...resolveEditContext(context, normalizedOptions),
-                    });
-                }
-            },
-            deleteBackward(context) {
-                const next =
-                    resolveDeleteBackward(context, normalizedOptions) ??
-                    context.resolved;
+        append(context) {
+            if (options?.append) {
+                return options.append(context.resolved, {
+                    ...resolveFormatFactoryEditHookContext(
+                        context,
+                        normalizedOptions
+                    ),
+                });
+            }
+        },
+        insert(context) {
+            if (options?.insert) {
+                return options.insert(context.resolved, {
+                    ...resolveFormatFactoryEditHookContext(
+                        context,
+                        normalizedOptions
+                    ),
+                });
+            }
+        },
+        delete(context) {
+            const next =
+                resolveDelete(context, normalizedOptions) ?? context.resolved;
 
-                if (options?.delete) {
-                    return options.delete(next, {
-                        ...resolveEditContext(context, normalizedOptions),
-                    });
-                }
+            if (options?.delete) {
+                return options.delete(next, {
+                    ...resolveFormatFactoryEditHookContext(
+                        context,
+                        normalizedOptions
+                    ),
+                });
+            }
 
-                return next;
-            },
+            return next;
         },
     });
 }

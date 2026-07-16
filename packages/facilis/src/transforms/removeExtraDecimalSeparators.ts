@@ -1,9 +1,9 @@
 /**
  * Options for removing extra decimal separators from a number-like string.
  *
- * @since 0.1.0
+ * @private
  */
-export type RemoveExtraDecimalSeparatorsOptions = {
+type RemoveExtraDecimalSeparatorsOptions = {
     /**
      * The decimal separator that marks the start of the fractional portion.
      */
