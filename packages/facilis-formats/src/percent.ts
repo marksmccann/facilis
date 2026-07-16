@@ -1,47 +1,27 @@
-import { defineNumberFormat, type Format } from 'facilis';
+import {
+    defineNumberFormat,
+    type Format,
+    type NumberFormatOptions,
+} from 'facilis';
 
 const PERCENT_SYMBOL = '%';
+
+type PercentNumberOptions = Pick<
+    NumberFormatOptions,
+    | 'allowNegative'
+    | 'decimalPlaces'
+    | 'decimalSeparator'
+    | 'max'
+    | 'min'
+    | 'padDecimalPlaces'
+>;
 
 /**
  * The configuration options for a percent format.
  *
  * @since 0.1.0
  */
-export type PercentOptions = {
-    /**
-     * The maximum number of decimal places to preserve. The default is `0`,
-     * which produces an integer-only percent format.
-     */
-    decimalPlaces?: number;
-
-    /**
-     * The minimum number of decimal places that should exist after blur. The
-     * default is `0`, which leaves the fractional portion unchanged on blur.
-     */
-    padDecimalPlaces?: number;
-
-    /**
-     * The separator to use between the whole and fractional portions of the
-     * formatted percent value. The default is `'.'`.
-     */
-    decimalSeparator?: string;
-
-    /**
-     * Whether to preserve a leading minus sign for negative values. The
-     * default is `false`.
-     */
-    allowNegative?: boolean;
-
-    /**
-     * The minimum complete percent value to allow while typing.
-     */
-    min?: number;
-
-    /**
-     * The maximum complete percent value to allow while typing.
-     */
-    max?: number;
-
+export type PercentOptions = PercentNumberOptions & {
     /**
      * Whether to append the percent symbol to the formatted value. The default
      * is `true`.
