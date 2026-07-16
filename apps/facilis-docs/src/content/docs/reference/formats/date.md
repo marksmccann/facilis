@@ -24,7 +24,7 @@ With `date({ pattern: 'MM/DD/YYYY', insertLeadingZero: true })`:
 - `2` becomes `02`
 - `24` becomes `02/04`
 
-With `date({ pattern: 'MM/DD/YYYY', strictMonthAndDay: true })`:
+With `date({ pattern: 'MM/DD/YYYY', strictDateSegments: true })`:
 
 - `13` becomes `1`
 - `1239` becomes `12/3`
@@ -107,19 +107,19 @@ With raw input `24`, this formats as `02/04`. Months `2` through `9` and days
 `4` through `9` can be padded because those digits cannot validly begin a
 two-digit month or day.
 
-### strictMonthAndDay
+### strictDateSegments
 
 ```ts
-type StrictMonthAndDay = boolean;
+type StrictDateSegments = boolean;
 ```
 
-The `strictMonthAndDay` option rejects impossible standalone month and day
+The `strictDateSegments` option rejects impossible standalone month and day
 segment values while typing. The default is `false`.
 
 ```ts
 const strictDateFormat = date({
     pattern: 'MM/DD/YYYY',
-    strictMonthAndDay: true,
+    strictDateSegments: true,
 });
 ```
 

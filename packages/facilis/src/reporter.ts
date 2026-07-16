@@ -5,6 +5,9 @@ const messages = {
     ERR02: 'Pattern formats require at least one token definition.',
     ERR03: 'Pattern format token keys must be a single character each.',
     ERR04: 'Pattern formats require the pattern string to include at least one token.',
+    ERR05: 'Date formats require a pattern option.',
+    ERR07: 'Date formats require a supported pattern.',
+    ERR08: 'Date formats require a supported separator.',
 } as const;
 
 export const reporter = createReporter(

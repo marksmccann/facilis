@@ -21,7 +21,7 @@ export function zipCode(options: ZipCodeOptions = {}): Format {
     const { includePlusFour = false } = options;
 
     return defineSegmentedFormat({
-        characters: 'digits',
+        matches: /\d/,
         segments: includePlusFour ? [5, '-', 4] : [5],
     });
 }

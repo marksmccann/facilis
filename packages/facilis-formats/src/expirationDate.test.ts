@@ -15,6 +15,18 @@ describe('expirationDate', () => {
         expect(input.append('12/34', '5')).toEqual(textState('12/34', 5));
     });
 
+    it('renders a configured separator', () => {
+        const input = setupInput(expirationDate({ separator: '-' }));
+
+        expect(input.type('1234')).toEqual(textState('12-34', 5));
+    });
+
+    it('rejects an impossible month when months are strict', () => {
+        const input = setupInput(expirationDate({ strictMonth: true }));
+
+        expect(input.type('13')).toEqual(textState('1', 1));
+    });
+
     it('accepts the separator when it is typed at the group boundary', () => {
         const input = setupInput(expirationDate());
 

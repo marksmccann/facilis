@@ -7,7 +7,7 @@ import { defineSegmentedFormat, type Format } from 'facilis';
  */
 export function phoneNumber(): Format {
     return defineSegmentedFormat({
-        characters: 'digits',
+        matches: /\d/,
         segments: ['(', 3, ') ', 3, '-', 4],
     });
 }

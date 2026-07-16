@@ -22,7 +22,7 @@ export type {
 } from './definePatternFormat';
 export { default as defineSegmentedFormat } from './defineSegmentedFormat';
 export type {
-    SegmentedFormatCharacters,
+    SegmentedFormatMatches,
     SegmentedFormatOptions,
     SegmentedFormatSegment,
     SegmentedFormatSegments,

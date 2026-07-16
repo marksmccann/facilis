@@ -1,6 +1,7 @@
 import defineSegmentedFormat, {
     type SegmentedFormatSegment,
 } from './defineSegmentedFormat';
+import { reporter } from './reporter';
 import type { Format } from './types';
 import insertBeforeCharacter from './transforms/insertBeforeCharacter';
 import rejectInvalidSegments from './transforms/rejectInvalidSegments';
@@ -31,6 +32,35 @@ export type DateFormatPattern =
 export type DateFormatSeparator = '/' | '-' | '.';
 
 /**
+ * The canonical date patterns supported by the date format.
+ *
+ * @private
+ */
+const DATE_PATTERNS = [
+    'MM/DD/YY',
+    'MM/DD/YYYY',
+    'DD/MM/YY',
+    'DD/MM/YYYY',
+    'YY/MM/DD',
+    'YYYY/MM/DD',
+    'MM/YY',
+    'MM/YYYY',
+    'YY/MM',
+    'YYYY/MM',
+] as const satisfies readonly DateFormatPattern[];
+
+/**
+ * The separators supported when rendering formatted date values.
+ *
+ * @private
+ */
+const DATE_SEPARATORS = [
+    '/',
+    '-',
+    '.',
+] as const satisfies readonly DateFormatSeparator[];
+
+/**
  * The configuration options for a date format.
  *
  * @since 0.1.0
@@ -49,11 +79,48 @@ export type DateFormatOptions = {
     insertLeadingZero?: boolean;
 
     /**
-     * Whether to reject impossible month and day values while typing. The
+     * Whether to reject impossible date segment values while typing. The
      * default is `false`.
      */
-    strictMonthAndDay?: boolean;
+    strictDateSegments?: boolean;
 };
+
+/**
+ * The complete date-format options after defaults have been applied.
+ *
+ * @private
+ */
+type NormalizedDateFormatOptions = Required<DateFormatOptions>;
+
+/**
+ * Applies date-format defaults and validates the supported option values.
+ *
+ * @private
+ */
+function normalizeDateFormatOptions(
+    options: DateFormatOptions
+): NormalizedDateFormatOptions {
+    if (!options || !Object.hasOwn(options, 'pattern')) {
+        reporter.fail('ERR05');
+    }
+
+    const separator = options.separator ?? '/';
+
+    if (!DATE_PATTERNS.includes(options.pattern)) {
+        reporter.fail('ERR07');
+    }
+
+    if (!DATE_SEPARATORS.includes(separator)) {
+        reporter.fail('ERR08');
+    }
+
+    return {
+        insertLeadingZero: options.insertLeadingZero ?? false,
+        pattern: options.pattern,
+        separator,
+        strictDateSegments: options.strictDateSegments ?? false,
+    };
+}
 
 /**
  * Determines whether one month or day segment can still resolve to a possible
@@ -127,17 +194,14 @@ function resolveDateSegments(
  * @since 0.1.0
  */
 export default function defineDateFormat(options: DateFormatOptions): Format {
-    const {
-        insertLeadingZero = false,
-        pattern,
-        separator = '/',
-        strictMonthAndDay = false,
-    } = options;
+    const normalizedOptions = normalizeDateFormatOptions(options);
+    const { insertLeadingZero, pattern, separator, strictDateSegments } =
+        normalizedOptions;
     const patternSegments = pattern.split('/');
     const leadingZeroRules = resolveLeadingZeroRules(patternSegments);
 
     return defineSegmentedFormat({
-        characters: 'digits',
+        matches: /\d/,
         segments: resolveDateSegments(patternSegments, separator),
         normalize(value) {
             let normalized = value;
@@ -149,7 +213,7 @@ export default function defineDateFormat(options: DateFormatOptions): Format {
                 );
             }
 
-            if (strictMonthAndDay) {
+            if (strictDateSegments) {
                 normalized = rejectInvalidSegments(
                     normalized,
                     patternSegments,

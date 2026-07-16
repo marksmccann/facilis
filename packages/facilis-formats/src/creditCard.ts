@@ -8,24 +8,17 @@ import { defineSegmentedFormat, type Format } from 'facilis';
 const AMEX_PREFIXES = ['34', '37'];
 
 /**
- * Tests whether the normalized value starts with an American Express prefix.
- *
- * @private
- */
-function isAmex(value: string) {
-    return AMEX_PREFIXES.includes(value.slice(0, 2));
-}
-
-/**
  * Creates a credit-card number format.
  *
  * @since 0.1.0
  */
 export function creditCard(): Format {
     return defineSegmentedFormat({
-        characters: 'digits',
+        matches: /\d/,
         segments(normalized) {
-            if (isAmex(normalized)) {
+            const prefix = normalized.slice(0, 2);
+
+            if (AMEX_PREFIXES.includes(prefix)) {
                 return [4, ' ', 6, ' ', 5];
             }
 

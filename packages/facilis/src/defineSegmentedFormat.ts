@@ -6,10 +6,7 @@ import type { Format } from './types';
  *
  * @since 0.1.0
  */
-export type SegmentedFormatCharacters =
-    | 'digits'
-    | RegExp
-    | ((character: string) => boolean);
+export type SegmentedFormatMatches = RegExp;
 
 /**
  * Defines one piece of a segmented display layout.
@@ -33,8 +30,8 @@ export type SegmentedFormatSegments =
  * @since 0.1.0
  */
 export type SegmentedFormatOptions = {
-    /** The characters allowed into the normalized value. */
-    characters: SegmentedFormatCharacters;
+    /** The raw character pattern allowed into the normalized value. */
+    matches: SegmentedFormatMatches;
 
     /** Adjusts the filtered semantic value before length is enforced. */
     normalize?: (normalized: string) => string;
@@ -49,19 +46,11 @@ export type SegmentedFormatOptions = {
  * @private
  */
 function matchesSegmentedCharacter(
-    characters: SegmentedFormatCharacters,
+    matches: SegmentedFormatMatches,
     character: string
 ) {
-    if (characters === 'digits') {
-        return /\d/.test(character);
-    }
-
-    if (characters instanceof RegExp) {
-        characters.lastIndex = 0;
-        return characters.test(character);
-    }
-
-    return characters(character);
+    matches.lastIndex = 0;
+    return matches.test(character);
 }
 
 /**
@@ -70,12 +59,9 @@ function matchesSegmentedCharacter(
  *
  * @private
  */
-function hasSegmentedCharacter(
-    characters: SegmentedFormatCharacters,
-    text: string
-) {
+function hasSegmentedCharacter(matches: SegmentedFormatMatches, text: string) {
     return Array.from(text).some((character) =>
-        matchesSegmentedCharacter(characters, character)
+        matchesSegmentedCharacter(matches, character)
     );
 }
 
@@ -118,7 +104,7 @@ function resolveSegmentedSegments(
 function normalizeSegmentedValue(raw: string, options: SegmentedFormatOptions) {
     const value = Array.from(raw)
         .filter((character) =>
-            matchesSegmentedCharacter(options.characters, character)
+            matchesSegmentedCharacter(options.matches, character)
         )
         .join('');
     const normalized = options.normalize ? options.normalize(value) : value;
@@ -205,7 +191,7 @@ function isAppendFormatting(
 ) {
     return (
         context.appended !== '' &&
-        !hasSegmentedCharacter(options.characters, context.appended) &&
+        !hasSegmentedCharacter(options.matches, context.appended) &&
         context.normalized.appended === '' &&
         context.normalized.attempted === context.normalized.previous
     );
@@ -284,10 +270,7 @@ export default function defineSegmentedFormat(
 
                 if (
                     context.inserted !== '' &&
-                    !hasSegmentedCharacter(
-                        options.characters,
-                        context.inserted
-                    ) &&
+                    !hasSegmentedCharacter(options.matches, context.inserted) &&
                     context.normalized.inserted === '' &&
                     context.normalized.attempted === context.normalized.previous
                 ) {

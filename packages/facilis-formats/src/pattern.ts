@@ -2,40 +2,8 @@ import {
     definePatternFormat,
     type Format,
     type PatternFormatOptions,
-    type PatternFormatPart,
-    type PatternFormatTokenDefinition,
     type PatternFormatTokenDefinitions,
 } from 'facilis';
-
-/**
- * Defines the matching rule for a single token symbol in a pattern format.
- *
- * @since 0.1.0
- */
-export type PatternTokenDefinition = PatternFormatTokenDefinition;
-
-/**
- * Maps each token symbol used in a pattern string to the rule that determines
- * which raw characters can fill that token slot.
- *
- * @since 0.1.0
- */
-export type PatternTokenDefinitions = PatternFormatTokenDefinitions;
-
-/**
- * The explicit configuration object for one parsed pattern definition.
- *
- * @since 0.1.0
- */
-export type ParsePatternOptions = PatternFormatOptions;
-
-/**
- * Describes one ordered part of a parsed pattern, either a token character or
- * a literal character from the original pattern string.
- *
- * @since 0.1.0
- */
-export type PatternPart = PatternFormatPart;
 
 /**
  * The built-in token definitions shared by the shorthand string syntax and the
@@ -54,15 +22,11 @@ const DEFAULT_PATTERN_TOKENS = {
  *
  * @since 0.1.0
  */
-export type PatternOptions = {
-    /**
-     * The pattern string that defines literal characters and token slots.
-     */
-    pattern: string;
+export type PatternOptions = Pick<PatternFormatOptions, 'pattern'> & {
     /**
      * The token definitions keyed by the wildcard characters used in the pattern.
      */
-    tokens?: PatternTokenDefinitions;
+    tokens?: PatternFormatTokenDefinitions;
 };
 
 /**
@@ -79,7 +43,7 @@ export type PatternInput = string | PatternOptions;
  *
  * @private
  */
-function normalizePatternOptions(input: PatternInput): ParsePatternOptions {
+function normalizePatternOptions(input: PatternInput): PatternFormatOptions {
     if (typeof input === 'string') {
         return {
             pattern: input,

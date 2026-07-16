@@ -136,7 +136,7 @@ export default function defineTimeFormat(options: TimeFormatOptions): Format {
     const leadingZeroRules = resolveLeadingZeroRules(patternSegments);
 
     return defineSegmentedFormat({
-        characters: 'digits',
+        matches: /\d/,
         segments: resolveTimeSegments(patternSegments, separator),
         normalize(value) {
             let normalized = value;

@@ -124,7 +124,7 @@ describe('date', () => {
         const input = setupInput(
             date({
                 pattern: 'MM/DD/YYYY',
-                strictMonthAndDay: true,
+                strictDateSegments: true,
             })
         );
 
@@ -135,7 +135,7 @@ describe('date', () => {
         const input = setupInput(
             date({
                 pattern: 'MM/DD/YYYY',
-                strictMonthAndDay: true,
+                strictDateSegments: true,
             })
         );
 
@@ -146,7 +146,7 @@ describe('date', () => {
         const input = setupInput(
             date({
                 pattern: 'DD/MM/YYYY',
-                strictMonthAndDay: true,
+                strictDateSegments: true,
             })
         );
 
@@ -158,7 +158,7 @@ describe('date', () => {
             date({
                 insertLeadingZero: true,
                 pattern: 'MM/DD/YYYY',
-                strictMonthAndDay: true,
+                strictDateSegments: true,
             })
         );
 

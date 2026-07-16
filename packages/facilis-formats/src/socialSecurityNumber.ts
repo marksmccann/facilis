@@ -7,7 +7,7 @@ import { defineSegmentedFormat, type Format } from 'facilis';
  */
 export function socialSecurityNumber(): Format {
     return defineSegmentedFormat({
-        characters: 'digits',
+        matches: /\d/,
         segments: [3, '-', 2, '-', 4],
     });
 }

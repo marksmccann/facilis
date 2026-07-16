@@ -30,43 +30,11 @@ export type PercentOptions = PercentNumberOptions & {
 };
 
 /**
- * The complete percent-format options after defaults have been applied.
- *
- * @private
- */
-type NormalizedPercentOptions = Required<Omit<PercentOptions, 'max' | 'min'>> &
-    Pick<PercentOptions, 'max' | 'min'>;
-
-/**
- * Applies the default percent-format options when an option is omitted.
- *
- * @private
- */
-function normalizePercentOptions(
-    options: PercentOptions = {}
-): NormalizedPercentOptions {
-    return {
-        allowNegative: options.allowNegative ?? false,
-        decimalPlaces: Math.max(0, options.decimalPlaces ?? 0),
-        decimalSeparator: options.decimalSeparator ?? '.',
-        includeSymbol: options.includeSymbol ?? true,
-        max: options.max,
-        min: options.min,
-        padDecimalPlaces: Math.max(0, options.padDecimalPlaces ?? 0),
-    };
-}
-
-/**
  * Determines whether a normalized value is still an incomplete numeric shell.
  *
  * @private
  */
-function isIncompletePercentValue(
-    value: string,
-    options: Pick<NormalizedPercentOptions, 'decimalSeparator'>
-) {
-    const { decimalSeparator } = options;
-
+function isIncompletePercentValue(value: string, decimalSeparator: string) {
     return (
         value === '' ||
         value === '-' ||
@@ -81,16 +49,15 @@ function isIncompletePercentValue(
  * @since 0.1.0
  */
 export function percent(options?: PercentOptions): Format {
-    const normalizedOptions = normalizePercentOptions(options);
     const {
+        includeSymbol = true,
         allowNegative,
         decimalPlaces,
         decimalSeparator,
-        includeSymbol,
+        padDecimalPlaces,
         max,
         min,
-        padDecimalPlaces: decimalPlacesToPad,
-    } = normalizedOptions;
+    } = options || {};
 
     return defineNumberFormat({
         allowNegative,
@@ -99,26 +66,26 @@ export function percent(options?: PercentOptions): Format {
         insertLeadingZero: true,
         max,
         min,
-        padDecimalPlaces: decimalPlacesToPad,
+        padDecimalPlaces,
         trimLeadingZeros: true,
         format(resolved, context) {
+            const { normalized, decimalSeparator: separator } = context;
+
             if (
                 !includeSymbol ||
-                isIncompletePercentValue(context.normalized, {
-                    decimalSeparator,
-                })
+                isIncompletePercentValue(normalized, separator)
             ) {
                 return resolved;
             }
 
             return `${resolved}${PERCENT_SYMBOL}`;
         },
-        blur(resolved) {
+        blur(resolved, context) {
+            const { decimalSeparator: separator } = context;
+
             if (
                 !includeSymbol ||
-                isIncompletePercentValue(resolved, {
-                    decimalSeparator,
-                })
+                isIncompletePercentValue(resolved, separator)
             ) {
                 return resolved;
             }

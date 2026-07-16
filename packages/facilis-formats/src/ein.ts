@@ -7,7 +7,7 @@ import { defineSegmentedFormat, type Format } from 'facilis';
  */
 export function ein(): Format {
     return defineSegmentedFormat({
-        characters: 'digits',
+        matches: /\d/,
         segments: [2, '-', 7],
     });
 }

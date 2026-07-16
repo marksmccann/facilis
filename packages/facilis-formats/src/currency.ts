@@ -32,20 +32,20 @@ export type CurrencyOptions = CurrencyNumberOptions & {
  *
  * @since 0.1.0
  */
-export function currency(options: CurrencyOptions = {}): Format {
+export function currency(options?: CurrencyOptions): Format {
     const {
-        decimalSeparator = '.',
         includeCents = true,
         symbol = '$',
-        thousandsSeparator = ',',
-    } = options;
+        decimalSeparator,
+        thousandsSeparator,
+    } = options || {};
 
     return defineNumberFormat({
         decimalPlaces: includeCents ? 2 : 0,
         decimalSeparator,
         insertLeadingZero: includeCents,
         padDecimalPlaces: includeCents ? 2 : 0,
-        thousandsSeparator,
+        thousandsSeparator: thousandsSeparator ?? ',',
         trimLeadingZeros: true,
         format(resolved) {
             if (resolved === '') return '';
