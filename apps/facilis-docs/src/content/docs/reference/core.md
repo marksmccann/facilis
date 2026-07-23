@@ -23,15 +23,30 @@ A `FormatDefinition` can include:
 - `format(normalized)`: optional. Builds the focused display value.
 - `blur(formatted)`: optional. Adjusts the formatted value when the field
   blurs.
-- `edit`: optional. Intercepts append, insert, and backward-delete intentions.
+- `append`, `insert`, and `delete`: optional. Intercept editing intentions.
 
 ## Runtime types
 
 - `TextState`: `{ value, selectionStart, selectionEnd }`.
 - `Selection`: selection-only state.
 - `InputDetails`: normalized input event details.
-- `Format`: adapter-facing runtime with `onMount`, `onInput`, and `onBlur`.
+- `Format`: reusable runtime with `formatValue`, `onMount`, `onInput`, and
+  `onBlur`.
 - `FormatEditResult`: return type for edit hooks.
+
+## formatValue
+
+`format.formatValue(value)` formats a standalone string for display. It runs the
+same normalized display pipeline a blurred input uses.
+
+```ts
+import { creditCard } from 'facilis-formats';
+
+const card = creditCard();
+
+card.formatValue('4111111111111111');
+// "4111 1111 1111 1111"
+```
 
 ## Format factories
 

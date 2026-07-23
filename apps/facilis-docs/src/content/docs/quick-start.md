@@ -32,14 +32,18 @@ returns a cleanup function that removes its listeners.
 
 ## React
 
-Use `useFormat()` when React owns the input.
+Use `useFormat()` to create a format instance and `useFormattedInput()` when
+React owns the input.
 
 ```tsx
-import { useFormat } from 'facilis-react';
+import { useFormat, useFormattedInput } from 'facilis-react';
 import { currency } from 'facilis-formats';
 
 function AmountInput() {
-    const amount = useFormat(currency, {
+    const amountFormat = useFormat(currency, {
+        includeCents: true,
+    });
+    const amount = useFormattedInput(amountFormat, {
         defaultValue: '1234.5',
         onValueChange(value) {
             console.log(value);
@@ -50,8 +54,8 @@ function AmountInput() {
 }
 ```
 
-The hook returns `inputProps` for the input and `inputRef` for direct access to
-the underlying element.
+`useFormattedInput()` returns `inputProps` for the input and `inputRef` for
+direct access to the underlying element.
 
 ## Next steps
 

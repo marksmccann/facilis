@@ -11,11 +11,11 @@ export type FormatFactory<FormatOptions extends object = object> = (
 ) => Format;
 
 /**
- * Describes the React-specific options reserved by `useFormat`.
+ * Describes the React-specific options reserved by `useFormattedInput`.
  *
  * @since 0.1.0
  */
-export type UseFormatHookOptions = {
+export type UseFormattedInputOptions = {
     /**
      * The initial input value Facilis should format when the input mounts.
      */
@@ -38,20 +38,12 @@ export type UseFormatHookOptions = {
 };
 
 /**
- * Combines format factory options with the React-specific options reserved by
- * `useFormat`.
+ * Describes the props returned by `useFormattedInput` for a React-managed
+ * input.
  *
  * @since 0.1.0
  */
-export type UseFormatOptions<FormatOptions extends object = object> =
-    FormatOptions & UseFormatHookOptions;
-
-/**
- * Describes the props returned by `useFormat` for a React-managed input.
- *
- * @since 0.1.0
- */
-export type UseFormatInputProps = {
+export type UseFormattedInputProps = {
     /**
      * Connects the input element to the format runtime.
      */
@@ -74,11 +66,11 @@ export type UseFormatInputProps = {
 };
 
 /**
- * Describes the object returned by `useFormat`.
+ * Describes the object returned by `useFormattedInput`.
  *
  * @since 0.1.0
  */
-export type UseFormatResult = {
+export type UseFormattedInputResult = {
     /**
      * The input element connected to the format runtime.
      */
@@ -87,5 +79,5 @@ export type UseFormatResult = {
     /**
      * Props to spread onto an `input` element.
      */
-    inputProps: UseFormatInputProps;
+    inputProps: UseFormattedInputProps;
 };

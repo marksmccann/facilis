@@ -18,6 +18,12 @@ import runInsert from './runInsert';
  */
 export default function defineFormat(definition: FormatDefinition): Format {
     return {
+        formatValue(value) {
+            const normalized = definition.normalize(value);
+            const formatted = runFormat(definition, normalized);
+
+            return runBlur(definition, formatted);
+        },
         onMount(current) {
             const normalized = definition.normalize(current.value);
             const formatted = runFormat(definition, normalized);

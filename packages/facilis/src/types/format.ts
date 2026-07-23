@@ -50,6 +50,11 @@ export type FormatDefinition = {
  */
 export type Format = {
     /**
+     * Formats a standalone value for display.
+     */
+    formatValue(value: string): string;
+
+    /**
      * Synchronizes the initial mounted value with the format.
      */
     onMount(current: TextState): TextState;

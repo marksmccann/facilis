@@ -1,7 +1,9 @@
 export { useFormat } from './useFormat';
+export { useFormattedInput } from './useFormattedInput';
+export { useFormattedValue } from './useFormattedValue';
 export type {
     FormatFactory,
-    UseFormatHookOptions,
-    UseFormatOptions,
-    UseFormatResult,
+    UseFormattedInputOptions,
+    UseFormattedInputProps,
+    UseFormattedInputResult,
 } from './types';

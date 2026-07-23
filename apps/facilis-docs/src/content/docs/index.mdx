@@ -68,11 +68,12 @@ const cleanup = bindFormat('#credit-card', creditCard());
     <TabItem label="React">
 
 ```tsx
-import { useFormat } from 'facilis-react';
+import { useFormat, useFormattedInput } from 'facilis-react';
 import { creditCard } from './formats/creditCard';
 
 function CreditCardField() {
-    const card = useFormat(creditCard);
+    const cardFormat = useFormat(creditCard);
+    const card = useFormattedInput(cardFormat);
 
     return <input {...card.inputProps} />;
 }

@@ -3,6 +3,8 @@ import React from 'react';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { useFormat } from './useFormat';
+import { useFormattedInput } from './useFormattedInput';
+import { useFormattedValue } from './useFormattedValue';
 
 afterEach(cleanup);
 
@@ -53,13 +55,35 @@ function dispatchInput(
 }
 
 describe('useFormat', () => {
-    it('formats the default value and passes format options to the factory', () => {
-        const createFormat = vi.fn(createTestFormat);
+    it('creates a format with factory options', () => {
+        const factory = vi.fn(createTestFormat);
+
+        function TestValue() {
+            const format = useFormat<TestFormatOptions>(factory, {
+                prefix: '>',
+            });
+            const formatted = useFormattedValue(format, 'ab');
+
+            return React.createElement('span', null, formatted);
+        }
+
+        render(React.createElement(TestValue));
+
+        expect(factory).toHaveBeenCalledWith({ prefix: '>' });
+        expect(screen.getByText('>AB!')).toBeDefined();
+    });
+});
+
+describe('useFormattedInput', () => {
+    it('formats the default value', () => {
+        const factory = vi.fn(createTestFormat);
 
         function TestInput() {
-            const { inputProps } = useFormat<TestFormatOptions>(createFormat, {
-                defaultValue: 'ab',
+            const format = useFormat<TestFormatOptions>(factory, {
                 prefix: '>',
+            });
+            const { inputProps } = useFormattedInput(format, {
+                defaultValue: 'ab',
             });
 
             return React.createElement('input', inputProps);
@@ -68,7 +92,7 @@ describe('useFormat', () => {
         render(React.createElement(TestInput));
         const input = screen.getByRole('textbox') as HTMLInputElement;
 
-        expect(createFormat).toHaveBeenCalledWith({ prefix: '>' });
+        expect(factory).toHaveBeenCalledWith({ prefix: '>' });
         expect(input.value).toBe('>AB');
     });
 
@@ -77,15 +101,14 @@ describe('useFormat', () => {
         const onValueChange = vi.fn();
 
         function TestInput() {
-            const { inputProps } = useFormat<TestFormatOptions>(
-                createTestFormat,
-                {
-                    defaultValue: 'a',
-                    onInput,
-                    onValueChange,
-                    prefix: '>',
-                }
-            );
+            const format = useFormat<TestFormatOptions>(createTestFormat, {
+                prefix: '>',
+            });
+            const { inputProps } = useFormattedInput(format, {
+                defaultValue: 'a',
+                onInput,
+                onValueChange,
+            });
 
             return React.createElement('input', inputProps);
         }
@@ -111,15 +134,14 @@ describe('useFormat', () => {
         const onValueChange = vi.fn();
 
         function TestInput() {
-            const { inputProps } = useFormat<TestFormatOptions>(
-                createTestFormat,
-                {
-                    defaultValue: 'ab',
-                    onBlur,
-                    onValueChange,
-                    prefix: '>',
-                }
-            );
+            const format = useFormat<TestFormatOptions>(createTestFormat, {
+                prefix: '>',
+            });
+            const { inputProps } = useFormattedInput(format, {
+                defaultValue: 'ab',
+                onBlur,
+                onValueChange,
+            });
 
             return React.createElement('input', inputProps);
         }
@@ -138,14 +160,13 @@ describe('useFormat', () => {
         const onValueChange = vi.fn();
 
         function TestInput() {
-            const { inputProps } = useFormat<TestFormatOptions>(
-                createTestFormat,
-                {
-                    defaultValue: 'ab',
-                    onValueChange,
-                    prefix: '>',
-                }
-            );
+            const format = useFormat<TestFormatOptions>(createTestFormat, {
+                prefix: '>',
+            });
+            const { inputProps } = useFormattedInput(format, {
+                defaultValue: 'ab',
+                onValueChange,
+            });
 
             return React.createElement('input', inputProps);
         }
