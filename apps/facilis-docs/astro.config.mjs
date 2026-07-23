@@ -11,6 +11,11 @@ export default defineConfig({
             title: 'Facilis',
             description:
                 'Framework-agnostic input formatting built around reusable formats and thin adapters.',
+            logo: {
+                dark: './src/assets/facilis-logo-coral.svg',
+                light: './src/assets/facilis-logo.svg',
+                replacesTitle: true,
+            },
             customCss: ['./src/styles/theme.css'],
             plugins: [starlightThemeRapide()],
             social: [

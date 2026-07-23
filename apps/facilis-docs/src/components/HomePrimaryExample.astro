@@ -1,0 +1,27 @@
+<div class="home-primary-example">
+    <div class="home-primary-example__snippet">
+        <slot name="snippet" />
+    </div>
+    <slot />
+</div>
+
+<style>
+    .home-primary-example {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(17rem, 0.8fr);
+        gap: 1rem;
+        align-items: start;
+        margin-block: 1.25rem 1.5rem;
+    }
+
+    .home-primary-example__snippet > :global(:first-child),
+    .home-primary-example :global(.home-credit-card-demo) {
+        margin-block: 0;
+    }
+
+    @media (max-width: 54rem) {
+        .home-primary-example {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

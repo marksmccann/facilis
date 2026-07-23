@@ -45,6 +45,10 @@ header.header .site-title {
     letter-spacing: 0;
 }
 
+header.header .site-title img {
+    max-height: 1.65rem;
+}
+
 .sl-link-button.primary {
     border-color: var(--facilis-coral);
     background: var(--facilis-coral);

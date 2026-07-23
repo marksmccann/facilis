@@ -5,7 +5,7 @@ description: Facilis is a framework-agnostic input formatting engine built aroun
 template: splash
 hero:
     title: Input formatting, redefined.
-    tagline: Facilis is a framework-agnostic input formatting engine built around portable format definitions. Define formats once, compose them freely, and integrate them anywhere.
+    tagline: Facilis (fah-SIL-lis) is a framework-agnostic input formatting engine built around portable format definitions. Define formats once, compose them freely, and integrate them anywhere.
     actions:
         - text: Start Formatting
           link: /facilis/quick-start/
@@ -21,34 +21,36 @@ import {
     Tabs,
     TabItem,
 } from '@astrojs/starlight/components';
-import HomeAccessCodeDemo from '../../components/HomeAccessCodeDemo.astro';
+import HomeCreditCardDemo from '../../components/HomeCreditCardDemo.astro';
+import HomePrimaryExample from '../../components/HomePrimaryExample.astro';
 
 ## Define a format once, use it anywhere.
 
-Formats are plain definitions. They describe how to normalize input, how to
-display the normalized value, and what should happen when the field blurs. The
+Formats are plain definitions. Factory helpers cover common authoring patterns,
+like filtering input into semantic groups and inserting literal separators. The
 definition stays free of DOM events, component state, and framework lifecycle
 details, so the same format can be mounted wherever you need it.
 
-```ts
-import { defineFormat } from 'facilis';
+<HomePrimaryExample>
+<div slot="snippet">
 
-export const accessCode = () =>
-    defineFormat({
-        normalize(raw) {
-            // Normalize raw input by removing formatted characters.
-            return raw.replace(/\D/g, '').slice(0, 6);
-        },
-        format(normalized) {
-            // Prepare the display value by formatting the normalized value.
-            return normalized.replace(/(\d{3})(?=\d)/, '$1-');
-        },
+```ts
+import { defineSegmentedFormat } from 'facilis';
+
+export const creditCard = () =>
+    defineSegmentedFormat({
+        matches: /\d/,
+        segments: [4, ' ', 4, ' ', 4, ' ', 4],
     });
 ```
 
-<HomeAccessCodeDemo />
+</div>
 
-The demo uses the same format shape as the code above. Adapters are
+<HomeCreditCardDemo />
+
+</HomePrimaryExample>
+
+The demo uses the same factory-built format as the code above. Adapters are
 intentionally thin: they connect real inputs to the runtime hooks while your
 format keeps the behavior in one place.
 
@@ -57,9 +59,9 @@ format keeps the behavior in one place.
 
 ```ts
 import { bindFormat } from 'facilis-dom';
-import { accessCode } from './formats/accessCode';
+import { creditCard } from './formats/creditCard';
 
-const cleanup = bindFormat('#access-code', accessCode());
+const cleanup = bindFormat('#credit-card', creditCard());
 ```
 
     </TabItem>
@@ -67,12 +69,12 @@ const cleanup = bindFormat('#access-code', accessCode());
 
 ```tsx
 import { useFormat } from 'facilis-react';
-import { accessCode } from './formats/accessCode';
+import { creditCard } from './formats/creditCard';
 
-function AccessCodeField() {
-    const code = useFormat(accessCode);
+function CreditCardField() {
+    const card = useFormat(creditCard);
 
-    return <input {...code.inputProps} />;
+    return <input {...card.inputProps} />;
 }
 ```
 
@@ -86,8 +88,8 @@ selection when needed.
 
 ## Use ours or compose your own.
 
-Start with first-party formats for common fields, reach for `pattern()` when a
-tokenized layout is enough, and use `defineFormat()` when the field has its own
+Start with first-party formats for common fields, reach for factory helpers when
+a reusable shape fits, and use `defineFormat()` when the field has its own
 rules.
 
 ```ts

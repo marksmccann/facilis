@@ -1,28 +1,29 @@
-<div class="home-access-code-demo">
-    <label class="home-access-code-demo__label" for="home-access-code">
-        Access code
+<div class="home-credit-card-demo">
+    <label class="home-credit-card-demo__label" for="home-credit-card">
+        Credit card
     </label>
     <input
-        class="home-access-code-demo__input"
-        id="home-access-code"
-        data-home-access-code
+        class="home-credit-card-demo__input"
+        id="home-credit-card"
+        data-home-credit-card
         inputmode="numeric"
-        placeholder="Try 12a-3456"
+        placeholder="Try 4242abcd42424242"
         type="text"
     />
-    <p class="home-access-code-demo__note">
-        Messy input like <code>12a-3456</code> becomes <code>123-456</code>.
+    <p class="home-credit-card-demo__note">
+        Messy input like <code>4242abcd42424242</code> becomes
+        <code>4242 4242 4242 4242</code>.
     </p>
 </div>
 
 <script>
-    import { mountHomeAccessCodeDemo } from '../demo/mountHomeAccessCodeDemo.ts';
+    import { mountHomeCreditCardDemo } from '../demo/mountHomeCreditCardDemo.ts';
 
-    mountHomeAccessCodeDemo();
+    mountHomeCreditCardDemo();
 </script>
 
 <style>
-    .home-access-code-demo {
+    .home-credit-card-demo {
         display: grid;
         gap: 0.75rem;
         max-width: 30rem;
@@ -33,13 +34,13 @@
         background: var(--sl-color-black);
     }
 
-    .home-access-code-demo__label {
+    .home-credit-card-demo__label {
         color: var(--sl-color-white);
         font-size: var(--sl-text-sm);
         font-weight: 650;
     }
 
-    .home-access-code-demo__input {
+    .home-credit-card-demo__input {
         width: 100%;
         padding: 0.75rem 0.85rem;
         border: 1px solid var(--sl-color-gray-5);
@@ -50,17 +51,17 @@
         font-size: var(--sl-text-lg);
     }
 
-    .home-access-code-demo__input:focus {
+    .home-credit-card-demo__input:focus {
         border-color: var(--sl-color-accent);
         outline: 2px solid var(--sl-color-accent-low);
         outline-offset: 2px;
     }
 
-    .home-access-code-demo__input::placeholder {
+    .home-credit-card-demo__input::placeholder {
         color: var(--sl-color-gray-3);
     }
 
-    .home-access-code-demo__note {
+    .home-credit-card-demo__note {
         margin: 0;
         color: var(--sl-color-gray-2);
         font-size: var(--sl-text-sm);
