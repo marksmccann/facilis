@@ -32,7 +32,8 @@
     ],
     "license": "MIT",
     "dependencies": {
-        "facilis": "^0.1.0"
+        "facilis": "^0.1.0",
+        "uncontrollable": "^9.0.0"
     },
     "peerDependencies": {
         "react": ">=18"

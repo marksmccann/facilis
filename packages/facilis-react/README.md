@@ -7,6 +7,7 @@ React adapter for Facilis.
 Create a Facilis format instance from a format factory.
 
 ```tsx
+import { useState } from 'react';
 import { useFormat, useFormattedInput } from 'facilis-react';
 import { number } from 'facilis-formats';
 
@@ -14,16 +15,18 @@ function AmountInput() {
     const amountFormat = useFormat(number, {
         decimalPlaces: 2,
     });
+    const [value, setValue] = useState('1,234.50');
     const amount = useFormattedInput(amountFormat, {
-        defaultValue: '1234.5',
-        onValueChange(value) {
-            console.log(value);
-        },
+        value,
+        onValueChange: setValue,
     });
 
     return <input {...amount.inputProps} />;
 }
 ```
+
+Use `defaultValue` instead when the hook should own the formatted display
+value.
 
 Use `amount.inputRef` when you need access to the input element.
 

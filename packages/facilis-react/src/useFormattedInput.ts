@@ -8,48 +8,11 @@ import {
     type FocusEventHandler,
     type InputEventHandler,
 } from 'react';
+import { useUncontrolledProp } from 'uncontrollable';
 import type {
     UseFormattedInputOptions,
     UseFormattedInputResult,
 } from './types';
-
-/**
- * Reads the current input value and selection.
- *
- * @private
- */
-function readTextState(input: HTMLInputElement): TextState {
-    return {
-        value: input.value,
-        selectionStart: input.selectionStart,
-        selectionEnd: input.selectionEnd,
-    };
-}
-
-/**
- * Writes one Facilis selection result back to the input element.
- *
- * @private
- */
-function writeSelection(input: HTMLInputElement, state: TextState) {
-    if (state.selectionStart !== null && state.selectionEnd !== null) {
-        input.setSelectionRange(state.selectionStart, state.selectionEnd);
-    }
-}
-
-/**
- * Reads the native input details React exposes through `nativeEvent`.
- *
- * @private
- */
-function readInputDetails(event: Event): InputDetails {
-    const inputEvent = event as InputEvent;
-
-    return {
-        inputType: inputEvent.inputType ?? null,
-        data: inputEvent.data ?? null,
-    };
-}
 
 /**
  * Creates props for a React-managed input backed by a Facilis format.
@@ -64,67 +27,109 @@ export function useFormattedInput(
     options: UseFormattedInputOptions = {}
 ): UseFormattedInputResult {
     const {
-        defaultValue: _defaultValue = '',
         onInput,
         onBlur,
         onValueChange,
+        value: _value,
+        defaultValue: _defaultValue = '',
     } = options;
-    const { current: defaultValue } = useRef(_defaultValue);
+    const { current: initialValue } = useRef(_value ?? _defaultValue);
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const [textState, setTextState] = useState(() => {
+    const didResolveInitialValueRef = useRef(false);
+    const [initialTextState] = useState(() => {
         return format.onMount({
-            value: defaultValue,
+            value: initialValue,
             selectionStart: null,
             selectionEnd: null,
         });
     });
+    const [value, setValue] = useUncontrolledProp<string>(
+        _value,
+        initialTextState.value,
+        onValueChange
+    );
+    const [selection, setSelection] = useState<
+        Pick<TextState, 'selectionStart' | 'selectionEnd'>
+    >({
+        selectionStart: initialTextState.selectionStart,
+        selectionEnd: initialTextState.selectionEnd,
+    });
+    const textState: TextState = {
+        value,
+        selectionStart: selection.selectionStart,
+        selectionEnd: selection.selectionEnd,
+    };
 
-    const notifyValueChange = useCallback(
+    useEffect(() => {
+        if (didResolveInitialValueRef.current) return;
+        didResolveInitialValueRef.current = true;
+
+        if (initialTextState.value !== initialValue) {
+            setValue(initialTextState.value);
+        }
+    }, [initialTextState.value, initialValue, setValue]);
+
+    const setTextState = useCallback(
         (previous: TextState, current: TextState) => {
+            setSelection({
+                selectionStart: current.selectionStart,
+                selectionEnd: current.selectionEnd,
+            });
+
             if (current.value !== previous.value) {
-                onValueChange?.(current.value);
+                setValue(current.value);
             }
         },
-        [onValueChange]
+        [setValue]
     );
 
     const onSelectionChange = useCallback(() => {
         const input = inputRef.current;
         if (input === null) return;
 
-        setTextState((current) => ({
-            ...current,
+        setSelection({
             selectionStart: input.selectionStart,
             selectionEnd: input.selectionEnd,
-        }));
+        });
     }, []);
 
     const handleInput = useCallback<InputEventHandler<HTMLInputElement>>(
         (event) => {
             const input = event.currentTarget;
             const previous = textState;
-            const current = readTextState(input);
-            const inputDetails = readInputDetails(event.nativeEvent);
+            const inputEvent = event.nativeEvent as InputEvent;
+            const inputDetails: InputDetails = {
+                inputType: inputEvent.inputType ?? null,
+                data: inputEvent.data ?? null,
+            };
+            const current: TextState = {
+                value: input.value,
+                selectionStart: input.selectionStart,
+                selectionEnd: input.selectionEnd,
+            };
             const next = format.onInput(inputDetails, previous, current);
 
             onInput?.(event);
-            setTextState(next);
-            notifyValueChange(previous, next);
+            setTextState(previous, next);
         },
-        [format, notifyValueChange, onInput, textState]
+        [setTextState, format, onInput, textState]
     );
 
     const handleBlur = useCallback<FocusEventHandler<HTMLInputElement>>(
         (event) => {
             const input = event.currentTarget;
             const previous = textState;
-            const next = format.onBlur(readTextState(input));
+            const current: TextState = {
+                value: input.value,
+                selectionStart: input.selectionStart,
+                selectionEnd: input.selectionEnd,
+            };
+            const next = format.onBlur(current);
 
             onBlur?.(event);
-            setTextState(next);
-            notifyValueChange(previous, next);
+            setTextState(previous, next);
         },
-        [format, notifyValueChange, onBlur, textState]
+        [setTextState, format, onBlur, textState]
     );
 
     useEffect(() => {
@@ -137,8 +142,13 @@ export function useFormattedInput(
 
     useLayoutEffect(() => {
         const input = inputRef.current;
+        const { selectionStart, selectionEnd } = textState;
+
         if (input === null) return;
-        writeSelection(input, textState);
+
+        if (selectionStart !== null && selectionEnd !== null) {
+            input.setSelectionRange(selectionStart, selectionEnd);
+        }
     }, [textState]);
 
     return {

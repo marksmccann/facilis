@@ -11,16 +11,11 @@ export type FormatFactory<FormatOptions extends object = object> = (
 ) => Format;
 
 /**
- * Describes the React-specific options reserved by `useFormattedInput`.
+ * Describes React event options shared by controlled and uncontrolled inputs.
  *
  * @since 0.1.0
  */
-export type UseFormattedInputOptions = {
-    /**
-     * The initial input value Facilis should format when the input mounts.
-     */
-    defaultValue?: string;
-
+type UseFormattedInputCommonOptions = {
     /**
      * Runs with the raw input event before Facilis updates the display value.
      */
@@ -30,12 +25,62 @@ export type UseFormattedInputOptions = {
      * Runs with the raw blur event before Facilis updates the display value.
      */
     onBlur?: FocusEventHandler<HTMLInputElement>;
-
-    /**
-     * Runs after Facilis resolves a new formatted value from input or blur.
-     */
-    onValueChange?: (value: string) => void;
 };
+
+/**
+ * Describes options for an input whose value is owned by the caller.
+ *
+ * @since 0.1.0
+ */
+export type UseFormattedInputControlledOptions =
+    UseFormattedInputCommonOptions & {
+        /**
+         * The current formatted display value.
+         */
+        value: string;
+
+        /**
+         * Runs when Facilis resolves a new formatted value.
+         */
+        onValueChange: (value: string) => void;
+
+        /**
+         * Controlled inputs cannot also provide an uncontrolled initial value.
+         */
+        defaultValue?: never;
+    };
+
+/**
+ * Describes options for an input whose value is owned by the hook.
+ *
+ * @since 0.1.0
+ */
+export type UseFormattedInputUncontrolledOptions =
+    UseFormattedInputCommonOptions & {
+        /**
+         * The initial input value Facilis should format when the input mounts.
+         */
+        defaultValue?: string;
+
+        /**
+         * Runs after Facilis resolves a new formatted value.
+         */
+        onValueChange?: (value: string) => void;
+
+        /**
+         * Uncontrolled inputs cannot also receive a caller-owned value.
+         */
+        value?: never;
+    };
+
+/**
+ * Describes the React-specific options reserved by `useFormattedInput`.
+ *
+ * @since 0.1.0
+ */
+export type UseFormattedInputOptions =
+    | UseFormattedInputControlledOptions
+    | UseFormattedInputUncontrolledOptions;
 
 /**
  * Describes the props returned by `useFormattedInput` for a React-managed

@@ -6,15 +6,18 @@ description: Create input props with the Facilis React adapter.
 Use `facilis-react` when React owns the input.
 
 ```tsx
+import { useState } from 'react';
 import { useFormat, useFormattedInput } from 'facilis-react';
 import { currency, number } from 'facilis-formats';
 
 function QuantityInput() {
+    const [value, setValue] = useState('12');
     const quantityFormat = useFormat(number, {
         trimLeadingZeros: true,
     });
     const quantity = useFormattedInput(quantityFormat, {
-        defaultValue: '0012',
+        value,
+        onValueChange: setValue,
     });
 
     return <input {...quantity.inputProps} />;
@@ -27,11 +30,12 @@ input options.
 
 ## Input options
 
-- `defaultValue`: initial value to format when the input mounts.
+- `value`: current formatted display value for controlled inputs.
+- `defaultValue`: initial value to format for uncontrolled inputs.
 - `onInput`: receives the React input event before Facilis updates state.
 - `onBlur`: receives the React blur event before Facilis updates state.
-- `onValueChange`: receives the next formatted value after input or blur when
-  the display value changes.
+- `onValueChange`: receives the next formatted value when the display value
+  changes. Controlled inputs require it.
 
 ## Returned values
 
@@ -56,8 +60,10 @@ const amount = useFormattedInput(amountFormat, {
 return <input {...amount.inputProps} />;
 ```
 
-The adapter keeps Facilis as the source for the displayed input value. Use
-`onValueChange` when the formatted value needs to leave the component.
+Use `value` with `onValueChange` when the formatted display value lives in your
+component state. Use `defaultValue` when the hook should own it.
+Pass an already formatted initial value when you do not want `onValueChange` to
+run on mount.
 
 ## Standalone values
 

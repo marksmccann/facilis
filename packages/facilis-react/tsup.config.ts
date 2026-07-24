@@ -1,6 +1,6 @@
 import { defineConfig } from 'tsup';
 
-const EXTERNAL_PACKAGES = ['facilis', 'react'];
+const EXTERNAL_PACKAGES = ['facilis', 'react', 'uncontrollable'];
 
 export default defineConfig({
     entry: {

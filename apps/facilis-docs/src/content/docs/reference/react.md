@@ -39,6 +39,7 @@ options.
 
 Input options:
 
+- `value`
 - `defaultValue`
 - `onInput`
 - `onBlur`
@@ -50,20 +51,28 @@ The hook returns:
 - `inputRef`: direct access to the input element.
 
 ```tsx
+import { useState } from 'react';
 import { useFormat, useFormattedInput } from 'facilis-react';
 import { currency } from 'facilis-formats';
 
 function AmountInput() {
+    const [value, setValue] = useState('$1,234.50');
     const amountFormat = useFormat(currency, {
         includeCents: true,
     });
     const amount = useFormattedInput(amountFormat, {
-        defaultValue: '1234.5',
+        value,
+        onValueChange: setValue,
     });
 
     return <input {...amount.inputProps} />;
 }
 ```
+
+Controlled inputs pass `value` and must pass `onValueChange`. Uncontrolled
+inputs pass `defaultValue` instead, with optional `onValueChange`.
+Pass an already formatted initial value when you do not want `onValueChange` to
+run on mount.
 
 ## useFormattedValue
 
