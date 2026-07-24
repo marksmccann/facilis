@@ -22,6 +22,22 @@ import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
         <p class="demo-note">Try <code>414.555.1212 ext. 9</code>. The format keeps the first 10 digits and displays them as a phone number.</p>
     </article>
 
+    <article class="demo-card">
+        <h2>Period separator</h2>
+        <p>The separator option changes the rendered punctuation between the prefix and line-number groups.</p>
+        <label class="demo-label" for="phone-number-period">Period phone number</label>
+        <input class="demo-input" id="phone-number-period" data-demo-phone-number-period type="text" placeholder="Try 4145551212" />
+        <p class="demo-note">This demo uses <code>phoneNumber(&lbrace; separator: '.' &rbrace;)</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>No parentheses</h2>
+        <p>The area code can render as a plain group when parentheses do not match the surrounding form style.</p>
+        <label class="demo-label" for="phone-number-no-parens">Plain phone number</label>
+        <input class="demo-input" id="phone-number-no-parens" data-demo-phone-number-no-parens type="text" placeholder="Try 4145551212" />
+        <p class="demo-note">This demo uses <code>phoneNumber(&lbrace; includeAreaCodeParens: false, separator: '.' &rbrace;)</code>.</p>
+    </article>
+
     <script>
         import { mountPhoneNumberDemo } from '../../../demo/mountFormatDemos.ts';
 

@@ -11,6 +11,28 @@ describe('phoneNumber', () => {
         );
     });
 
+    it('uses a custom separator before the line-number group', () => {
+        const input = setupInput(phoneNumber({ separator: '.' }));
+
+        expect(input.type('5551234567')).toEqual(
+            textState('(555) 123.4567', 14)
+        );
+    });
+
+    it('formats the area code as a plain group when parens are omitted', () => {
+        const input = setupInput(phoneNumber({ includeAreaCodeParens: false }));
+
+        expect(input.type('5551234567')).toEqual(textState('555-123-4567', 12));
+    });
+
+    it('uses the custom separator between every group without parens', () => {
+        const input = setupInput(
+            phoneNumber({ includeAreaCodeParens: false, separator: '.' })
+        );
+
+        expect(input.type('5551234567')).toEqual(textState('555.123.4567', 12));
+    });
+
     it('accepts formatting when it is typed at a group boundary', () => {
         const input = setupInput(phoneNumber());
 

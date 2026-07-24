@@ -176,6 +176,12 @@ export function mountPercentDemo() {
 export function mountPhoneNumberDemo() {
     bind('[data-demo-phone-number-default]', () => phoneNumber());
     bind('[data-demo-phone-number-paste]', () => phoneNumber());
+    bind('[data-demo-phone-number-period]', () =>
+        phoneNumber({ separator: '.' })
+    );
+    bind('[data-demo-phone-number-no-parens]', () =>
+        phoneNumber({ includeAreaCodeParens: false, separator: '.' })
+    );
 }
 
 export function mountSocialSecurityNumberDemo() {
