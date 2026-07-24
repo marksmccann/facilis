@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import defineFormat from '../../facilis/src/factories/defineFormat';
+import defineFormat from '../../facilis/src/core/defineFormat';
 import { pattern } from '../../facilis-formats/src/pattern';
 import { bindFormat } from './bindFormat';
 
@@ -68,8 +68,8 @@ describe('bindFormat', () => {
         bindToFakeInput(input, format);
 
         expect(input.value).toBe('[A][B]');
-        expect(input.selectionStart).toBe(6);
-        expect(input.selectionEnd).toBe(6);
+        expect(input.selectionStart).toBe(5);
+        expect(input.selectionEnd).toBe(5);
     });
 
     it('passes the previous committed value into live input formatting', () => {

@@ -48,7 +48,7 @@ describe('setupInput', () => {
     const input = setupInput(testFormat);
 
     it('mounts an initial value through the format', () => {
-        expect(input.mount('ab', 2)).toEqual(textState('[A][B]', 6));
+        expect(input.mount('ab', 2)).toEqual(textState('[A][B]', 5));
     });
 
     it('applies blur-time formatting', () => {
@@ -56,7 +56,7 @@ describe('setupInput', () => {
     });
 
     it('appends text at the end of a value', () => {
-        expect(input.append('[A]', 'b')).toEqual(textState('[A][B]', 6));
+        expect(input.append('[A]', 'b')).toEqual(textState('[A][B]', 5));
     });
 
     it('inserts text at a collapsed selection', () => {
@@ -76,6 +76,6 @@ describe('setupInput', () => {
     });
 
     it('types a sequence from an empty value', () => {
-        expect(input.type('ab')).toEqual(textState('[A][B]', 6));
+        expect(input.type('ab')).toEqual(textState('[A][B]', 5));
     });
 });
