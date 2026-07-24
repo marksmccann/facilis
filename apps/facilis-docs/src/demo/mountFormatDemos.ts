@@ -55,7 +55,7 @@ export function mountDateDemo() {
         date({ insertLeadingZero: true, pattern: 'MM/DD/YYYY' })
     );
     bind('[data-demo-date-strict-date-segments]', () =>
-        date({ pattern: 'MM/DD/YYYY', strictDateSegments: true })
+        date({ pattern: 'MM/DD/YYYY', strictSegments: true })
     );
     bind('[data-demo-date-paste]', () => date({ pattern: 'MM/DD/YYYY' }));
 }
@@ -222,10 +222,10 @@ export function mountTimeDemo() {
         time({ insertLeadingZero: true, pattern: 'HH:mm' })
     );
     bind('[data-demo-time-strict-twenty-four]', () =>
-        time({ pattern: 'HH:mm', strictTimeParts: true })
+        time({ pattern: 'HH:mm', strictSegments: true })
     );
     bind('[data-demo-time-strict-twelve]', () =>
-        time({ pattern: 'hh:mm', strictTimeParts: true })
+        time({ pattern: 'hh:mm', strictSegments: true })
     );
     bind('[data-demo-time-paste]', () => time({ pattern: 'HH:mm:ss' }));
 }

@@ -1,6 +1,6 @@
 ---
 title: time
-description: Format numeric times with explicit time-part patterns.
+description: Format numeric times with explicit time-segment patterns.
 ---
 
 `time()` creates a reusable time format that keeps only digits and displays
@@ -28,12 +28,12 @@ With `time({ pattern: 'HH:mm', insertLeadingZero: true })`:
 - `930` becomes `09:30`
 - `126` becomes `12:06`
 
-With `time({ pattern: 'HH:mm', strictTimeParts: true })`:
+With `time({ pattern: 'HH:mm', strictSegments: true })`:
 
 - Appending `9` to `2` keeps the value at `2`
 - Appending `6` to `12` keeps the value at `12`
 
-With `time({ pattern: 'hh:mm', strictTimeParts: true })`:
+With `time({ pattern: 'hh:mm', strictSegments: true })`:
 
 - Appending `3` to `1` keeps the value at `1`
 
@@ -66,10 +66,10 @@ type TimePattern = 'HH:mm' | 'HH:mm:ss' | 'hh:mm' | 'hh:mm:ss';
 ```
 
 The `pattern` option is required. Pattern strings use `:` as the canonical
-separator between time parts.
+separator between time segments.
 
 `HH` formats 24-hour values. `hh` formats 12-hour values. The pattern controls
-which hour range `strictTimeParts` enforces.
+which hour range `strictSegments` enforces.
 
 ### separator
 
@@ -94,7 +94,7 @@ With raw input `1430`, this formats as `14.30`.
 type InsertLeadingZero = boolean;
 ```
 
-The `insertLeadingZero` option pads safe single-digit time part values while
+The `insertLeadingZero` option pads safe single-digit time segment values while
 typing. The default is `false`.
 
 ```ts
@@ -107,19 +107,19 @@ const forgivingTimeFormat = time({
 With raw input `930`, this formats as `09:30`. With raw input `126`, this
 formats as `12:06`.
 
-### strictTimeParts
+### strictSegments
 
 ```ts
-type StrictTimeParts = boolean;
+type StrictSegments = boolean;
 ```
 
-The `strictTimeParts` option rejects impossible hour, minute, and second values
+The `strictSegments` option rejects impossible hour, minute, and second values
 while typing. The default is `false`.
 
 ```ts
 const strictTimeFormat = time({
     pattern: 'HH:mm',
-    strictTimeParts: true,
+    strictSegments: true,
 });
 ```
 

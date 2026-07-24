@@ -109,56 +109,56 @@ describe('time', () => {
         expect(input.type('2930')).toEqual(textState('29:30', 5));
     });
 
-    it('rejects an attempted impossible 24-hour hour when time parts are strict', () => {
+    it('rejects an attempted impossible 24-hour hour when time segments are strict', () => {
         const input = setupInput(
             time({
                 pattern: 'HH:mm',
-                strictTimeParts: true,
+                strictSegments: true,
             })
         );
 
         expect(input.append('2', '9')).toEqual(textState('2', 1));
     });
 
-    it('rejects an attempted impossible 12-hour hour when time parts are strict', () => {
+    it('rejects an attempted impossible 12-hour hour when time segments are strict', () => {
         const input = setupInput(
             time({
                 pattern: 'hh:mm',
-                strictTimeParts: true,
+                strictSegments: true,
             })
         );
 
         expect(input.append('1', '3')).toEqual(textState('1', 1));
     });
 
-    it('rejects an attempted zero 12-hour hour when time parts are strict', () => {
+    it('rejects an attempted zero 12-hour hour when time segments are strict', () => {
         const input = setupInput(
             time({
                 pattern: 'hh:mm',
-                strictTimeParts: true,
+                strictSegments: true,
             })
         );
 
         expect(input.append('0', '0')).toEqual(textState('0', 1));
     });
 
-    it('rejects an attempted impossible minute when time parts are strict', () => {
+    it('rejects an attempted impossible minute when time segments are strict', () => {
         const input = setupInput(
             time({
                 pattern: 'HH:mm',
-                strictTimeParts: true,
+                strictSegments: true,
             })
         );
 
         expect(input.append('12', '6')).toEqual(textState('12', 2));
     });
 
-    it('allows leading-zero insertion before applying strict time parts', () => {
+    it('allows leading-zero insertion before applying strict time segments', () => {
         const input = setupInput(
             time({
                 insertLeadingZero: true,
                 pattern: 'HH:mm',
-                strictTimeParts: true,
+                strictSegments: true,
             })
         );
 

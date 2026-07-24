@@ -34,7 +34,7 @@ describe('defineTimeFormat', () => {
         const format = defineTimeFormat({
             insertLeadingZero: true,
             pattern: 'HH:mm',
-            strictTimeParts: true,
+            strictSegments: true,
         });
 
         expect(format.formatValue('306')).toBe('03:06');
@@ -83,7 +83,7 @@ describe('defineTimeFormat', () => {
             appended: '.',
             pattern: 'HH:mm',
             separator: '.',
-            strictTimeParts: false,
+            strictSegments: false,
         });
     });
 });

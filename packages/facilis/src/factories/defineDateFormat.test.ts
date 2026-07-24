@@ -34,7 +34,7 @@ describe('defineDateFormat', () => {
         const format = defineDateFormat({
             insertLeadingZero: true,
             pattern: 'MM/DD/YYYY',
-            strictDateSegments: true,
+            strictSegments: true,
         });
 
         expect(format.formatValue('24')).toBe('02/04');
@@ -83,7 +83,7 @@ describe('defineDateFormat', () => {
             appended: '-',
             pattern: 'MM/DD/YYYY',
             separator: '-',
-            strictDateSegments: false,
+            strictSegments: false,
         });
     });
 });

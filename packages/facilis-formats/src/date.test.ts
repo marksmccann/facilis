@@ -124,7 +124,7 @@ describe('date', () => {
         const input = setupInput(
             date({
                 pattern: 'MM/DD/YYYY',
-                strictDateSegments: true,
+                strictSegments: true,
             })
         );
 
@@ -135,7 +135,7 @@ describe('date', () => {
         const input = setupInput(
             date({
                 pattern: 'MM/DD/YYYY',
-                strictDateSegments: true,
+                strictSegments: true,
             })
         );
 
@@ -146,19 +146,19 @@ describe('date', () => {
         const input = setupInput(
             date({
                 pattern: 'DD/MM/YYYY',
-                strictDateSegments: true,
+                strictSegments: true,
             })
         );
 
         expect(input.type('4')).toEqual(textState('', 0));
     });
 
-    it('allows leading-zero insertion before applying strict month and day values', () => {
+    it('allows leading-zero insertion before applying strict month and day segments', () => {
         const input = setupInput(
             date({
                 insertLeadingZero: true,
                 pattern: 'MM/DD/YYYY',
-                strictDateSegments: true,
+                strictSegments: true,
             })
         );
 

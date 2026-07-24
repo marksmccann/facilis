@@ -52,10 +52,10 @@ export type DateFormatSeparator = (typeof DATE_SEPARATORS)[number];
  * @private
  */
 type DateFormatConfig = {
-    /** The canonical pattern that defines the date parts to format. */
+    /** The canonical pattern that defines the date segments to format. */
     pattern: DateFormatPattern;
 
-    /** The separator to render between date parts. The default is `/`. */
+    /** The separator to render between date segments. The default is `/`. */
     separator?: DateFormatSeparator;
 
     /**
@@ -68,7 +68,7 @@ type DateFormatConfig = {
      * Whether to reject impossible date segment values while typing. The
      * default is `false`.
      */
-    strictDateSegments?: boolean;
+    strictSegments?: boolean;
 };
 
 /**
@@ -114,7 +114,7 @@ function resolveDateFormatConfig(
         insertLeadingZero: options.insertLeadingZero ?? false,
         pattern: options.pattern,
         separator,
-        strictDateSegments: options.strictDateSegments ?? false,
+        strictSegments: options.strictSegments ?? false,
     };
 }
 
@@ -191,7 +191,7 @@ function resolveDateSegments(
  */
 export default function defineDateFormat(options: DateFormatOptions): Format {
     const resolvedConfig = resolveDateFormatConfig(options);
-    const { insertLeadingZero, pattern, separator, strictDateSegments } =
+    const { insertLeadingZero, pattern, separator, strictSegments } =
         resolvedConfig;
     const patternSegments = pattern.split('/');
     const leadingZeroRules = resolveLeadingZeroRules(patternSegments);
@@ -210,7 +210,7 @@ export default function defineDateFormat(options: DateFormatOptions): Format {
                 );
             }
 
-            if (strictDateSegments) {
+            if (strictSegments) {
                 normalized = rejectInvalidSegments(
                     normalized,
                     patternSegments,

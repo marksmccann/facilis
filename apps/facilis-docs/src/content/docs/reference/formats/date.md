@@ -1,6 +1,6 @@
 ---
 title: date
-description: Format numeric dates with explicit date-part patterns.
+description: Format numeric dates with explicit date-segment patterns.
 ---
 
 `date()` creates a reusable date format that keeps only digits and displays
@@ -24,7 +24,7 @@ With `date({ pattern: 'MM/DD/YYYY', insertLeadingZero: true })`:
 - `2` becomes `02`
 - `24` becomes `02/04`
 
-With `date({ pattern: 'MM/DD/YYYY', strictDateSegments: true })`:
+With `date({ pattern: 'MM/DD/YYYY', strictSegments: true })`:
 
 - `13` becomes `1`
 - `1239` becomes `12/3`
@@ -68,7 +68,7 @@ type DatePattern =
 ```
 
 The `pattern` option is required. Pattern strings use `/` as the canonical
-separator between date parts.
+separator between date segments.
 
 ### separator
 
@@ -107,19 +107,19 @@ With raw input `24`, this formats as `02/04`. Months `2` through `9` and days
 `4` through `9` can be padded because those digits cannot validly begin a
 two-digit month or day.
 
-### strictDateSegments
+### strictSegments
 
 ```ts
-type StrictDateSegments = boolean;
+type StrictSegments = boolean;
 ```
 
-The `strictDateSegments` option rejects impossible standalone month and day
+The `strictSegments` option rejects impossible standalone month and day
 segment values while typing. The default is `false`.
 
 ```ts
 const strictDateFormat = date({
     pattern: 'MM/DD/YYYY',
-    strictDateSegments: true,
+    strictSegments: true,
 });
 ```
 

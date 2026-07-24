@@ -21,6 +21,6 @@ export function expirationDate(options?: ExpirationDateOptions): Format {
     return defineDateFormat({
         pattern: 'MM/YY',
         separator,
-        strictDateSegments: strictMonth,
+        strictSegments: strictMonth,
     });
 }

@@ -42,14 +42,14 @@ export type TimeFormatSeparator = (typeof TIME_SEPARATORS)[number];
  * @private
  */
 type TimeFormatConfig = {
-    /** The canonical pattern that defines the time parts to format. */
+    /** The canonical pattern that defines the time segments to format. */
     pattern: TimeFormatPattern;
 
-    /** The separator to render between time parts. The default is `:`. */
+    /** The separator to render between time segments. The default is `:`. */
     separator?: TimeFormatSeparator;
 
     /**
-     * Whether to insert a leading zero for safe single-digit time part values
+     * Whether to insert a leading zero for safe single-digit time segment values
      * while typing. The default is `false`.
      */
     insertLeadingZero?: boolean;
@@ -58,7 +58,7 @@ type TimeFormatConfig = {
      * Whether to reject impossible hour, minute, and second values while
      * typing. The default is `false`.
      */
-    strictTimeParts?: boolean;
+    strictSegments?: boolean;
 };
 
 /**
@@ -104,7 +104,7 @@ function resolveTimeFormatConfig(
         insertLeadingZero: options.insertLeadingZero ?? false,
         pattern: options.pattern,
         separator,
-        strictTimeParts: options.strictTimeParts ?? false,
+        strictSegments: options.strictSegments ?? false,
     };
 }
 
@@ -190,7 +190,7 @@ function resolveTimeSegments(
  */
 export default function defineTimeFormat(options: TimeFormatOptions): Format {
     const resolvedConfig = resolveTimeFormatConfig(options);
-    const { insertLeadingZero, pattern, separator, strictTimeParts } =
+    const { insertLeadingZero, pattern, separator, strictSegments } =
         resolvedConfig;
     const patternSegments = pattern.split(':');
     const leadingZeroRules = resolveLeadingZeroRules(patternSegments);
@@ -209,7 +209,7 @@ export default function defineTimeFormat(options: TimeFormatOptions): Format {
                 );
             }
 
-            if (strictTimeParts) {
+            if (strictSegments) {
                 normalized = rejectInvalidSegments(
                     normalized,
                     patternSegments,
