@@ -6,7 +6,7 @@ description: Reference for the framework-agnostic facilis package.
 The `facilis` package contains the framework-agnostic runtime contract.
 
 ```ts
-import { defineFormat, defineNumberFormat } from 'facilis';
+import { defineFormat, defineNumberFormat, defineTextFormat } from 'facilis';
 import type { Format, FormatDefinition, TextState } from 'facilis';
 ```
 
@@ -58,3 +58,4 @@ returning regular formats.
 - `defineDateFormat`
 - `defineTimeFormat`
 - `defineNumberFormat`
+- `defineTextFormat`

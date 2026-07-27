@@ -17,6 +17,7 @@ export default defineConfig({
         socialSecurityNumber: 'src/socialSecurityNumber.ts',
         text: 'src/text.ts',
         time: 'src/time.ts',
+        vin: 'src/vin.ts',
         zipCode: 'src/zipCode.ts',
     },
     format: ['esm', 'cjs'],

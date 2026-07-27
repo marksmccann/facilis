@@ -1,0 +1,30 @@
+---
+import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
+---
+
+<FormatDemoLayout
+    apiHref="/facilis/reference/formats/vin/"
+    title="vin() Demo"
+>
+    <article class="demo-card">
+        <h2>Default formatting</h2>
+        <p>Vehicle Identification Numbers preserve VIN-safe letters and digits, convert letters to uppercase, and stop at 17 characters.</p>
+        <label class="demo-label" for="vin-default">VIN</label>
+        <input class="demo-input" id="vin-default" data-demo-vin-default type="text" placeholder="Try 1hgcm82633a004352" />
+        <p class="demo-note">This format uses <code>transform: 'uppercase'</code>, excludes <code>I</code>, <code>O</code>, and <code>Q</code>, and applies <code>maxLength: 17</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Paste cleanup</h2>
+        <p>Pasted values can include spacing or unsupported characters while the format keeps only the canonical VIN text.</p>
+        <label class="demo-label" for="vin-paste">Pasted VIN</label>
+        <input class="demo-input" id="vin-paste" data-demo-vin-paste type="text" placeholder="Try 1hg cm82633a004352 ioq" />
+        <p class="demo-note">This scenario shows the same <code>vin()</code> behavior against noisy input.</p>
+    </article>
+
+    <script>
+        import { mountVinDemo } from '../../../demo/mountFormatDemos.ts';
+
+        mountVinDemo();
+    </script>
+</FormatDemoLayout>

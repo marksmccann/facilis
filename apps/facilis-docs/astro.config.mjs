@@ -101,6 +101,7 @@ export default defineConfig({
                         },
                         { label: 'text', slug: 'reference/formats/text' },
                         { label: 'time', slug: 'reference/formats/time' },
+                        { label: 'vin', slug: 'reference/formats/vin' },
                         {
                             label: 'zipCode',
                             slug: 'reference/formats/zip-code',

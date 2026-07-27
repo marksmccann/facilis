@@ -23,6 +23,7 @@ page when you want the full route list in one place.
 - `/facilis/demos/formats/social-security-number/`
 - `/facilis/demos/formats/text/`
 - `/facilis/demos/formats/time/`
+- `/facilis/demos/formats/vin/`
 - `/facilis/demos/formats/zip-code/`
 
 ## How to use the demos

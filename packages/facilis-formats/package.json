@@ -72,6 +72,11 @@
             "import": "./dist/time.js",
             "require": "./dist/time.cjs"
         },
+        "./vin": {
+            "types": "./dist/vin.d.ts",
+            "import": "./dist/vin.js",
+            "require": "./dist/vin.cjs"
+        },
         "./zipCode": {
             "types": "./dist/zipCode.d.ts",
             "import": "./dist/zipCode.js",

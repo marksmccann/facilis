@@ -64,8 +64,8 @@ Use the object form whenever you need custom tokens.
 
 ## `text`
 
-Create a text format that keeps only the characters matched by a regular
-expression.
+Create a text format that can keep only the characters matched by a regular
+expression, transform letter case, and limit length.
 
 ```ts
 import { bindFormat } from 'facilis-dom';
@@ -84,4 +84,25 @@ bindFormat(
         matches: /\d/,
     })
 );
+
+bindFormat(
+    input,
+    text({
+        maxLength: 6,
+        transform: 'uppercase',
+    })
+);
+```
+
+## `vin`
+
+Create a Vehicle Identification Number format that preserves VIN-safe letters
+and digits, converts letters to uppercase, and limits the value to 17
+characters.
+
+```ts
+import { bindFormat } from 'facilis-dom';
+import { vin } from 'facilis-formats';
+
+bindFormat(input, vin());
 ```

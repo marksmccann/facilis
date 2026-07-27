@@ -11,6 +11,7 @@ Start with a named first-party format when the field has a common domain shape.
 - Use `date()`, `time()`, or `expirationDate()` for supported date/time shapes.
 - Use `ein()`, `socialSecurityNumber()`, or `zipCode()` for common US identity
   and address fields.
+- Use `vin()` for Vehicle Identification Numbers.
 
 See the [Formats Overview](/facilis/reference/formats/) for the full list.
 

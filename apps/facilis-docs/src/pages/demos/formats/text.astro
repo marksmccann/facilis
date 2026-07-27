@@ -30,6 +30,22 @@ import FormatDemoLayout from '../../../components/FormatDemoLayout.astro';
         <p class="demo-note">This scenario uses <code>/[a-f0-9]/i</code>.</p>
     </article>
 
+    <article class="demo-card">
+        <h2>Uppercase transform</h2>
+        <p>Use <code>transform</code> when the normalized text should use a canonical letter case.</p>
+        <label class="demo-label" for="text-uppercase">Uppercase text</label>
+        <input class="demo-input" id="text-uppercase" data-demo-text-uppercase type="text" placeholder="Try abcDef123" />
+        <p class="demo-note">This scenario leaves <code>matches</code> undefined and uses <code>transform: 'uppercase'</code>.</p>
+    </article>
+
+    <article class="demo-card">
+        <h2>Maximum length</h2>
+        <p>Use <code>maxLength</code> to cap plain text values without adding number-specific formatting.</p>
+        <label class="demo-label" for="text-max-length">Six characters</label>
+        <input class="demo-input" id="text-max-length" data-demo-text-max-length type="text" placeholder="Try ABCdef123" />
+        <p class="demo-note">This scenario leaves <code>matches</code> undefined, then uses <code>maxLength: 6</code> and <code>transform: 'lowercase'</code>.</p>
+    </article>
+
     <script>
         import { mountTextDemo } from '../../../demo/mountFormatDemos.ts';
 

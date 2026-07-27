@@ -12,6 +12,7 @@ import {
     socialSecurityNumber,
     text,
     time,
+    vin,
     zipCode,
 } from '../../../../packages/facilis-formats/src/index.ts';
 
@@ -209,6 +210,17 @@ export function mountTextDemo() {
             matches: /[a-f0-9]/i,
         })
     );
+    bind('[data-demo-text-uppercase]', () =>
+        text({
+            transform: 'uppercase',
+        })
+    );
+    bind('[data-demo-text-max-length]', () =>
+        text({
+            maxLength: 6,
+            transform: 'lowercase',
+        })
+    );
 }
 
 export function mountTimeDemo() {
@@ -238,4 +250,9 @@ export function mountZipCodeDemo() {
     bind('[data-demo-zip-code-paste]', () =>
         zipCode({ includePlusFour: true })
     );
+}
+
+export function mountVinDemo() {
+    bind('[data-demo-vin-default]', () => vin());
+    bind('[data-demo-vin-paste]', () => vin());
 }

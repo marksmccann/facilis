@@ -10,4 +10,5 @@ export * from './phoneNumber';
 export * from './socialSecurityNumber';
 export * from './text';
 export * from './time';
+export * from './vin';
 export * from './zipCode';

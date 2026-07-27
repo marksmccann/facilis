@@ -1,6 +1,7 @@
 export { default as defineFormat } from './core/defineFormat';
 export { default as defineDateFormat } from './factories/defineDateFormat';
 export { default as defineNumberFormat } from './factories/defineNumberFormat';
+export { default as defineTextFormat } from './factories/defineTextFormat';
 export { default as defineTimeFormat } from './factories/defineTimeFormat';
 export { default as definePatternFormat } from './factories/definePatternFormat';
 export { default as defineSegmentedFormat } from './factories/defineSegmentedFormat';
@@ -9,6 +10,7 @@ export type * from './types/format';
 export type * from './types/input';
 export type * from './factories/defineDateFormat';
 export type * from './factories/defineNumberFormat';
+export type * from './factories/defineTextFormat';
 export type * from './factories/defineTimeFormat';
 export type * from './factories/definePatternFormat';
 export type * from './factories/defineSegmentedFormat';
