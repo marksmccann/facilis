@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/marksmccann/facilis/compare/v0.1.0...v0.2.0) (2026-08-04)
+
+### Features
+
+- add number format factory ([d6a07e1](https://github.com/marksmccann/facilis/commit/d6a07e10860a4c1e4555d5ee0482667964e465dd))
+- add number format hooks ([e8892d5](https://github.com/marksmccann/facilis/commit/e8892d53408a292f64e95009bd9e22f08d3ba6c2))
+- add pattern format factory ([4936007](https://github.com/marksmccann/facilis/commit/4936007458d7024fa14d8c996d9f787c6aa313d6))
+- add segmented format factories ([c1bde2a](https://github.com/marksmccann/facilis/commit/c1bde2aebcb38bfd947dda606671c08d0ec82faf))
+- add standalone format values ([25daf37](https://github.com/marksmccann/facilis/commit/25daf37d53401277ae9d85148740091638fa5575))
+- add text factory and VIN format ([b8cc20e](https://github.com/marksmccann/facilis/commit/b8cc20e30ceab339c6b793ca374fb5549ef2ce01))
+- add time format factory ([97b3dda](https://github.com/marksmccann/facilis/commit/97b3dda5af90c4f896c36b98d739dd77e268235c))
+- rename strict format option ([1be9e37](https://github.com/marksmccann/facilis/commit/1be9e3712508e74eed008f45730ad9c54484e084))
+
 # 0.1.0 (2026-07-14)
 
 ### Code Refactoring

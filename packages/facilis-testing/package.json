@@ -1,6 +1,6 @@
 {
     "name": "facilis-testing",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "description": "Testing helpers for Facilis formats and adapters.",
     "type": "module",
     "main": "./dist/index.cjs",
@@ -36,7 +36,7 @@
     },
     "devDependencies": {
         "@types/node": "^26.0.1",
-        "facilis": "^0.1.0",
+        "facilis": "^0.2.0",
         "vitest": "^4.1.9"
     }
 }
