@@ -15,7 +15,7 @@ const testFormat = defineFormat({
     blur(formatted) {
         return `${formatted}!`;
     },
-    delete(context) {
+    delete(_next, context) {
         if (context.deleted === ']') {
             return {
                 value: context.previous.slice(0, context.cursor - 3),

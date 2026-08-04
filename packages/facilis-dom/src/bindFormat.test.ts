@@ -84,7 +84,7 @@ describe('bindFormat', () => {
             normalize(raw) {
                 return raw.toUpperCase();
             },
-            append(context) {
+            append(_next, context) {
                 previousValueSeen = context.previous;
                 previousCursorSeen = context.cursor;
             },
