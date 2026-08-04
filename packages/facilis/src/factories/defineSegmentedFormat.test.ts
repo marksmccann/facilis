@@ -81,4 +81,14 @@ describe('defineSegmentedFormat', () => {
         });
         expect('resolved' in (contexts[0] as object)).toBe(false);
     });
+
+    it('accepts the built-in append result when a factory hook returns undefined', () => {
+        const format = defineSegmentedFormat({
+            matches: /\d/,
+            segments: [2, '/', 2],
+            append() {},
+        });
+
+        expect(append(format, '12', 'x')).toEqual(state('12/', 3));
+    });
 });

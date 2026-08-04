@@ -1,20 +1,21 @@
 import type {
     FormatAppendHookContext,
     FormatDeleteHookContext,
+    FormatEditHookResult,
     FormatInsertHookContext,
 } from './hooks';
 import type { TextState } from './input';
 
 /**
- * Describes the context passed to factory edit hooks after removing the
- * built-in resolved state from the core format hook context.
+ * Describes the context passed to factory edit hooks after adding factory
+ * configuration to the core format hook context.
  *
  * @private
  */
 export type FormatFactoryEditHookContext<
-    TContext extends { resolved: TextState },
+    TContext,
     TOptions,
-> = Omit<TContext, 'resolved'> & TOptions;
+> = TContext & TOptions;
 
 /**
  * Combines one factory's public options with the shared factory hook options.
@@ -68,7 +69,7 @@ export type FormatFactoryOptions<
             FormatAppendHookContext,
             THookOptions
         >
-    ) => TextState;
+    ) => FormatEditHookResult;
 
     /**
      * Customizes insert behavior after the built-in behavior has resolved the
@@ -80,7 +81,7 @@ export type FormatFactoryOptions<
             FormatInsertHookContext,
             THookOptions
         >
-    ) => TextState;
+    ) => FormatEditHookResult;
 
     /**
      * Customizes delete behavior after the built-in behavior has resolved the
@@ -92,5 +93,5 @@ export type FormatFactoryOptions<
             FormatDeleteHookContext,
             THookOptions
         >
-    ) => TextState;
+    ) => FormatEditHookResult;
 };

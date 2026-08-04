@@ -1,5 +1,4 @@
 import defineSegmentedFormat from './defineSegmentedFormat';
-import type { SegmentedFormatOptions } from './defineSegmentedFormat';
 import type { SegmentedFormatSegment } from './defineSegmentedFormat';
 import insertBeforeCharacter from '../helpers/insertBeforeCharacter';
 import rejectInvalidSegments from '../helpers/rejectInvalidSegments';

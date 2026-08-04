@@ -22,11 +22,13 @@ describe('runInsert', () => {
 
     it('runs the insert hook with the inserted middle text', () => {
         const contexts: unknown[] = [];
+        const nextStates: unknown[] = [];
         const result = runInsert({
             ...baseContext,
             definition: {
                 ...baseContext.definition,
-                insert(context) {
+                insert(next, context) {
+                    nextStates.push(next);
                     contexts.push(context);
                     return 'next';
                 },
@@ -34,6 +36,11 @@ describe('runInsert', () => {
         });
 
         expect(result).toBe('next');
+        expect(nextStates[0]).toEqual({
+            value: '1234',
+            selectionStart: 3,
+            selectionEnd: 3,
+        });
         expect(contexts[0]).toMatchObject({
             intent: 'insert',
             previous: '124',
@@ -63,7 +70,7 @@ describe('runInsert', () => {
                 },
                 definition: {
                     ...baseContext.definition,
-                    insert(context) {
+                    insert(_next, context) {
                         contexts.push(context);
                     },
                 },

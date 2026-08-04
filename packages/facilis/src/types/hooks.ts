@@ -39,11 +39,6 @@ type FormatEditHookContext = {
     formatted: string;
 
     /**
-     * The default value and selection state resolved for this edit.
-     */
-    resolved: TextState;
-
-    /**
      * Extracts the semantic value from any display value using the active format
      * definition.
      */

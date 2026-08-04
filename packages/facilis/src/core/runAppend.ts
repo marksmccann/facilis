@@ -18,12 +18,11 @@ export default function runAppend(
         const cursor = previous.value.length;
         const appended = current.value.slice(cursor);
 
-        result = append({
+        result = append(resolved, {
             intent: 'append',
             previous: previous.value,
             attempted: current.value,
             formatted,
-            resolved,
             normalize,
             cursor,
             start: cursor,

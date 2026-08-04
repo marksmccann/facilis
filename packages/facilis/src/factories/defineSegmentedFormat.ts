@@ -1,8 +1,5 @@
 import defineFormat from '../core/defineFormat';
-import {
-    resolveFormatFactoryEditHookContext,
-    resolveFormatFactoryEditResult,
-} from './resolveFormatFactoryEdit';
+import resolveEditNext from '../core/resolveEditNext';
 import type { FormatEditHookResult } from '../types/hooks';
 import type { FormatFactoryOptions } from '../types/factory';
 import type { Format } from '../types/format';
@@ -258,7 +255,7 @@ export default function defineSegmentedFormat(
 
             return formatted;
         },
-        append(context) {
+        append(next, context) {
             let result: FormatEditHookResult;
 
             if (isAppendFormatting(context, config)) {
@@ -305,17 +302,19 @@ export default function defineSegmentedFormat(
             }
 
             if (options.append) {
-                return options.append(
-                    resolveFormatFactoryEditResult(result, context),
-                    {
-                        ...resolveFormatFactoryEditHookContext(context, config),
-                    }
-                );
+                const resolved = resolveEditNext(result, next, context);
+
+                const hookResult = options.append(resolved, {
+                    ...context,
+                    ...config,
+                });
+
+                return hookResult === undefined ? resolved : hookResult;
             }
 
             return result;
         },
-        insert(context) {
+        insert(next, context) {
             let result: FormatEditHookResult;
             const segments = resolveSegmentedSegments(
                 context.normalized.previous,
@@ -353,17 +352,19 @@ export default function defineSegmentedFormat(
             }
 
             if (options.insert) {
-                return options.insert(
-                    resolveFormatFactoryEditResult(result, context),
-                    {
-                        ...resolveFormatFactoryEditHookContext(context, config),
-                    }
-                );
+                const resolved = resolveEditNext(result, next, context);
+
+                const hookResult = options.insert(resolved, {
+                    ...context,
+                    ...config,
+                });
+
+                return hookResult === undefined ? resolved : hookResult;
             }
 
             return result;
         },
-        delete(context) {
+        delete(next, context) {
             let result: FormatEditHookResult;
 
             if (
@@ -379,12 +380,14 @@ export default function defineSegmentedFormat(
             }
 
             if (options.delete) {
-                return options.delete(
-                    resolveFormatFactoryEditResult(result, context),
-                    {
-                        ...resolveFormatFactoryEditHookContext(context, config),
-                    }
-                );
+                const resolved = resolveEditNext(result, next, context);
+
+                const hookResult = options.delete(resolved, {
+                    ...context,
+                    ...config,
+                });
+
+                return hookResult === undefined ? resolved : hookResult;
             }
 
             return result;

@@ -138,4 +138,13 @@ describe('defineNumberFormat', () => {
 
         expect(deleteBackward(format, '12,345', 2)).toEqual(state('1,345', 1));
     });
+
+    it('accepts the built-in delete result when a factory hook returns undefined', () => {
+        const format = defineNumberFormat({
+            thousandsSeparator: ',',
+            delete() {},
+        });
+
+        expect(deleteBackward(format, '12,345', 2)).toEqual(state('1,345', 1));
+    });
 });

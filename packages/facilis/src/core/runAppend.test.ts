@@ -20,13 +20,15 @@ describe('runAppend', () => {
         expect(runAppend(baseContext)).toBeUndefined();
     });
 
-    it('runs the append hook with resolved edit context', () => {
+    it('runs the append hook with next state and edit context', () => {
         const contexts: unknown[] = [];
+        const nextStates: unknown[] = [];
         const result = runAppend({
             ...baseContext,
             definition: {
                 ...baseContext.definition,
-                append(context) {
+                append(next, context) {
+                    nextStates.push(next);
                     contexts.push(context);
                     return 'next';
                 },
@@ -34,12 +36,16 @@ describe('runAppend', () => {
         });
 
         expect(result).toBe('next');
+        expect(nextStates[0]).toEqual({
+            value: '123',
+            selectionStart: 3,
+            selectionEnd: 3,
+        });
         expect(contexts[0]).toMatchObject({
             intent: 'append',
             previous: '12',
             attempted: '123a',
             formatted: '123',
-            resolved: { value: '123', selectionStart: 3, selectionEnd: 3 },
             cursor: 2,
             start: 2,
             end: 2,
@@ -50,5 +56,6 @@ describe('runAppend', () => {
                 appended: '3',
             },
         });
+        expect('resolved' in (contexts[0] as object)).toBe(false);
     });
 });

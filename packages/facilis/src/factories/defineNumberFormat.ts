@@ -1,12 +1,8 @@
 import defineFormat from '../core/defineFormat';
-import { resolveFormatFactoryEditHookContext } from './resolveFormatFactoryEdit';
+import resolveEditNext from '../core/resolveEditNext';
 import isDeleteOverFormatting from '../helpers/isDeleteOverFormatting';
 import type { FormatFactoryOptions } from '../types/factory';
-import type {
-    FormatAppendHookContext,
-    FormatDeleteHookContext,
-    FormatInsertHookContext,
-} from '../types/hooks';
+import type { FormatDeleteHookContext } from '../types/hooks';
 import type { Format } from '../types/format';
 import type { Selection, TextState } from '../types/input';
 
@@ -615,40 +611,39 @@ export default function defineNumberFormat(
 
             return resolved;
         },
-        append(context) {
+        append(next, context) {
             if (options?.append) {
-                return options.append(context.resolved, {
-                    ...resolveFormatFactoryEditHookContext(
-                        context,
-                        resolvedConfig
-                    ),
+                return options.append(next, {
+                    ...context,
+                    ...resolvedConfig,
                 });
             }
         },
-        insert(context) {
+        insert(next, context) {
             if (options?.insert) {
-                return options.insert(context.resolved, {
-                    ...resolveFormatFactoryEditHookContext(
-                        context,
-                        resolvedConfig
-                    ),
+                return options.insert(next, {
+                    ...context,
+                    ...resolvedConfig,
                 });
             }
         },
-        delete(context) {
-            const next =
-                resolveDelete(context, resolvedConfig) ?? context.resolved;
+        delete(next, context) {
+            const resolved = resolveEditNext(
+                resolveDelete(context, resolvedConfig),
+                next,
+                context
+            );
 
             if (options?.delete) {
-                return options.delete(next, {
-                    ...resolveFormatFactoryEditHookContext(
-                        context,
-                        resolvedConfig
-                    ),
+                const result = options.delete(resolved, {
+                    ...context,
+                    ...resolvedConfig,
                 });
+
+                return result === undefined ? resolved : result;
             }
 
-            return next;
+            return resolved;
         },
     });
 }

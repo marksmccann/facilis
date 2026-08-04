@@ -22,11 +22,13 @@ describe('runDelete', () => {
 
     it('runs the delete hook with the deleted character', () => {
         const contexts: unknown[] = [];
+        const nextStates: unknown[] = [];
         const result = runDelete({
             ...baseContext,
             definition: {
                 ...baseContext.definition,
-                delete(context) {
+                delete(next, context) {
+                    nextStates.push(next);
                     contexts.push(context);
                     return null;
                 },
@@ -34,6 +36,11 @@ describe('runDelete', () => {
         });
 
         expect(result).toBeNull();
+        expect(nextStates[0]).toEqual({
+            value: '123',
+            selectionStart: 2,
+            selectionEnd: 2,
+        });
         expect(contexts[0]).toMatchObject({
             intent: 'delete',
             previous: '12-3',
@@ -63,7 +70,7 @@ describe('runDelete', () => {
                 },
                 definition: {
                     ...baseContext.definition,
-                    delete(context) {
+                    delete(_next, context) {
                         contexts.push(context);
                     },
                 },

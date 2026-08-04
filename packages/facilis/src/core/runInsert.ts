@@ -20,12 +20,11 @@ export default function runInsert(
         const insertedEnd = current.value.length - suffixLength;
         const inserted = current.value.slice(cursor, insertedEnd);
 
-        result = insert({
+        result = insert(resolved, {
             intent: 'insert',
             previous: previous.value,
             attempted: current.value,
             formatted,
-            resolved,
             normalize,
             cursor,
             start: cursor,

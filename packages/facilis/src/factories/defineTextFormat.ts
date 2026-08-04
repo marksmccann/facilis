@@ -1,5 +1,4 @@
 import defineFormat from '../core/defineFormat';
-import { resolveFormatFactoryEditHookContext } from './resolveFormatFactoryEdit';
 import type { FormatFactoryOptions } from '../types/factory';
 import type { Format } from '../types/format';
 
@@ -130,24 +129,27 @@ export default function defineTextFormat(
 
             return formatted;
         },
-        append(context) {
+        append(next, context) {
             if (append) {
-                return append(context.resolved, {
-                    ...resolveFormatFactoryEditHookContext(context, config),
+                return append(next, {
+                    ...context,
+                    ...config,
                 });
             }
         },
-        insert(context) {
+        insert(next, context) {
             if (insert) {
-                return insert(context.resolved, {
-                    ...resolveFormatFactoryEditHookContext(context, config),
+                return insert(next, {
+                    ...context,
+                    ...config,
                 });
             }
         },
-        delete(context) {
+        delete(next, context) {
             if (deleteHook) {
-                return deleteHook(context.resolved, {
-                    ...resolveFormatFactoryEditHookContext(context, config),
+                return deleteHook(next, {
+                    ...context,
+                    ...config,
                 });
             }
         },

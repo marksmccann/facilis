@@ -1,8 +1,5 @@
 import defineFormat from '../core/defineFormat';
-import {
-    resolveFormatFactoryEditHookContext,
-    resolveFormatFactoryEditResult,
-} from './resolveFormatFactoryEdit';
+import resolveEditNext from '../core/resolveEditNext';
 import isDeleteOverFormatting from '../helpers/isDeleteOverFormatting';
 import { reporter } from '../reporter';
 import type {
@@ -405,7 +402,7 @@ export default function definePatternFormat(
 
             return formatted;
         },
-        append(context) {
+        append(next, context) {
             let result: FormatEditHookResult;
 
             if (isAppendFormatting(context)) {
@@ -445,17 +442,19 @@ export default function definePatternFormat(
             }
 
             if (options.append) {
-                return options.append(
-                    resolveFormatFactoryEditResult(result, context),
-                    {
-                        ...resolveFormatFactoryEditHookContext(context, config),
-                    }
-                );
+                const resolved = resolveEditNext(result, next, context);
+
+                const hookResult = options.append(resolved, {
+                    ...context,
+                    ...config,
+                });
+
+                return hookResult === undefined ? resolved : hookResult;
             }
 
             return result;
         },
-        insert(context) {
+        insert(next, context) {
             let result: FormatEditHookResult;
 
             if (isInsertAtMaxLength(context, maxLength)) {
@@ -463,17 +462,19 @@ export default function definePatternFormat(
             }
 
             if (options.insert) {
-                return options.insert(
-                    resolveFormatFactoryEditResult(result, context),
-                    {
-                        ...resolveFormatFactoryEditHookContext(context, config),
-                    }
-                );
+                const resolved = resolveEditNext(result, next, context);
+
+                const hookResult = options.insert(resolved, {
+                    ...context,
+                    ...config,
+                });
+
+                return hookResult === undefined ? resolved : hookResult;
             }
 
             return result;
         },
-        delete(context) {
+        delete(next, context) {
             let result: FormatEditHookResult;
 
             if (isDeleteOverFormatting(context)) {
@@ -493,12 +494,14 @@ export default function definePatternFormat(
             }
 
             if (options.delete) {
-                return options.delete(
-                    resolveFormatFactoryEditResult(result, context),
-                    {
-                        ...resolveFormatFactoryEditHookContext(context, config),
-                    }
-                );
+                const resolved = resolveEditNext(result, next, context);
+
+                const hookResult = options.delete(resolved, {
+                    ...context,
+                    ...config,
+                });
+
+                return hookResult === undefined ? resolved : hookResult;
             }
 
             return result;

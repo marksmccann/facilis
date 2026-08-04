@@ -30,17 +30,26 @@ export type FormatDefinition = {
     /**
      * Handles text appended to the end of the value.
      */
-    append?: (context: FormatAppendHookContext) => FormatEditHookResult;
+    append?: (
+        next: TextState,
+        context: FormatAppendHookContext
+    ) => FormatEditHookResult;
 
     /**
      * Handles text inserted before the end of the value.
      */
-    insert?: (context: FormatInsertHookContext) => FormatEditHookResult;
+    insert?: (
+        next: TextState,
+        context: FormatInsertHookContext
+    ) => FormatEditHookResult;
 
     /**
      * Handles deletion.
      */
-    delete?: (context: FormatDeleteHookContext) => FormatEditHookResult;
+    delete?: (
+        next: TextState,
+        context: FormatDeleteHookContext
+    ) => FormatEditHookResult;
 };
 
 /**

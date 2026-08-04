@@ -24,7 +24,7 @@ describe('defineFormat', () => {
             normalize(raw) {
                 return raw.replace(/\D/g, '');
             },
-            delete(context) {
+            delete(_next, context) {
                 normalizedPrefix = context.normalize('$12');
                 return context.formatted;
             },

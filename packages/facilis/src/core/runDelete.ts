@@ -20,12 +20,11 @@ export default function runDelete(
         const end = cursor;
         const deleted = previous.value.slice(start, end);
 
-        result = deleteHook({
+        result = deleteHook(resolved, {
             intent: 'delete',
             previous: previous.value,
             attempted: current.value,
             formatted,
-            resolved,
             normalize,
             cursor,
             start,
